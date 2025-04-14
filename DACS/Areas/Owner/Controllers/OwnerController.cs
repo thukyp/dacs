@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Đồ_án_cs.Areas.Owner.Controllers
+namespace DACS.Areas.Owner.Controllers
 {
     [Area("Owner")]
     [Authorize(Roles = "Owner")]

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Đồ_án_cs.Models
+namespace DACS.Models
 {
     public class SanPham // Product / Byproduct
     {

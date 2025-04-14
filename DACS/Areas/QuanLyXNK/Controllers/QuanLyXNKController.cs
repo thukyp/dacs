@@ -1,8 +1,8 @@
-﻿using Đồ_án_cs.Models;
+﻿using DACS.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Đồ_án_cs.Areas.QuanLyXNK.Controllers
+namespace DACS.Areas.QuanLyXNK.Controllers
 {
     [Area("QuanLyXNK")]
     [Authorize(Roles = "QuanLyXNK, Owner")]

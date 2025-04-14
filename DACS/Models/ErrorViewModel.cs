@@ -1,4 +1,4 @@
-namespace Đồ_án_cs.Models
+namespace DACS.Models
 {
     public class ErrorViewModel
     {
