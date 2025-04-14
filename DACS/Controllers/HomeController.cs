@@ -17,6 +17,11 @@ namespace DACS.Controllers
             return View();
         }
 
+        public IActionResult ThuGom()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

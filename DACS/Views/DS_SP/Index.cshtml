@@ -1,0 +1,200 @@
+﻿@{
+    ViewData["Title"] = "Danh sách Phụ phẩm Nông nghiệp"; // Tiêu đề trang
+    // Layout = "_YourLayoutName"; // Đảm bảo dùng đúng Layout
+}
+
+<div class="container mt-4">
+    <div class="row">
+
+        <div class="col-lg-3 mb-4 mb-lg-0">
+            <h4><i class="fas fa-filter me-2"></i>Lọc sản phẩm theo</h4>
+            <hr>
+
+            <div class="mb-3">
+                <h5>Danh mục</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="cat1">
+                    <label class="form-check-label" for="cat1">
+                        Phụ phẩm đã xử lý
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="cat2" checked>
+                    <label class="form-check-label" for="cat2">
+                        Phụ phẩm thô
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="cat3">
+                    <label class="form-check-label" for="cat3">
+                        Phụ phẩm dạng viên nén
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="cat4">
+                    <label class="form-check-label" for="cat4">
+                        Làm thức ăn chăn nuôi
+                    </label>
+                </div>
+            </div>
+            <hr>
+
+            <div class="mb-3">
+                <h5>Giá</h5>
+                <label for="customRange1" class="form-label">Khoảng giá (kéo để chọn)</label>
+                <input type="range" class="form-range" id="customRange1">
+                <div class="d-flex justify-content-between mt-2">
+                    <input type="number" class="form-control form-control-sm w-45" placeholder="Thấp nhất: 1.000₫" value="1000">
+                    <span class="mx-1">-</span>
+                    <input type="number" class="form-control form-control-sm w-45" placeholder="Cao nhất: 500.000₫" value="500000">
+                </div>
+            </div>
+            <hr>
+
+            <div class="mb-3">
+                <h5>Đặc tính</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="feat1" checked>
+                    <label class="form-check-label" for="feat1">
+                        Hữu cơ (Organic)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="feat2">
+                    <label class="form-check-label" for="feat2">
+                        Độ ẩm thấp (&lt;15%)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="feat3">
+                    <label class="form-check-label" for="feat3">
+                        Đã nghiền
+                    </label>
+                </div>
+            </div>
+
+        </div><div class="col-lg-9">
+
+            <div class="d-flex justify-content-between align-items-center mb-3 bg-light p-2 rounded">
+                <div>
+                    <span class="text-muted">Chế độ xem: Lưới</span> @* Hiển thị dạng chữ đơn giản *@
+                </div>
+                <div class="d-flex">
+                    <div class="me-2">
+                        <label for="sortBy" class="visually-hidden">Sắp xếp</label>
+                        <select class="form-select form-select-sm" id="sortBy">
+                            <option selected>Sắp xếp: Tên A-Z</option>
+                            <option value="1">Sắp xếp: Giá thấp-cao</option>
+                            <option value="2">Sắp xếp: Giá cao-thấp</option>
+                            <option value="3">Sắp xếp: Mới nhất</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="showPerPage" class="visually-hidden">Hiển thị</label>
+                        <select class="form-select form-select-sm" id="showPerPage">
+                            <option selected>Hiển thị: 12 / trang</option>
+                            <option value="24">Hiển thị: 24 / trang</option>
+                            <option value="36">Hiển thị: 36 / trang</option>
+                        </select>
+                    </div>
+                </div>
+            </div><h1>@ViewData["Title"] (Demo)</h1>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                @* Hiển thị 3 sản phẩm/hàng trên màn hình vừa trở lên *@
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        @* Thêm shadow nhẹ cho card nổi bật hơn *@
+                        <img src="https://via.placeholder.com/250x180?text=Vo+Trau" class="card-img-top p-2" alt="Vỏ trấu" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Phụ phẩm thô</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Vỏ trấu xay (Bao 20kg)</h5> @* Tăng độ đậm cho tên SP *@
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 30.000₫</strong></p> @* Tăng kích thước, đổi màu giá *@
+                            <a href="#" class="btn btn-primary btn-sm w-100 mb-2">Thêm vào giỏ</a>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Rom+Kho" class="card-img-top p-2" alt="Rơm khô" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Phụ phẩm thô</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Rơm khô (Bó 5kg)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 15.000₫</strong></p>
+                            <a href="#" class="btn btn-primary btn-sm w-100 mb-2">Thêm vào giỏ</a>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Ba+Mia" class="card-img-top p-2" alt="Bã mía" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Đã xử lý</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Bã mía ép khối (Tấn)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 500.000₫</strong></p>
+                            <a href="#" class="btn btn-primary btn-sm w-100 mb-2">Thêm vào giỏ</a>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Loi+Ngo" class="card-img-top p-2" alt="Lõi ngô" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Phụ phẩm thô</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Lõi ngô nghiền (kg)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 2.500₫</strong></p>
+                            <a href="#" class="btn btn-primary btn-sm w-100 mb-2">Thêm vào giỏ</a>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Phan+Bon" class="card-img-top p-2" alt="Phân bón" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Đã xử lý</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Phân Compost (Bao 10kg)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 50.000₫</strong></p>
+                            <a href="#" class="btn btn-primary btn-sm w-100 mb-2">Thêm vào giỏ</a>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Vien+Nen" class="card-img-top p-2" alt="Viên nén" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Dạng viên nén</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Viên nén trấu (kg)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 3.000₫</strong></p>
+                            <a href="#" class="btn btn-primary btn-sm w-100 mb-2">Thêm vào giỏ</a>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div> <nav aria-label="Page navigation example" class="mt-5">
+                @* Tăng khoảng cách trên cho phân trang *@
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled"><a class="page-link" href="#">&laquo; Trang trước</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Trang sau &raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div> @* Bạn cần đảm bảo đã nhúng Font Awesome vào _Layout.cshtml nếu muốn dùng icon fas fa-... *@
+@* Ví dụ link Font Awesome (cần có trong <head> của _Layout.cshtml):
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+*@

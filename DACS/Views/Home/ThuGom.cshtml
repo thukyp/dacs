@@ -1,0 +1,188 @@
+﻿@{
+    ViewData["Title"] = "Tạo Yêu Cầu Thu Gom Phụ Phẩm";
+    // Layout = "_YourLayoutName"; // Đảm bảo dùng đúng Layout
+}
+
+<div class="container mt-4 mb-5">
+    <h1 class="mb-4">Tạo Yêu Cầu Thu Gom Phụ Phẩm</h1>
+    <form>
+        <div class="row g-4">
+
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <i class="fas fa-user me-2"></i>NGƯỜI CUNG CẤP (Nông dân/Trang trại)
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="supplierName" class="form-label">Họ và Tên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="supplierName" placeholder="Nhập tên người liên hệ" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="supplierPhone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="supplierPhone" placeholder="Nhập số điện thoại liên hệ" required>
+                        </div>
+
+                        <hr>
+                        <h5 class="mb-3">Địa chỉ lấy phụ phẩm <span class="text-danger">*</span></h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="supplierProvince" class="form-label">Tỉnh/Thành phố</label>
+                                <select class="form-select" id="supplierProvince" required>
+                                    <option selected disabled value="">Chọn Tỉnh/TP...</option>
+                                    <option>Đồng Tháp</option>
+                                    <option>An Giang</option>
+                                    <option>Cần Thơ</option>
+                                    <option>...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="supplierDistrict" class="form-label">Quận/Huyện</label>
+                                <select class="form-select" id="supplierDistrict" required>
+                                    <option selected disabled value="">Chọn Quận/Huyện...</option>
+                                    <option>...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="supplierWard" class="form-label">Xã/Phường</label>
+                                <select class="form-select" id="supplierWard" required>
+                                    <option selected disabled value="">Chọn Xã/Phường...</option>
+                                    <option>...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="supplierStreet" class="form-label">Số nhà, Đường/Ấp/Thôn</label>
+                                <input type="text" class="form-control" id="supplierStreet" placeholder="Nhập địa chỉ chi tiết">
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3">
+                            <label for="pickupReadyTime" class="form-label">Thời gian sẵn sàng thu gom <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="pickupReadyTime" required>
+                            <small class="form-text text-muted">Chọn ngày giờ bạn muốn chúng tôi đến lấy.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="supplierNotes" class="form-label">Ghi chú thêm</label>
+                            <textarea class="form-control" id="supplierNotes" rows="2" placeholder="Ví dụ: Đường vào khó khăn, cần xe nhỏ; Gọi trước khi đến 30 phút..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div><div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <i class="fas fa-box-open me-2"></i>THÔNG TIN PHỤ PHẨM CẦN THU GOM
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="byproductType" class="form-label">Loại phụ phẩm <span class="text-danger">*</span></label>
+                            <select class="form-select" id="byproductType" required>
+                                <option selected disabled value="">Chọn loại phụ phẩm...</option>
+                                <option value="rom">Rơm rạ</option>
+                                <option value="trau">Vỏ trấu</option>
+                                <option value="bamia">Bã mía</option>
+                                <option value="loingo">Lõi ngô / Cùi bắp</option>
+                                <option value="thanlua">Thân cây (lúa, ngô...)</option>
+                                <option value="vocaphe">Vỏ cà phê</option>
+                                <option value="xodua">Xơ dừa</option>
+                                <option value="khac">Loại khác (ghi rõ ở dưới)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="byproductDescription" class="form-label">Mô tả chi tiết</label>
+                            <textarea class="form-control" id="byproductDescription" rows="2" placeholder="Ví dụ: Rơm lúa ST25 vụ hè thu, đã phơi khô; Vỏ trấu xay; Bã mía tươi..."></textarea>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="byproductQuantity" class="form-label">Số lượng ước tính <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="byproductQuantity" placeholder="Nhập số lượng" required min="1">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="byproductUnit" class="form-label">Đơn vị tính <span class="text-danger">*</span></label>
+                                <select class="form-select" id="byproductUnit" required>
+                                    <option selected disabled value="">Chọn ĐVT...</option>
+                                    <option value="kg">Kg</option>
+                                    <option value="tan">Tấn</option>
+                                    <option value="bo">Bó</option>
+                                    <option value="bao">Bao</option>
+                                    <option value="m3">Mét khối (m³)</option>
+                                    <option value="xe">Xe (rùa, công nông...)</option>
+                                    <option value="khac">Đơn vị khác</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="byproductValue" class="form-label">Giá trị mong muốn (Nếu có)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="byproductValue" placeholder="Nhập giá trị" min="0">
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                            <small class="form-text text-muted">Giá trị bạn đề xuất cho số lượng phụ phẩm trên.</small>
+                        </div>
+
+                        <hr>
+                        <h5 class="mb-3">Đặc tính phụ phẩm (Chọn nếu có)</h5>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="" id="charBulky">
+                                    <label class="form-check-label" for="charBulky">Cồng kềnh</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="" id="charWet">
+                                    <label class="form-check-label" for="charWet">Ẩm / Ướt (Dễ hỏng)</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="" id="charDry">
+                                    <label class="form-check-label" for="charDry">Khô (Dễ cháy)</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="" id="charMoisture">
+                                    <label class="form-check-label" for="charMoisture">Độ ẩm cao (&gt;20%)</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="" id="charImpure">
+                                    <label class="form-check-label" for="charImpure">Nhiều tạp chất (Đất, đá...)</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="" id="charProcessed">
+                                    <label class="form-check-label" for="charProcessed">Đã qua xử lý (Sơ bộ)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label for="byproductImages" class="form-label">Hình ảnh (Nếu có)</label>
+                            <input class="form-control" type="file" id="byproductImages" multiple>
+                            <small class="form-text text-muted">Tải lên ảnh chụp thực tế để việc thu gom dễ dàng hơn.</small>
+                        </div>
+
+                    </div>
+                </div>
+            </div><div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                Tôi đã đọc và đồng ý với <a href="#" target="_blank">Điều khoản & Quy định</a> thu gom. <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-paper-plane me-2"></i>Yêu cầu Thu gom</button>
+                            <button type="button" class="btn btn-secondary"><i class="fas fa-save me-2"></i>Lưu nháp</button>
+                            <button type="reset" class="btn btn-outline-danger"><i class="fas fa-redo me-2"></i>Làm mới Form</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>@* Bạn cần nhúng Font Awesome vào _Layout.cshtml để hiển thị icon (ví dụ: fas fa-user) *@
