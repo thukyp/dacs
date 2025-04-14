@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Đồ_án_cs</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Đồ_án_cs.styles.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=DM+Sans&amp;display=swap'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <title>
+        Hahana
+    </title>
+</head>
+<body>
+
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="search" xmlns="http://www.w3.org/2000/symbolsvg" viewBox="0 0 24 24">
+            <path fill="currentColor" fill-rule="evenodd" d="M11.5 2.75a8.75 8.75 0 1 0 0 17.5a8.75 8.75 0 0 0 0-17.5M1.25 11.5c0-5.66 4.59-10.25 10.25-10.25S21.75 5.84 21.75 11.5c0 2.56-.939 4.902-2.491 6.698l3.271 3.272a.75.75 0 1 1-1.06 1.06l-3.272-3.271A10.21 10.21 0 0 1 11.5 21.75c-5.66 0-10.25-4.59-10.25-10.25" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="user" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" fill-rule="evenodd" d="M12 1.25a4.75 4.75 0 1 0 0 9.5a4.75 4.75 0 0 0 0-9.5M8.75 6a3.25 3.25 0 1 1 6.5 0a3.25 3.25 0 0 1-6.5 0M12 12.25c-2.313 0-4.445.526-6.024 1.414C4.42 14.54 3.25 15.866 3.25 17.5v.102c-.001 1.162-.002 2.62 1.277 3.662c.629.512 1.51.877 2.7 1.117c1.192.242 2.747.369 4.773.369s3.58-.127 4.774-.369c1.19-.24 2.07-.605 2.7-1.117c1.279-1.042 1.277-2.5 1.276-3.662V17.5c0-1.634-1.17-2.96-2.725-3.836c-1.58-.888-3.711-1.414-6.025-1.414M4.75 17.5c0-.851.622-1.775 1.961-2.528c1.316-.74 3.184-1.222 5.29-1.222c2.104 0 3.972.482 5.288 1.222c1.34.753 1.961 1.677 1.961 2.528c0 1.308-.04 2.044-.724 2.6c-.37.302-.99.597-2.05.811c-1.057.214-2.502.339-4.476.339c-1.974 0-3.42-.125-4.476-.339c-1.06-.214-1.68-.509-2.05-.81c-.684-.557-.724-1.293-.724-2.601" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" fill-rule="evenodd" d="M5.624 4.424C3.965 5.182 2.75 6.986 2.75 9.137c0 2.197.9 3.891 2.188 5.343c1.063 1.196 2.349 2.188 3.603 3.154c.298.23.594.459.885.688c.526.415.995.778 1.448 1.043c.452.264.816.385 1.126.385c.31 0 .674-.12 1.126-.385c.453-.265.922-.628 1.448-1.043c.29-.23.587-.458.885-.687c1.254-.968 2.54-1.959 3.603-3.155c1.289-1.452 2.188-3.146 2.188-5.343c0-2.15-1.215-3.955-2.874-4.713c-1.612-.737-3.778-.542-5.836 1.597a.75.75 0 0 1-1.08 0C9.402 3.882 7.236 3.687 5.624 4.424M12 4.46C9.688 2.39 7.099 2.1 5 3.059C2.786 4.074 1.25 6.426 1.25 9.138c0 2.665 1.11 4.699 2.567 6.339c1.166 1.313 2.593 2.412 3.854 3.382c.286.22.563.434.826.642c.513.404 1.063.834 1.62 1.16c.557.325 1.193.59 1.883.59s1.326-.265 1.883-.59c.558-.326 1.107-.756 1.62-1.16a78.6 78.6 0 0 1 .826-.642c1.26-.97 2.688-2.07 3.854-3.382c1.457-1.64 2.567-3.674 2.567-6.339c0-2.712-1.535-5.064-3.75-6.077c-2.099-.96-4.688-.67-7 1.399" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="cart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" fill-rule="evenodd" d="M2.249 2.292a.75.75 0 1 0-.498 1.416l.262.091c.667.235 1.106.39 1.429.549c.303.149.437.27.525.398c.09.132.16.314.2.677c.04.38.041.875.041 1.615V9.76c0 1.453.014 2.5.151 3.3c.146.854.438 1.466.985 2.042c.594.627 1.346.9 2.243 1.026c.858.122 1.948.122 3.293.122h5.406c.742 0 1.366 0 1.87-.062c.537-.065 1.025-.209 1.452-.556c.426-.348.665-.797.837-1.309c.163-.482.289-1.093.439-1.82l.508-2.469l.002-.005l.01-.052c.165-.825.303-1.519.338-2.077c.036-.586-.031-1.164-.413-1.66c-.235-.306-.565-.479-.866-.584a4.617 4.617 0 0 0-1.002-.21c-.687-.076-1.522-.076-2.34-.076H5.667a5.932 5.932 0 0 0-.01-.108c-.054-.497-.17-.95-.453-1.362c-.284-.416-.662-.682-1.102-.899c-.412-.202-.936-.386-1.553-.603zm3.46 4.578h11.38c.856 0 1.61.001 2.205.067c.296.034.517.08.672.134a.56.56 0 0 1 .176.086c.062.082.128.23.102.651c-.027.444-.143 1.036-.321 1.926v.002l-.5 2.42c-.16.783-.27 1.303-.399 1.688c-.123.366-.239.523-.364.625c-.125.102-.303.184-.685.23c-.404.05-.935.051-1.734.051h-5.303c-1.417 0-2.4-.002-3.14-.107c-.716-.101-1.093-.285-1.366-.573c-.32-.338-.493-.668-.595-1.263c-.11-.65-.129-1.558-.129-3.047zM7.5 21.75a2.25 2.25 0 1 1 0-4.5a2.25 2.25 0 0 1 0 4.5m-.75-2.25a.75.75 0 1 0 1.5 0a.75.75 0 0 0-1.5 0m9.75 2.25a2.25 2.25 0 1 1 0-4.5a2.25 2.25 0 0 1 0 4.5m-.75-2.25a.75.75 0 1 0 1.5 0a.75.75 0 0 0-1.5 0" clip-rule="evenodd" />
+        </symbol>
+
+    </svg>
+
+    @* nhấn vào search hiện lên khung chat và đề xuất *@
+    <div class="search-popup">
+        <div class="search-popup-container">
+
+            <form role="search" method="get" class="search-form" action="">
+                <input type="search" id="search-form" class="search-field" placeholder="Type and press enter" value="" name="s" />
+                <button type="submit" class="search-submit"><svg class="search"><use xlink:href="#search"></use></svg></button>
+            </form>
+
+            <h5 class="cat-list-title">Browse Categories</h5>
+
+            <ul class="cat-list">
+                <li class="cat-list-item">
+                    <a href="#" title="Mobile Phones">Mobile Phones</a>
+                </li>
+                <li class="cat-list-item">
+                    <a href="#" title="Smart Watches">Smart Watches</a>
+                </li>
+                <li class="cat-list-item">
+                    <a href="#" title="Headphones">Headphones</a>
+                </li>
+                <li class="cat-list-item">
+                    <a href="#" title="Accessories">Accessories</a>
+                </li>
+                <li class="cat-list-item">
+                    <a href="#" title="Monitors">Monitors</a>
+                </li>
+                <li class="cat-list-item">
+                    <a href="#" title="Speakers">Speakers</a>
+                </li>
+                <li class="cat-list-item">
+                    <a href="#" title="Memory Cards">Memory Cards</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <header id="header" class="site-header">
+        <div class="nav-top navbar-expand-sm navbar-light bg-light">
+            <div class="container-fluid">
+                <div class="row g-0">
+                    <div class="col-lg-5">
+                        <div class="Big4 ms-auto justify-content-start d-flex w-80">
+                            <div class="BigAss">
+                                <a href="https://www.youtube.com/watch?v=i6wU_CQUbIA">
+                                    <i class="fa-brands fa-tiktok">TikTok</i>
+                                </a>
+
+
+                                <a href="https://www.youtube.com/watch?v=i6wU_CQUbIA">
+                                    <i class="fa-brands fa-facebook">Facebook</i>
+                                </a>
+
+
+                                <a href="https://www.youtube.com/watch?v=i6wU_CQUbIA">
+                                    <i class="fa-brands fa-zalo"><img src="~/images/Zalo.png" width="25" height="25" /> Zalo</i>
+
+                                </a>
+
+
+                                <a href="https://www.youtube.com/watch?v=i6wU_CQUbIA">
+                                    <i class="fa-brands fa-youtube">Youtube</i>
+
+                                </a>
+                            </div>
+                        </div>
+					</div>
+                    <div class="col-lg-2"></div>
+					<div class="col-lg-5 col-md-6 col-sm-5 language-currency-header">
+                        <partial name="_LoginPartial" />
+                          </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="navbar-brand">
+            <a class="navbar-branch" href="#">
+                <img src="/images/hana.png" class="logo-lg d-none d-lg-block" width=200 height=170 />
+            </a>
+        </div>
+
+        <nav id="header-nav" class="navbar-mid navbar-expand-sm navbar-light bg-light">
+            <div class="container">
+
+
+                <div class="user-items d-flex">
+                    
+                        
+					<ul class="d-flex justify-content-end list-unstyled mb-0">
+						
+							
+						<li class="search-item pe-3">
+							
+                            <a href="#" class="search-button">
+                                <svg class="search">
+                                    <use xlink:href="#search"></use>
+                                </svg>
+                            </a>
+                        </li>
+
+                        
+                        <li class="wishlist-dropdown dropdown pe-3">
+                            <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                <svg class="wishlist">
+                                    <use xlink:href="#heart"></use>
+                                </svg>
+                            </a>
+                            <div class="dropdown-menu animate slide dropdown-menu-start dropdown-menu-lg-end p-3">
+                                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-primary">Your wishlist</span>
+                                    <span class="badge bg-primary rounded-pill">2</span>
+                                </h4>
+                                <ul class="list-group mb-3">
+                                    <li class="list-group-item bg-transparent d-flex justify-content-between lh-sm">
+                                        <div>
+                                            <h5>
+                                                <a href="single-product.html">Iphone 15 pro max</a>
+                                            </h5>
+                                            <small>Special discounted price.</small>
+                                            <a href="#" class="d-block fw-medium text-capitalize mt-2">Add to cart</a>
+                                        </div>
+                                        <span class="text-primary">$2000</span>
+                                    </li>
+                                    <li class="list-group-item bg-transparent d-flex justify-content-between lh-sm">
+                                        <div>
+                                            <h5>
+                                                <a href="single-product.html">Apple Watch (2nd Gen)</a>
+                                            </h5>
+                                            <small>Professional apple watch.</small>
+                                            <a href="#" class="d-block fw-medium text-capitalize mt-2">Add to cart</a>
+                                        </div>
+                                        <span class="text-primary">$400</span>
+                                    </li>
+                                    <li class="list-group-item bg-transparent d-flex justify-content-between">
+                                        <span class="text-uppercase"><b>Total (USD)</b></span>
+                                        <strong>$1470</strong>
+                                    </li>
+                                </ul>
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <a href="#" class="w-100 btn btn-dark mb-1" type="submit">Add all to cart</a>
+                                    <a href="cart.html" class="w-100 btn btn-primary" type="submit">View cart</a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="cart-dropdown dropdown">
+                            <a href="cart.html" class="dropdown-toggle d-inline-flex align-items-center" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                                <svg class="cart">
+                                    <use xlink:href="#cart"></use>
+                                </svg><span class="cartCount fs-6 fw-light">(02)</span>
+                            </a>
+                            <div class="dropdown-menu animate slide dropdown-menu-start dropdown-menu-lg-end p-3">
+                                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-primary">Your cart</span>
+                                    <span class="badge bg-primary rounded-pill">2</span>
+                                </h4>
+                                <ul class="list-group mb-3">
+                                    <li class="list-group-item bg-transparent d-flex justify-content-between lh-sm">
+                                        <div>
+                                            <h5>
+                                                <a href="single-product.html">IPad (9th Gen)</a>
+                                            </h5>
+                                            <small>High quality in good price.</small>
+                                        </div>
+                                        <span class="text-primary">$870</span>
+                                    </li>
+                                    <li class="list-group-item bg-transparent d-flex justify-content-between lh-sm">
+                                        <div>
+                                            <h5>
+                                                <a href="single-product.html">Drone with camera</a>
+                                            </h5>
+                                            <small>Professional drone with camera.</small>
+                                        </div>
+                                        <span class="text-primary">$600</span>
+                                    </li>
+                                    <li class="list-group-item bg-transparent d-flex justify-content-between">
+                                        <span class="text-uppercase"><b>Total (USD)</b></span>
+                                        <strong>$1470</strong>
+                                    </li>
+
+                                </ul>
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    <a href="cart.html" class="w-100 btn btn-dark mb-1" type="submit">View Cart</a>
+                                    <a href="checkout.html" class="w-100 btn btn-primary" type="submit">Go to checkout</a>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+
+        </nav>
+
+        <nav class="navbar-bot navbar-expand-sm navbar-light bg-light">
+            <div class="row">
+                <div class="col-lg-1 col-3 col-xs-3 ">
+                </div>
+                <div class="col-lg-11 col-9 col-xs-9 ">
+                    <ul class="navbar-nav d-flex w-200">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/home/index">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Giới thiệu mô hình</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Danh Mục Sản phẩm</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Đặt thu gom</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Tin tức & bài viết</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Liên Hệ</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+
+
+        </nav>
+
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="end-footer">
+        <div class="container">
+            <div class="row">
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li>
+                            <a href="#">about us</a>
+                        </li>
+                        <li>
+                            <a href="#">our service</a>
+                        </li>
+                        <li>
+                            <a href="#">privacy policy</a>
+                        </li>
+                        <li>
+                            <a href="#">affiliate program</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Get help</h4>
+                    <ul>
+                        <li>
+                            <a href="#">FAQ</a>
+                        </li>
+                        <li>
+                            <a href="#">shipping</a>
+                        </li>
+                        <li>
+                            <a href="#">return</a>
+                        </li>
+                        <li>
+                            <a href="#">order status</a>
+                        </li>
+                        <li>
+                            <a href="#">payment opinions</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Service</h4>
+                    <ul>
+                        <li>
+                            <a href="#">dfdfsdsv</a>
+                        </li>
+                        <li>
+                            <a href="#">dvsdsvdsv</a>
+                        </li>
+                        <li>
+                            <a href="#">dsvdvsdvs</a>
+                        </li>
+                        <li>
+                            <a href="#">dsvdvsvds</a>
+                        </li>
+                        <li>
+                            <a href="#">vdsdsvdvs</a>
+                        </li>
+                        <li>
+                            <a href="#">dvsdvs</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Follow us</h4>
+                    <div class="social-link">
+                        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#"><i class="fa-brands fa-zalo"><img src="~/Img/icons8-zalo-50.png" width="25" height="25" /></i></a>
+                        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
