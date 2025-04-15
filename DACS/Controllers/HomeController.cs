@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using DACS.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DACS.Controllers
@@ -16,21 +17,28 @@ namespace DACS.Controllers
         {
             return View();
         }
-
+        public IActionResult Introduction()
+        {
+            return View();
+        }
         public IActionResult ThuGom()
         {
             return View();
         }
-
-        public IActionResult Privacy()
+        public IActionResult Contact()
+        {
+            return View();
+        }
+        public IActionResult News()
         {
             return View();
         }
 
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new DACS.Models.ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

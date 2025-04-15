@@ -40,42 +40,7 @@
     </svg>
 
     @* nhấn vào search hiện lên khung chat và đề xuất *@
-    <div class="search-popup">
-        <div class="search-popup-container">
-
-            <form role="search" method="get" class="search-form" action="">
-                <input type="search" id="search-form" class="search-field" placeholder="Type and press enter" value="" name="s" />
-                <button type="submit" class="search-submit"><svg class="search"><use xlink:href="#search"></use></svg></button>
-            </form>
-
-            <h5 class="cat-list-title">Browse Categories</h5>
-
-            <ul class="cat-list">
-                <li class="cat-list-item">
-                    <a href="#" title="Mobile Phones">Mobile Phones</a>
-                </li>
-                <li class="cat-list-item">
-                    <a href="#" title="Smart Watches">Smart Watches</a>
-                </li>
-                <li class="cat-list-item">
-                    <a href="#" title="Headphones">Headphones</a>
-                </li>
-                <li class="cat-list-item">
-                    <a href="#" title="Accessories">Accessories</a>
-                </li>
-                <li class="cat-list-item">
-                    <a href="#" title="Monitors">Monitors</a>
-                </li>
-                <li class="cat-list-item">
-                    <a href="#" title="Speakers">Speakers</a>
-                </li>
-                <li class="cat-list-item">
-                    <a href="#" title="Memory Cards">Memory Cards</a>
-                </li>
-            </ul>
-
-        </div>
-    </div>
+    
     <header id="header" class="site-header">
         <div class="nav-top navbar-expand-sm navbar-light bg-light">
             <div class="container-fluid">
@@ -105,11 +70,11 @@
                                 </a>
                             </div>
                         </div>
-                    </div>
+					</div>
                     <div class="col-lg-2"></div>
-                    <div class="col-lg-5 col-md-6 col-sm-5 language-currency-header">
+					<div class="col-lg-5 col-md-6 col-sm-5 language-currency-header">
                         <partial name="_LoginPartial" />
-                    </div>
+                          </div>
 
                 </div>
             </div>
@@ -125,21 +90,41 @@
 
 
                 <div class="user-items d-flex">
-
-
-                    <ul class="d-flex justify-content-end list-unstyled mb-0">
-
-
-                        <li class="search-item pe-3">
-
-                            <a href="#" class="search-button">
-                                <svg class="search">
+                    
+                        
+					<ul class="d-flex justify-content-end list-unstyled mb-0">
+						
+							
+						<li class="search-item pe-3">
+							
+                            <!-- Nút mở popup -->
+                            <button class="search-button">
+                                <svg class="search" color="#009BDE">
                                     <use xlink:href="#search"></use>
                                 </svg>
-                            </a>
+                            </button>
+
+                            <!-- Popup tìm kiếm -->
+                            <div class="search-popup" id="searchPopup">
+                                <div class="search-popup-container">
+                                    <button class="close-btn" id="closeSearch">&times;</button>
+                                    <form action="/tim-kiem" method="get">
+                                        <input type="search" name="s" placeholder="Tìm sản phẩm bạn cần..." autofocus />
+                                    </form>
+
+                                    <ul class="cat-list">
+                                        <li><a href="#">Điện thoại</a></li>
+                                        <li><a href="#">Đồng hồ</a></li>
+                                        <li><a href="#">Tai nghe</a></li>
+                                        <li><a href="#">Phụ kiện</a></li>
+                                        <li><a href="#">Màn hình</a></li>
+                                        <li><a href="#">Loa</a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </li>
 
-
+                        
                         <li class="wishlist-dropdown dropdown pe-3">
                             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">
                                 <svg class="wishlist">
@@ -244,11 +229,10 @@
                             <a class="nav-link active" href="/home/index">Trang chủ</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Giới thiệu mô hình</a>
+                            <a class="nav-link" href="/home/Introduction">Giới thiệu mô hình</a>
                         </li>
                         <li class="nav-item dropdown-hover-container">
-                            <a class="nav-link" asp-controller="DS_SP" asp-action="Index">Danh sách sản phẩm</a>
-
+                            <a class="nav-link" asp-controller="DS_SP" asp-action="Index">Danh Mục Sản phẩm</a>
                             <div class="mega-menu-content">
                                 <section class="category-section bg-white py-4">
                                     @* Giữ lại padding cho section *@
@@ -347,16 +331,16 @@
 
                                     </div>
                                 </section>
-                            </div> @* HẾT div.mega-menu-content *@
+                            </div>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="ThuGom">Đặt thu gom</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Tin tức & bài viết</a>
+                            <a class="nav-link" href="/home/News">Tin tức & bài viết</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Liên Hệ</a>
+                            <a class="nav-link" href="/home/contact">Liên Hệ</a>
                         </li>
 
                     </ul>
@@ -449,11 +433,93 @@
             </div>
         </div>
     </footer>
+    <script>
+               document.addEventListener("DOMContentLoaded", function () {
+            // 1. Lấy đường dẫn URL hiện tại và chuẩn hóa nó
+            let currentPath = window.location.pathname.toLowerCase(); // Chuyển thành chữ thường
 
+            // Xóa dấu gạch chéo "/" ở cuối nếu có (trừ khi nó là trang gốc "/")
+            if (currentPath.length > 1 && currentPath.endsWith('/')) {
+                currentPath = currentPath.slice(0, -1);
+            }
+
+            // 2. Định nghĩa các đường dẫn có thể có cho trang chủ
+            // !!! Quan trọng: Chỉnh sửa mảng này cho phù hợp với href của link Trang chủ và các URL thực tế của bạn
+            const homePaths = ["/", "/home", "/home/index"]; // Ví dụ các đường dẫn trang chủ
+
+            // Kiểm tra xem trang hiện tại có phải là trang chủ không
+            const isCurrentPageHome = homePaths.includes(currentPath);
+
+            // 3. Lấy tất cả các link trong menu điều hướng
+            // !!! Quan trọng: Đảm bảo selector này khớp với cấu trúc HTML của bạn
+            const navLinks = document.querySelectorAll(".navbar-nav .nav-link"); // Sử dụng selector cụ thể hơn nếu cần
+
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute("href");
+
+                // Bỏ qua các link không hợp lệ hoặc chỉ là anchor "#"
+                if (!linkHref || linkHref === "#") {
+                    link.classList.remove("active"); // Đảm bảo link # không bao giờ active
+                    return; // Chuyển sang link tiếp theo
+                }
+
+                // 4. Chuẩn hóa href của link
+                let linkPath = linkHref.toLowerCase(); // Chuyển thành chữ thường
+                if (linkPath.length > 1 && linkPath.endsWith('/')) {
+                    linkPath = linkPath.slice(0, -1);
+                }
+
+                // 5. So sánh và quyết định có active hay không
+                let isActive = false;
+                if (isCurrentPageHome) {
+                    // Nếu trang hiện tại LÀ trang chủ => kiểm tra xem link này có trỏ về một trong các dạng của trang chủ không
+                    if (homePaths.includes(linkPath)) {
+                        isActive = true;
+                    }
+                } else {
+                    // Nếu trang hiện tại KHÔNG phải trang chủ => yêu cầu khớp chính xác đường dẫn
+                    if (currentPath === linkPath) {
+                        isActive = true;
+                    }
+                }
+
+                // 6. Thêm hoặc xóa class "active"
+                if (isActive) {
+                    link.classList.add("active");
+                } else {
+                    link.classList.remove("active");
+                }
+            });
+        });
+    </script>
+    <script>
+        const openBtn = document.querySelector('.search-button');
+        const popup = document.getElementById('searchPopup');
+        const closeBtn = document.getElementById('closeSearch');
+
+        openBtn.addEventListener('click', () => {
+          popup.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+          popup.classList.remove('active');
+        });
+
+        // Bấm ra ngoài là đóng
+        popup.addEventListener('click', (e) => {
+          if (e.target === popup) popup.classList.remove('active');
+        });
+
+        // Bấm ESC để đóng
+        document.addEventListener('keyup', (e) => {
+          if (e.key === 'Escape') popup.classList.remove('active');
+        });
+    </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
