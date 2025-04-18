@@ -15,5 +15,9 @@ namespace DACS.Controllers
         {
             return View();
         }
+
+        public IActionResult CT_SP() { 
+            return View();
+        }
     }
 }

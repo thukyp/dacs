@@ -1,4 +1,5 @@
 using DACS.Models;
+using DACS.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -33,6 +34,7 @@ builder.Services.ConfigureApplicationCookie(options => {
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddScoped<INguoiMuaRepository, NguoiMuaRepository>();
 
 
 var app = builder.Build();

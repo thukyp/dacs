@@ -7,11 +7,11 @@ namespace DACS.Models
     {
         [Required]
         [StringLength(10)]
-        public string M_NguoiMua { get; set; } // PFK
+        public string? M_NguoiMua { get; set; } // PFK
 
         [Required]
         [StringLength(10)]
-        public string M_SanPham { get; set; } // PFK
+        public string? M_SanPham { get; set; } // PFK
 
         // Nên là int 1-5
         [StringLength(10)]
@@ -24,10 +24,10 @@ namespace DACS.Models
 
         // Navigation Properties
         [ForeignKey("M_NguoiMua")]
-        public virtual NguoiMua NguoiMua { get; set; }
+        public virtual NguoiMua? NguoiMua { get; set; }
 
         [ForeignKey("M_SanPham")]
-        public virtual SanPham SanPham { get; set; }
+        public virtual SanPham? SanPham { get; set; }
 
     }
 }

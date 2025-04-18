@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DACS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250414131232_intally")]
-    partial class intally
+    [Migration("20250418035004_intaili")]
+    partial class intaili
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -426,7 +426,13 @@ namespace DACS.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("M_NguoiMua");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("NguoiMuas");
                 });
@@ -457,7 +463,13 @@ namespace DACS.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("M_NongDan");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("NongDans");
                 });
@@ -945,6 +957,28 @@ namespace DACS.Migrations
                     b.Navigation("GiamGia");
 
                     b.Navigation("LoaiSanPham");
+                });
+
+            modelBuilder.Entity("DACS.Models.NguoiMua", b =>
+                {
+                    b.HasOne("DACS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DACS.Models.NongDan", b =>
+                {
+                    b.HasOne("DACS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DACS.Models.QuanLyNhap", b =>

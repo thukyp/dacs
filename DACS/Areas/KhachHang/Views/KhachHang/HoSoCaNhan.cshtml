@@ -1,238 +1,88 @@
-﻿<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hồ Sơ Cá Nhân - Tài khoản của tôi</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="/css/UserAccountLayout.css" />
-    <style>
-        .container {
-            display: grid;
-            max-width: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            flex-direction: row;
-        }
-        /* Thêm style riêng cho trang profile nếu cần */
-        .profile-avatar-display {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #fff;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
+﻿@* File: Areas/KhachHang/Views/KhachHang/HoSoCaNhan.cshtml *@
+@model EditNguoiMuaProfile
+@using DACS.Models.ViewModels
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 
-        .definition-list dt {
-            font-weight: 500;
-            color: #6c757d;
-        }
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    // Layout = "~/Areas/KhachHang/Views/Shared/_UserAccountLayout.cshtml"; // Đặt Layout phù hợp
 
-        .definition-list dd {
-            color: #343a40;
-            margin-bottom: 0.8rem;
-        }
-        /* Style cho form edit (ẩn ban đầu) */
-        #profileEditForm .form-label {
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
+    var currentUser = await UserManager.GetUserAsync(User);
+    var userFullName = Model?.Ten_NguoiMua ?? currentUser?.FullName ?? User.Identity?.Name;
 
-        #avatarPreviewEdit {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
+    var defaultAvatar = "/images/default-avatar.png";
+    var avatarPath = string.IsNullOrEmpty(Model?.AvatarUrl) ? defaultAvatar : Url.Content("~" + Model.AvatarUrl);
+}
 
-        #avatarUploadInput {
-            display: none;
-        }
-        /* Ẩn input file gốc */
-        .avatar-upload-label {
-            cursor: pointer;
-            color: #0d6efd;
-        }
-
-            .avatar-upload-label:hover {
-                text-decoration: underline;
-            }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
-        <div class="container">
-
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user me-1"></i> Xin chào, Nguyễn Văn Nông!
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
-                        <li><a class="dropdown-item" href="#">Tài khoản của tôi</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-	<div class="container account-section">
-		
-        <div class="row">
-            <div class="col-lg-3">
-                <div class="account-menu list-group">
-                    
-                    <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="Index" class="list-group-item list-group-item-action "><i class="fas fa-tachometer-alt fa-fw me-2"></i> Tổng quan</a>
-                    <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="HoSoCaNhan" class="list-group-item list-group-item-action active"><i class="fas fa-user-circle fa-fw me-2"></i> Hồ sơ cá nhân</a>
-
-                    <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuDonHang" class="list-group-item list-group-item-action"><i class="fas fa-receipt fa-fw me-2"></i> Lịch sử Đơn hàng</a>
-                    <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuGiaoDich" class="list-group-item list-group-item-action"><i class="fas fa-credit-card fa-fw me-2"></i> Lịch sử Giao dịch</a>
-                    <a href="#" class="list-group-item list-group-item-action"><i class="fas fa-lock fa-fw me-2"></i> Đổi mật khẩu</a>
-                    <a href="#" class="list-group-item list-group-item-action"><i class="fas fa-map-marker-alt fa-fw me-2"></i> Sổ địa chỉ</a>
-                    <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post" class="list-group-item list-group-item-action text-danger mt-3"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Đăng xuất</a>
-                </div>
+<div class="container account-section">
+    <div class="row">
+        @* Cột Menu bên trái *@
+        <div class="col-lg-3">
+            <div class="account-menu list-group">
+                @* Cập nhật asp-controller="KhachHang" và asp-action tương ứng *@
+                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="Index" class="list-group-item list-group-item-action "><i class="fas fa-tachometer-alt fa-fw me-2"></i> Tổng quan</a>
+                @* Đặt class active cho link này *@
+                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="HoSoCaNhan" class="list-group-item list-group-item-action active"><i class="fas fa-user-circle fa-fw me-2"></i> Hồ sơ cá nhân</a>
+                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuDonHang" class="list-group-item list-group-item-action"><i class="fas fa-receipt fa-fw me-2"></i> Lịch sử Đơn hàng</a>
+                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuGiaoDich" class="list-group-item list-group-item-action"><i class="fas fa-credit-card fa-fw me-2"></i> Lịch sử Giao dịch</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="list-group-item list-group-item-action"><i class="fas fa-lock fa-fw me-2"></i> Đổi mật khẩu</a>
+                @* <a asp-area="KhachHang" asp-controller="Address" asp-action="Index" class="list-group-item list-group-item-action"><i class="fas fa-map-marker-alt fa-fw me-2"></i> Sổ địa chỉ</a> *@
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm_sidebar_hscn">
+                    <button type="submit" class="list-group-item list-group-item-action text-danger mt-3 border-0 bg-transparent"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Đăng xuất</button>
+                </form>
             </div>
+        </div>
 
-            <div class="col-lg-9">
-                <div class="account-content">
-                    
+        @* Cột Nội dung chính bên phải *@
+        <div class="col-lg-9">
+            <div class="account-content">
+                @* Hiển thị thông báo *@
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+                }
+
+                @if (Model != null)
+                {
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="mb-0">Thông Tin Cá Nhân</h4>
-                        <button id="editProfileBtn" class="btn btn-outline-primary btn-sm"><i class="fas fa-edit me-1"></i> Chỉnh sửa</button>
+                        @* Nút này điều hướng đến Action Edit trong KhachHangController *@
+                        <a asp-action="Edit" asp-controller="KhachHang" asp-area="KhachHang" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i> Chỉnh sửa hồ sơ
+                        </a>
                     </div>
 
-
+                    @* Phần hiển thị thông tin *@
                     <div id="profileDisplaySection">
                         <div class="text-center mb-4">
-                            <img id="profileAvatarDisplay" src="/images/default-avatar.png" alt="Ảnh đại diện" class="profile-avatar-display">
+                            <img id="profileAvatarDisplay" src="@avatarPath" alt="Ảnh đại diện" class="profile-avatar-display" onerror="this.src='@defaultAvatar'">
                         </div>
                         <dl class="row definition-list">
                             <dt class="col-sm-4">Họ và Tên</dt>
-                            <dd class="col-sm-8" id="displayFullName">Nguyễn Văn Nông</dd>
-
-                            <dt class="col-sm-4">Email</dt>
-                            <dd class="col-sm-8" id="displayEmail">nongdan@example.com</dd>
-
+                            <dd class="col-sm-8">@Model.Ten_NguoiMua</dd>
+                            <dt class="col-sm-4">Email đăng nhập</dt>
+                            <dd class="col-sm-8">@(User.Identity?.Name ?? "N/A")</dd>
+                            <dt class="col-sm-4">Email liên hệ</dt>
+                            <dd class="col-sm-8">@Model.Email_NguoiMua</dd>
                             <dt class="col-sm-4">Số điện thoại</dt>
-                            <dd class="col-sm-8" id="displayPhoneNumber">0909123456</dd>
-
+                            <dd class="col-sm-8">@Model.SDT_NguoiMua</dd>
                             <dt class="col-sm-4">Địa chỉ</dt>
-                            <dd class="col-sm-8" id="displayAddress">123 Đường Ruộng Lúa, Xã Cây Trái, Huyện Nông Sản, Tỉnh Đồng Bằng</dd>
-
+                            <dd class="col-sm-8">@Model.DiaChi_NguoiMua</dd>
                             <dt class="col-sm-4">Giới tính</dt>
-                            <dd class="col-sm-8" id="displayGender">Nam</dd>
+                            <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Gender) ? "Chưa cập nhật" : Model.Gender)</dd>
                         </dl>
                     </div>
-
-                    <div id="profileEditSection" style="display: none;">
-                        <form id="editProfileForm" action="#" method="post" enctype="multipart/form-data">
-                            <div class="text-center mb-4">
-                                <img id="avatarPreviewEdit" src="/images/default-avatar.png" alt="Xem trước"> <br>
-                                <label for="avatarUploadInput" class="avatar-upload-label mt-2 d-inline-block">
-                                    <i class="fas fa-camera"></i> Thay đổi ảnh
-                                </label>
-                                <input type="file" name="profileImageFile" id="avatarUploadInput" accept="image/*" onchange="previewEditImage(event)" />
-                                <small class="form-text text-muted d-block">Ảnh PNG, JPG, GIF.</small>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="inputFullName" class="form-label">Họ và Tên</label>
-                                <input type="text" class="form-control" id="inputFullName" name="FullName" value="Nguyễn Văn Nông">
-                            </div>
-                            <div class="mb-3">
-                                <label for="inputPhoneNumber" class="form-label">Số điện thoại</label>
-                                <input type="tel" class="form-control" id="inputPhoneNumber" name="PhoneNumber" value="0909123456">
-                            </div>
-                            <div class="mb-3">
-                                <label for="inputAddress" class="form-label">Địa chỉ</label>
-                                <textarea class="form-control" id="inputAddress" name="Address" rows="3">123 Đường Ruộng Lúa, Xã Cây Trái, Huyện Nông Sản, Tỉnh Đồng Bằng</textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="selectGender" class="form-label">Giới tính</label>
-                                <select class="form-select" id="selectGender" name="Gender">
-                                    <option value="">-- Chọn --</option>
-                                    <option value="Nam">Nam</option>
-                                    <option value="Nữ">Nữ</option>
-                                    <option value="Khác">Khác</option>
-                                </select>
-                            </div>
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                                <button type="button" id="cancelEditBtn" class="btn btn-secondary">Hủy bỏ</button>
-                            </div>
-                        </form>
-                    </div>
-
-                </div>
+                }
+                else if (TempData["ErrorMessage"] == null)
+                {
+                    <div class="alert alert-warning">Không thể tải thông tin hồ sơ.</div>
+                }
             </div>
         </div>
     </div>
-
-    <footer class="bg-white mt-5 py-4 border-top">
-        <div class="container text-center text-muted">
-            <small>&copy; 2025 Trang Nông Sản. All Rights Reserved.</small>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // JS xử lý ẩn hiện và preview ảnh (tương tự ví dụ minimalist)
-        const displaySection = document.getElementById('profileDisplaySection');
-        const editSection = document.getElementById('profileEditSection');
-        const editButton = document.getElementById('editProfileBtn');
-        const cancelButton = document.getElementById('cancelEditBtn');
-        const editForm = document.getElementById('editProfileForm');
-        const avatarPreview = document.getElementById('avatarPreviewEdit');
-        const avatarDisplay = document.getElementById('profileAvatarDisplay');
-
-        function previewEditImage(event) { /* ... (như code trước) ... */ }
-
-        function showEditMode() {
-            // Lấy dữ liệu từ display -> form
-            document.getElementById('inputFullName').value = document.getElementById('displayFullName').textContent;
-            document.getElementById('inputPhoneNumber').value = document.getElementById('displayPhoneNumber').textContent;
-            document.getElementById('inputAddress').value = document.getElementById('displayAddress').textContent;
-            document.getElementById('selectGender').value = document.getElementById('displayGender').textContent || ''; // Lấy giá trị text
-            avatarPreview.src = avatarDisplay.src; // Đặt ảnh preview form = ảnh display
-            document.getElementById('avatarUploadInput').value = ""; // Reset input file
-
-            displaySection.style.display = 'none';
-            editSection.style.display = 'block';
-            editButton.style.display = 'none';
-        }
-
-        function showDisplayMode() {
-            displaySection.style.display = 'block';
-            editSection.style.display = 'none';
-            editButton.style.display = 'inline-block';
-        }
-
-        editButton.addEventListener('click', showEditMode);
-        cancelButton.addEventListener('click', showDisplayMode);
-
-        editForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Ngăn submit tĩnh
-            console.log('Form saved (simulation)');
-            // --- Logic lưu ---
-            // Cập nhật lại phần display từ form
-            document.getElementById('displayFullName').textContent = document.getElementById('inputFullName').value;
-            document.getElementById('displayPhoneNumber').textContent = document.getElementById('inputPhoneNumber').value;
-            document.getElementById('displayAddress').textContent = document.getElementById('inputAddress').value;
-            document.getElementById('displayGender').textContent = document.getElementById('selectGender').value;
-             if (document.getElementById('avatarUploadInput').files.length > 0) {
-                 avatarDisplay.src = avatarPreview.src;
-             }
-            showDisplayMode();
-            alert('Cập nhật thành công! (Mô phỏng)');
-        });
-
-        showDisplayMode(); // Mặc định hiển thị thông tin
-    </script>
-</body>
-</html>
+</div>

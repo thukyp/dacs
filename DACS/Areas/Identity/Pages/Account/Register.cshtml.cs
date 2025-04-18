@@ -21,12 +21,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DACS.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DACS.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ApplicationDbContext _context;
+
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly RoleManager<IdentityRole>_roleManager;
@@ -34,13 +37,15 @@ namespace DACS.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
+
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -49,6 +54,7 @@ namespace DACS.Areas.Identity.Pages.Account
                 _roleManager = roleManager; 
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -156,16 +162,42 @@ namespace DACS.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    if(!string.IsNullOrEmpty(Input.Role))
+                    var roleToAssign = string.IsNullOrEmpty(Input.Role) ? SD.Role_KhachHang : Input.Role;
+                    await _userManager.AddToRoleAsync(user, roleToAssign);
+
+                    try
                     {
-                        await _userManager.AddToRoleAsync(user, Input.Role);
+                        if (roleToAssign == SD.Role_KhachHang)
+                        {
+                            var nguoiMuaProfile = new NguoiMua
+                            {
+                                M_NguoiMua = Guid.NewGuid().ToString("N").Substring(0, 10), // <<< DÒNG BẠN ĐÃ THÊM
+                                UserId = user.Id // << Liên kết User ID
+                            };
+                            // DÙNG DbContext TRỰC TIẾP
+                            _context.NguoiMuas.Add(nguoiMuaProfile);
+                            await _context.SaveChangesAsync(); // Lưu trực tiếp qua DbContext
+                            _logger.LogInformation($"NguoiMua profile created for User ID: {user.Id}");
+                        }
+                        //else if (roleToAssign == SD.Role_PhuTa || roleToAssign == SD.Role_BacSi)
+                        //{
+
+                        //    var newNhanVien = new NhanVien
+                        //    {
+                        //        UserId = user.Id
+                        //    };
+                        //    _context.NhanViens.Add(newNhanVien);
+                        //    await _context.SaveChangesAsync(); // Lưu NhanVien
+                        //    _logger.LogInformation($"NhanVien record created for User ID: {user.Id}");
+                        //}
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        await _userManager.AddToRoleAsync(user, SD.Role_KhachHang);
+                        _logger.LogError(ex, $"Error creating profile record (BenhNhan/NhanVien) for User ID: {user.Id}");
+
                     }
 
-                        var userId = await _userManager.GetUserIdAsync(user);
+                    var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(

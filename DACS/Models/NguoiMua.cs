@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DACS.Models
 {
@@ -25,9 +26,20 @@ namespace DACS.Models
         [StringLength(255)]
         public string DiaChi_NguoiMua { get; set; }
 
+        [StringLength(10)] 
+        public string? Gender { get; set; } 
+
+        [StringLength(255)] 
+        public string? AvatarUrl { get; set; }
+
         // Navigation Properties
         public virtual ICollection<ChiTietDatHang> ChiTietDatHangs { get; set; } = new List<ChiTietDatHang>();
         public virtual ICollection<ChiTietDanhGia> ChiTietDanhGias { get; set; } = new List<ChiTietDanhGia>();
+        [Required]
+        public string? UserId { get; set; } // <<< SỬA LẠI: Bỏ dấu ?
+
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser? User { get; set; }
 
     }
 }

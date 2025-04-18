@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\NongDan\Data\" />
+    <Folder Include="Areas\NongDan\Models\" />
     <Folder Include="Areas\KhachHang\Data\" />
     <Folder Include="Areas\KhachHang\Models\" />
     <Folder Include="Areas\Owner\Data\" />

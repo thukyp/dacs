@@ -5,13 +5,15 @@ namespace DACS.Models
 {
     public class ChiTietDatHang // Order Detail
     {
+        [Key]
+        public string M_CTDatHang { get; set; }
         [Required]
         [StringLength(10)]
-        public string M_SanPham { get; set; } // PFK
+        public string? M_SanPham { get; set; } // PFK
 
         [Required]
         [StringLength(10)]
-        public string M_DonHang { get; set; } // PFK
+        public string? M_DonHang { get; set; } // PFK
 
         [Required]
         // Nên dùng Decimal
@@ -27,17 +29,19 @@ namespace DACS.Models
         [Required]
         [StringLength(10)]
         // CẢNH BÁO: Cột này có vẻ thừa, nên bỏ đi.
-        public string M_NguoiMua { get; set; } // FK?
+        public string? M_NguoiMua { get; set; } // FK?
 
         // Navigation Properties
         [ForeignKey("M_SanPham")]
-        public virtual SanPham SanPham { get; set; }
+        public virtual SanPham? SanPham { get; set; }
 
         [ForeignKey("M_DonHang")]
-        public virtual DonHang DonHang { get; set; }
+        public virtual DonHang? DonHang { get; set; }
 
         [ForeignKey("M_NguoiMua")]
-        public virtual NguoiMua NguoiMua { get; set; } // Liên kết này có cần thiết?
+        public virtual NguoiMua? NguoiMua { get; set; } // Liên kết này có cần thiết?
+        public DateTime NgayTao { get; set; }
 
+        public string TrangThaiDonHang { get; set; }
     }
 }
