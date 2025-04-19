@@ -6,8 +6,7 @@
     <title>Admin - Quản Lý Sản Phẩm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="/css/AdminLayout.css" />
-    <link rel="stylesheet" href="/css/AdminProductManagement.css" />
+    
     <style>
         /* Copy CSS từ code #49 vào đây hoặc file CSS riêng */
         body, html {
@@ -132,23 +131,27 @@
         <div class="main-content-area">
             <div class="page-header">Quản Lý Sản Phẩm (Phụ Phẩm)</div>
 
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
+            <div class="row" id="stat-cards">
+                <div class="col-md-4">
                     <div class="stat-card">
-                        <div class="value">100</div> <div class="label">Tổng sản phẩm</div>
+                        <div class="value" id="total-products">0</div>
+                        <div class="label">Tổng sản phẩm</div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-md-4">
                     <div class="stat-card">
-                        <div class="value text-success">80</div> <div class="label">Sản phẩm còn hàng</div>
+                        <div class="value text-success" id="in-stock-products">0</div>
+                        <div class="label">Sản phẩm còn hàng</div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-md-4">
                     <div class="stat-card">
-                        <div class="value text-danger">20</div> <div class="label">Sản phẩm hết hàng</div>
+                        <div class="value text-danger" id="out-stock-products">0</div>
+                        <div class="label">Sản phẩm hết hàng</div>
                     </div>
                 </div>
             </div>
+
 
             <div class="filter-card">
                 <div class="row g-3 align-items-center">
@@ -165,15 +168,46 @@
                     <div class="col-md-2">
                         <select id="category-filter-select" class="form-select form-select-sm">
                             <option value="" selected>Lọc theo loại</option>
-                            <option value="rom">Rơm Rạ</option>
-                            <option value="trau">Vỏ Trấu</option>
-                            <option value="dua">Xơ Dừa</option>
-                            <option value="ngo">Thân Ngô</option>
-                            <option value="khac">Khác</option>
+                            <optgroup label="Phụ phẩm từ cây lúa">
+                                <option value="rom">Rơm rạ</option>
+                                <option value="trau">Trấu</option>
+                                <option value="camgao">Cám gạo</option>
+                            </optgroup>
+
+                            <optgroup label="Phụ phẩm từ ngô">
+                                <option value="thanngo">Thân ngô</option>
+                                <option value="la-ngo">Lá ngô</option>
+                                <option value="raungo">Râu ngô</option>
+                            </optgroup>
+
+                            <optgroup label="Phụ phẩm từ cây đậu, lạc">
+                                <option value="vodau">Vỏ đậu</option>
+                                <option value="thanla">Thân/lá đậu</option>
+                                <option value="vohaclac">Vỏ hạt lạc</option>
+                            </optgroup>
+
+                            <optgroup label="Phụ phẩm từ dừa">
+                                <option value="xodua">Xơ dừa</option>
+                                <option value="vodua">Vỏ dừa</option>
+                                <option value="mundua">Mùn dừa</option>
+                            </optgroup>
+
+                            <optgroup label="Phụ phẩm từ chuối">
+                                <option value="thanchuoi">Thân cây chuối</option>
+                                <option value="lachuoi">Lá chuối</option>
+                                <option value="bapchuoi">Bắp chuối</option>
+                            </optgroup>
+
+                            <optgroup label="Khác">
+                                <option value="bamia">Bã mía</option>
+                                <option value="baca-phe">Bã cà phê</option>
+                                <option value="bananh">Bã nành</option>
+                                <option value="mungocu">Mùn cưa</option>
+                            </optgroup>
                         </select>
                     </div>
                     <div class="col-md-2 text-end">
-                        <button class="btn btn-sm btn-success w-100"><i class="fas fa-plus me-1"></i> Thêm SP</button>
+                        <button id="openAddProductModal" class="btn btn-sm btn-success w-100"><i class="fas fa-plus me-1"></i> Thêm SP</button>
                     </div>
                 </div>
             </div>
@@ -189,7 +223,7 @@
                                 <th class="text-center">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="product-table-body">
                             <tr>
                                 <td>Rơm Rạ</td>
                                 <td>500 đ/kg</td>
@@ -241,10 +275,143 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm sản phẩm mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-product-form">
+                        <div class="mb-3">
+                            <label class="form-label">Tên sản phẩm</label>
+                            <input type="text" class="form-control" id="product-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Giá (đ/kg)</label>
+                            <input type="number" class="form-control" id="product-price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Khối lượng (kg)</label>
+                            <input type="number" class="form-control" id="product-quantity" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">Thêm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+	</div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl) })
+    
+           <script src="~/js/search.js"></script>
+    <script src="~/js/price.js">
+       
     </script>
+    @* loai sp *@
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const categoryFilter = document.getElementById("category-filter-select");
+            const table = document.querySelector("table");
+            const rows = Array.from(table.querySelectorAll("tbody tr"));
+
+            // Hàm chuẩn hoá text tiếng Việt (bỏ dấu)
+            function normalizeText(text) {
+                return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            }
+
+            function filterByCategory() {
+                const selectedValue = normalizeText(categoryFilter.value);
+
+                rows.forEach(row => {
+                    const productName = row.cells[0].textContent.trim().toLowerCase();
+                    const normalizedName = normalizeText(productName);
+
+                    if (!selectedValue || normalizedName.includes(selectedValue)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+
+            categoryFilter.addEventListener("change", filterByCategory);
+        });
+    </script>
+    @* THEM SP *@
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const openAddProductModal = document.getElementById('openAddProductModal');
+            const addProductModal = new bootstrap.Modal(document.getElementById('addProductModal'));
+            const addProductForm = document.getElementById('add-product-form');
+            const tableBody = document.querySelector('table tbody');
+
+            openAddProductModal.addEventListener('click', () => {
+                addProductModal.show();
+            });
+
+            addProductForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const name = document.getElementById('product-name').value.trim();
+                const price = document.getElementById('product-price').value.trim();
+                const quantity = document.getElementById('product-quantity').value.trim();
+
+                if (name && price && quantity) {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>${name}</td>
+                        <td>${parseInt(price).toLocaleString('vi-VN')} đ/kg</td>
+                        <td>${quantity} kg</td>
+                        <td class="actions text-center">
+                            <button class="btn btn-sm btn-outline-primary" title="Chỉnh Sửa"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" title="Xóa"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(newRow);
+                    addProductModal.hide();
+                    addProductForm.reset();
+                }
+            });
+        });
+    </script>
+    @* dem so san pham *@
+    <script>
+                                document.addEventListener("DOMContentLoaded", function() {
+          function updateProductStats() {
+            const tableBody = document.getElementById('product-table-body');
+            const rows = tableBody.querySelectorAll('tr');
+
+            let total = 0;
+            let inStock = 0;
+            let outStock = 0;
+
+            rows.forEach(row => {
+              const khoiLuongCell = row.cells[2].textContent.trim(); // Lấy cột Khối lượng
+              const match = khoiLuongCell.match(/(\d+)/); // Tách số kg
+
+              if (match) {
+                const khoiLuong = parseInt(match[1]);
+                total++;
+
+                if (khoiLuong > 0) {
+                  inStock++;
+                } else {
+                  outStock++;
+                }
+              }
+            });
+
+            // Cập nhật số liệu vào Stat Cards
+            document.getElementById('total-products').textContent = total;
+            document.getElementById('in-stock-products').textContent = inStock;
+            document.getElementById('out-stock-products').textContent = outStock;
+          }
+
+          // Gọi hàm khi trang tải xong
+          updateProductStats();
+        });
+                </script>
 </body>
 </html>

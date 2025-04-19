@@ -16,7 +16,7 @@ namespace DACS.Models
         [Required]
         [StringLength(10)]
         // CẢNH BÁO: Có thể thừa? PK nên là (M_YeuCau, M_SanPham)?
-        public string M_NongDan { get; set; } // PFK
+        public string M_KhachHang { get; set; } // PFK
 
         [Required]
         public int SoLuong { get; set; } // Số lượng thu gom
@@ -44,8 +44,8 @@ namespace DACS.Models
         [ForeignKey("M_DonViTinh")]
         public virtual DonViTinh DonViTinh { get; set; }
 
-        [ForeignKey("M_NongDan")]
-        public virtual NongDan NongDan { get; set; }
+        [ForeignKey("M_KhachHang")]
+        public virtual KhachHang KhachHang { get; set; }
 
         [ForeignKey("M_QuanLy")]
         public virtual QuanLy QuanLy { get; set; }

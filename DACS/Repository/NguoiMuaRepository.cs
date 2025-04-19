@@ -16,41 +16,41 @@ namespace DACS.Repositories
             _context = context;
         }
 
-        public async Task AddAsync(NguoiMua nguoiMua)
+        public async Task AddAsync(KhachHang nguoiMua)
         {
-            await _context.NguoiMuas.AddAsync(nguoiMua);
+            await _context.KhachHangs.AddAsync(nguoiMua);
             // Chưa gọi SaveChangesAsync() ở đây
         }
 
-        public void Delete(NguoiMua nguoiMua)
+        public void Delete(KhachHang nguoiMua)
         {
-            _context.NguoiMuas.Remove(nguoiMua);
+            _context.KhachHangs.Remove(nguoiMua);
             // Chưa gọi SaveChangesAsync() ở đây
         }
 
-        public async Task<IEnumerable<NguoiMua>> GetAllAsync()
+        public async Task<IEnumerable<KhachHang>> GetAllAsync()
         {
             // Có thể thêm .Include() nếu muốn lấy kèm dữ liệu liên quan
-            return await _context.NguoiMuas.ToListAsync();
+            return await _context.KhachHangs.ToListAsync();
         }
 
-        public async Task<NguoiMua?> GetByMaAsync(string maNguoiMua)
+        public async Task<KhachHang?> GetByMaAsync(string maNguoiMua)
         {
-            return await _context.NguoiMuas
+            return await _context.KhachHangs
                                  // .Include(nm => nm.User) // Ví dụ Include User nếu cần
-                                 .FirstOrDefaultAsync(nm => nm.M_NguoiMua == maNguoiMua);
+                                 .FirstOrDefaultAsync(nm => nm.M_KhachHang == maNguoiMua);
         }
 
-        public async Task<NguoiMua?> GetByUserIdAsync(string userId)
+        public async Task<KhachHang?> GetByUserIdAsync(string userId)
         {
-            return await _context.NguoiMuas
+            return await _context.KhachHangs
                                  // .Include(nm => nm.User) // Ví dụ Include User nếu cần
                                  .FirstOrDefaultAsync(nm => nm.UserId == userId);
         }
 
-        public void Update(NguoiMua nguoiMua)
+        public void Update(KhachHang nguoiMua)
         {
-            _context.NguoiMuas.Update(nguoiMua);
+            _context.KhachHangs.Update(nguoiMua);
             // Chưa gọi SaveChangesAsync() ở đây
         }
 

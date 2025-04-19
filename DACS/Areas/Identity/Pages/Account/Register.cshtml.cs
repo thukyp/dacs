@@ -169,13 +169,13 @@ namespace DACS.Areas.Identity.Pages.Account
                     {
                         if (roleToAssign == SD.Role_KhachHang)
                         {
-                            var nguoiMuaProfile = new NguoiMua
+                            var nguoiMuaProfile = new Models.KhachHang
                             {
-                                M_NguoiMua = Guid.NewGuid().ToString("N").Substring(0, 10), // <<< DÒNG BẠN ĐÃ THÊM
+                                M_KhachHang = Guid.NewGuid().ToString("N").Substring(0, 10), // <<< DÒNG BẠN ĐÃ THÊM
                                 UserId = user.Id // << Liên kết User ID
                             };
                             // DÙNG DbContext TRỰC TIẾP
-                            _context.NguoiMuas.Add(nguoiMuaProfile);
+                            _context.KhachHangs.Add(nguoiMuaProfile);
                             await _context.SaveChangesAsync(); // Lưu trực tiếp qua DbContext
                             _logger.LogInformation($"NguoiMua profile created for User ID: {user.Id}");
                         }

@@ -1,22 +1,44 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace DACS.Models
 {
     public class QuanLy
     {
-        [Key]
+        [Key] // Giả sử đây là PK
+        [Required]
         [StringLength(10)]
-        public string M_QuanLy { get; set; }
+        public string M_QuanLy { get; set; } // Varchar(10) PK & FK to QuanLy
 
-        // Nên dùng bool (bit trong SQL)
-        [StringLength(3)]
-        public string? XacNhan { get; set; }
+        [Column(TypeName = "nvarchar(MAX)")] // Thay Ntext
+        public string? YeuCau { get; set; }
 
-        // Navigation Property
-        // Quan hệ 1-1 thì cần cấu hình Fluent API
-        public virtual QuanLyNhap QuanLyNhap { get; set; }
+        // Cột M_QuanLy thứ 2 trong SQL bị trùng tên, cần sửa trong SQL. Bỏ qua ở đây.
+
+        [Required]
+        [StringLength(10)]
+        public string M_HoanTra { get; set; } // Varchar(10) FK
+
+        [Required]
+        [StringLength(10)]
+        public string M_DonHang { get; set; } // Varchar(10) FK
+
+        // Navigation Properties
+        [ForeignKey("M_QuanLy")]
+        public virtual Owner Owner { get; set; }
+
+        [ForeignKey("M_HoanTra")]
+        public virtual HoanTra HoanTra { get; set; }
+
+        [ForeignKey("M_DonHang")]
+        public virtual DonHang DonHang { get; set; }
+
+        [Required]
+        [StringLength(450)] // Khớp với Id của AspNetUsers
+        public string UserId { get; set; } // Foreign Key
+
         public virtual ICollection<ChiTietThuGom> ChiTietThuGoms { get; set; } = new List<ChiTietThuGom>();
-
-
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
     }
 }

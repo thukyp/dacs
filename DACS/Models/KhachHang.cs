@@ -3,28 +3,28 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DACS.Models
 {
-    public class NguoiMua // Buyer
+    public class KhachHang // Buyer
     {
         [Key]
         [StringLength(10)]
-        public string M_NguoiMua { get; set; }
+        public string M_KhachHang    { get; set; }
 
         [Required]
         [StringLength(100)]
-        public string Ten_NguoiMua { get; set; }
+        public string Ten_KhachHang { get; set; }
 
         [Required]
         [StringLength(100)]
         [EmailAddress]
-        public string Email_NguoiMua { get; set; }
+        public string Email_KhachHang { get; set; }
 
         [Required]
         [StringLength(20)] // Tăng độ dài SĐT
-        public string SDT_NguoiMua { get; set; }
+        public string SDT_KhachHang { get; set; }
 
         [Required]
         [StringLength(255)]
-        public string DiaChi_NguoiMua { get; set; }
+        public string DiaChi_KhachHang { get; set; }
 
         [StringLength(10)] 
         public string? Gender { get; set; } 
@@ -35,6 +35,10 @@ namespace DACS.Models
         // Navigation Properties
         public virtual ICollection<ChiTietDatHang> ChiTietDatHangs { get; set; } = new List<ChiTietDatHang>();
         public virtual ICollection<ChiTietDanhGia> ChiTietDanhGias { get; set; } = new List<ChiTietDanhGia>();
+
+        public virtual ICollection<YeuCauThuGom> YeuCauThuGoms { get; set; } = new List<YeuCauThuGom>();
+        public virtual ICollection<ChiTietThuGom> ChiTietThuGoms { get; set; } = new List<ChiTietThuGom>(); // Nếu có
+
         [Required]
         public string? UserId { get; set; } // <<< SỬA LẠI: Bỏ dấu ?
 

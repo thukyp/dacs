@@ -29,7 +29,7 @@ namespace DACS.Models
         [Required]
         [StringLength(10)]
         // CẢNH BÁO: Cột này có vẻ thừa, nên bỏ đi.
-        public string? M_NguoiMua { get; set; } // FK?
+        public string? M_KhachHang { get; set; } // FK?
 
         // Navigation Properties
         [ForeignKey("M_SanPham")]
@@ -38,8 +38,8 @@ namespace DACS.Models
         [ForeignKey("M_DonHang")]
         public virtual DonHang? DonHang { get; set; }
 
-        [ForeignKey("M_NguoiMua")]
-        public virtual NguoiMua? NguoiMua { get; set; } // Liên kết này có cần thiết?
+        [ForeignKey("M_KhachHang")]
+        public virtual KhachHang? KhachHang { get; set; } // Liên kết này có cần thiết?
         public DateTime NgayTao { get; set; }
 
         public string TrangThaiDonHang { get; set; }

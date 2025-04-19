@@ -8,22 +8,22 @@ namespace DACS.Repositories
     public interface INguoiMuaRepository
     {
         // Lấy tất cả người mua (có thể thêm phân trang/sắp xếp sau)
-        Task<IEnumerable<NguoiMua>> GetAllAsync();
+        Task<IEnumerable<KhachHang>> GetAllAsync();
 
         // Lấy người mua theo Mã Người Mua (Khóa chính)
-        Task<NguoiMua?> GetByMaAsync(string maNguoiMua);
+        Task<KhachHang?> GetByMaAsync(string maNguoiMua);
 
         // Lấy người mua theo UserId (Khóa ngoại từ ApplicationUser) - Rất quan trọng cho Profile
-        Task<NguoiMua?> GetByUserIdAsync(string userId);
+        Task<KhachHang?> GetByUserIdAsync(string userId);
 
         // Thêm người mua mới
-        Task AddAsync(NguoiMua nguoiMua);
+        Task AddAsync(KhachHang nguoiMua);
 
         // Cập nhật thông tin người mua
-        void Update(NguoiMua nguoiMua); // Update thường không cần async
+        void Update(KhachHang nguoiMua); // Update thường không cần async
 
         // Xóa người mua
-        void Delete(NguoiMua nguoiMua); // Delete thường không cần async
+        void Delete(KhachHang nguoiMua); // Delete thường không cần async
 
         // Lưu các thay đổi vào database (Quan trọng!)
         Task SaveChangesAsync();

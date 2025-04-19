@@ -19,9 +19,9 @@ namespace DACS.Models
         // --- Missing FK to NongDan based on logic/ERD? ---
         [Required]
         [StringLength(10)]
-        public string M_NongDan { get; set; }
-        [ForeignKey("M_NongDan")]
-        public virtual NongDan NongDan { get; set; }
+        public string M_KhachHang { get; set; }
+        [ForeignKey("M_KhachHang")]
+        public virtual KhachHang KhachHang { get; set; }
 
         // Navigation Property
         public virtual ICollection<ChiTietThuGom> ChiTietThuGoms { get; set; } = new List<ChiTietThuGom>();

@@ -10,8 +10,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
-    public DbSet<NguoiMua> NguoiMuas { get; set; }
-    public DbSet<NongDan> NongDans { get; set; }
+    public DbSet<KhachHang> KhachHangs { get; set; }
     public DbSet<LoaiSanPham> LoaiSanPhams { get; set; }
     public DbSet<DonViTinh> DonViTinhs { get; set; }
     public DbSet<KhoLuuTru> KhoLuuTrus { get; set; }
@@ -26,11 +25,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<LoaiSanPhamGiamGia> LoaiSanPhamGiamGias { get; set; } // Bảng nối Loại SP - Giảm giá
     public DbSet<YeuCauThuGom> YeuCauThuGoms { get; set; }
     public DbSet<ChiTietThuGom> ChiTietThuGoms { get; set; }
-    public DbSet<ThanhToanNongDan> ThanhToanNongDans { get; set; }
     public DbSet<HoanTra> HoanTras { get; set; }
     public DbSet<ChiTietHoanTra> ChiTietHoanTras { get; set; }
+    public DbSet<Owner> Owner { get; set; }
     public DbSet<QuanLy> QuanLys { get; set; }
-    public DbSet<QuanLyNhap> QuanLyNhaps { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -41,23 +39,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasKey(cdh => new { cdh.M_SanPham, cdh.M_DonHang }); // Composite key
 
         builder.Entity<ChiTietDanhGia>()
-            .HasKey(cdg => new { cdg.M_NguoiMua, cdg.M_SanPham }); // Composite key for ReviewDetail // <<< CONFIGURATION IS PRESENT
+            .HasKey(cdg => new { cdg.M_KhachHang, cdg.M_SanPham }); // Composite key for ReviewDetail // <<< CONFIGURATION IS PRESENT
 
         builder.Entity<ChiTietHoanTra>()
             .HasKey(ctht => new { ctht.M_HoanTra, ctht.M_DonHang }); // Composite key (Lưu ý: M_DonHang có thể không đủ chi tiết)
 
         builder.Entity<ChiTietThuGom>()
-            .HasKey(ctg => new { ctg.M_YeuCau, ctg.M_NongDan }); // Composite key (Lưu ý: M_NongDan có thể thừa)
+            .HasKey(ctg => new { ctg.M_YeuCau, ctg.M_KhachHang }); // Composite key (Lưu ý: M_NongDan có thể thừa)
 
         builder.Entity<SanPhamGiamGia>()
             .HasKey(spg => new { spg.M_SanPham, spg.M_GiamGia }); // Composite key
 
         builder.Entity<LoaiSanPhamGiamGia>()
             .HasKey(lsg => new { lsg.M_LoaiSP, lsg.M_GiamGia }); // Composite key
-
-        builder.Entity<ThanhToanNongDan>()
-       .Property(ttnd => ttnd.SoTien)
-       .HasColumnType("decimal(18, 2)");
 
         builder.Entity<GiamGia>() // Configuration for GiamGia entity
            .Property(gg => gg.GiaTriDonHangToiThieu).HasColumnType("decimal(18, 2)");
@@ -85,9 +79,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .OnDelete(DeleteBehavior.Restrict); // Ngăn cascade delete
 
             // Quan hệ với NongDan
-            entity.HasOne(ctg => ctg.NongDan)
+            entity.HasOne(ctg => ctg.KhachHang)
                   .WithMany(nd => nd.ChiTietThuGoms)
-                  .HasForeignKey(ctg => ctg.M_NongDan)
+                  .HasForeignKey(ctg => ctg.M_KhachHang)
                   .OnDelete(DeleteBehavior.Restrict); // Ngăn cascade delete
 
             // Quan hệ với QuanLy
@@ -101,6 +95,28 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .WithMany(sp => sp.ChiTietThuGoms)
                   .HasForeignKey(ctg => ctg.M_SanPham)
                   .OnDelete(DeleteBehavior.Restrict); // QUAN TRỌNG: Ngăn cascade delete
-        });
+
+
+        // Cấu hình User <-> KhachHang
+        builder.Entity<KhachHang>()
+            .HasOne(kh => kh.User)
+            .WithOne() // Hoặc .WithOne(u => u.KhachHangProfile) nếu bạn thêm nav prop vào ApplicationUser
+            .HasForeignKey<KhachHang>(kh => kh.UserId)
+            .IsRequired();
+
+        // Cấu hình KhachHang -> YeuCauThuGom (One-to-Many)
+        // Giả sử YeuCauThuGom có khóa ngoại là M_KhachHang và navigation property là KhachHang
+        builder.Entity<KhachHang>()
+               .HasMany(kh => kh.YeuCauThuGoms)
+               .WithOne(yctg => yctg.KhachHang) // Tên navigation property trong YeuCauThuGom
+               .HasForeignKey(yctg => yctg.M_KhachHang); // Tên khóa ngoại trong YeuCauThuGom
+
+        // Cấu hình KhachHang -> ChiTietDatHang (One-to-Many)
+        builder.Entity<KhachHang>()
+              .HasMany(kh => kh.ChiTietDatHangs)
+              .WithOne(ctdh => ctdh.KhachHang) // Tên navigation property trong ChiTietDatHang
+              .HasForeignKey(ctdh => ctdh.M_KhachHang); // Tên khóa ngoại trong ChiTietDatHang
+
+    });
     }
 }

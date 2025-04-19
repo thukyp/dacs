@@ -1,4 +1,5 @@
-﻿using DACS.Models;
+﻿using System.Globalization;
+using DACS.Models;
 using DACS.Models.ViewModels;
 using DACS.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -44,17 +45,17 @@ namespace DACS.Areas.KhachHang.Controllers
             var viewModel = new KhachHangDashboardViewModel();
 
             // 1. Lấy thông tin profile Người Mua
-            var nguoiMuaProfile = await _context.NguoiMuas
+            var nguoiMuaProfile = await _context.KhachHangs
                                         .AsNoTracking()
                                         .FirstOrDefaultAsync(nm => nm.UserId == userId);
 
             if (nguoiMuaProfile != null)
             {
-                viewModel.TenNguoiMua = nguoiMuaProfile.Ten_NguoiMua;
-                viewModel.EmailNguoiMua = nguoiMuaProfile.Email_NguoiMua; // Email liên hệ
-                viewModel.SdtNguoiMua = nguoiMuaProfile.SDT_NguoiMua;
+                viewModel.TenNguoiMua = nguoiMuaProfile.Ten_KhachHang;
+                viewModel.EmailNguoiMua = nguoiMuaProfile.Email_KhachHang; // Email liên hệ
+                viewModel.SdtNguoiMua = nguoiMuaProfile.SDT_KhachHang;
                 // Lấy địa chỉ mặc định (ví dụ lấy từ DiaChi_NguoiMua, hoặc từ bảng Sổ Địa Chỉ nếu có)
-                viewModel.DiaChiMacDinh = nguoiMuaProfile.DiaChi_NguoiMua;
+                viewModel.DiaChiMacDinh = nguoiMuaProfile.DiaChi_KhachHang;
             }
             else
             {
@@ -69,7 +70,7 @@ namespace DACS.Areas.KhachHang.Controllers
                 }
             }
             var recentOrdersData = await _context.ChiTietDatHangs
-                             .Where(dh => dh.NguoiMua.UserId == userId)
+                             .Where(dh => dh.KhachHang.UserId == userId)
                              .OrderByDescending(dh => dh.NgayTao) // <<< Sửa ở đây
                              .Take(3)
                              .Select(dh => new OrderSummaryViewModel
@@ -104,16 +105,16 @@ namespace DACS.Areas.KhachHang.Controllers
                 if (user == null) { return NotFound("Lỗi: Không tìm thấy tài khoản người dùng."); }
 
                 // Tạo hồ sơ NguoiMua cơ bản
-                nguoiMuaProfile = new NguoiMua
+                nguoiMuaProfile = new Models.KhachHang
                 {
                     // Tạo khóa chính - Đảm bảo logic này giống với RegisterModel
-                    M_NguoiMua = Guid.NewGuid().ToString("N").Substring(0, 10),
+                    M_KhachHang = Guid.NewGuid().ToString("N").Substring(0, 10),
                     UserId = userId,
                     // Lấy thông tin mặc định từ ApplicationUser nếu có
-                    Ten_NguoiMua = user.FullName ?? user.UserName ?? "Chưa đặt tên", // Ưu tiên FullName, rồi UserName
-                    Email_NguoiMua = user.Email ?? "Chưa có email", // Email này là email liên hệ, có thể khác email đăng nhập
-                    SDT_NguoiMua = user.PhoneNumber ?? "Chưa có SĐT",
-                    DiaChi_NguoiMua = user.Address ?? "Chưa có địa chỉ", // Giả sử ApplicationUser có Address
+                    Ten_KhachHang = user.FullName ?? user.UserName ?? "Chưa đặt tên", // Ưu tiên FullName, rồi UserName
+                    Email_KhachHang = user.Email ?? "Chưa có email", // Email này là email liên hệ, có thể khác email đăng nhập
+                    SDT_KhachHang = user.PhoneNumber ?? "Chưa có SĐT",
+                    DiaChi_KhachHang = user.Address ?? "Chưa có địa chỉ", // Giả sử ApplicationUser có Address
 
                 };
 
@@ -148,10 +149,10 @@ namespace DACS.Areas.KhachHang.Controllers
             var viewModel = new EditNguoiMuaProfile
             {
                 // Gán các thuộc tính từ nguoiMuaProfile sang viewModel
-                Ten_NguoiMua = nguoiMuaProfile.Ten_NguoiMua,
-                Email_NguoiMua = nguoiMuaProfile.Email_NguoiMua,
-                SDT_NguoiMua = nguoiMuaProfile.SDT_NguoiMua,
-                DiaChi_NguoiMua = nguoiMuaProfile.DiaChi_NguoiMua,
+                Ten_NguoiMua = nguoiMuaProfile.Ten_KhachHang,
+                Email_NguoiMua = nguoiMuaProfile.Email_KhachHang,
+                SDT_NguoiMua = nguoiMuaProfile.SDT_KhachHang,
+                DiaChi_NguoiMua = nguoiMuaProfile.DiaChi_KhachHang,
                 Gender = nguoiMuaProfile.Gender,
                 AvatarUrl = nguoiMuaProfile.AvatarUrl
                 // Gán thêm các trường khác nếu ViewModel của bạn có
@@ -180,10 +181,10 @@ namespace DACS.Areas.KhachHang.Controllers
             var viewModel = new EditNguoiMuaProfile
             {
                 // Gán các thuộc tính từ nguoiMuaProfile sang viewModel
-                Ten_NguoiMua = nguoiMuaProfile.Ten_NguoiMua,
-                Email_NguoiMua = nguoiMuaProfile.Email_NguoiMua,
-                SDT_NguoiMua = nguoiMuaProfile.SDT_NguoiMua,
-                DiaChi_NguoiMua = nguoiMuaProfile.DiaChi_NguoiMua,
+                Ten_NguoiMua = nguoiMuaProfile.Ten_KhachHang,
+                Email_NguoiMua = nguoiMuaProfile.Email_KhachHang,
+                SDT_NguoiMua = nguoiMuaProfile.SDT_KhachHang,
+                DiaChi_NguoiMua = nguoiMuaProfile.DiaChi_KhachHang,
                 Gender = nguoiMuaProfile.Gender,
                 AvatarUrl = nguoiMuaProfile.AvatarUrl
                 // Gán M_NguoiMua nếu bạn cần nó trong form (ví dụ: hidden field)
@@ -222,10 +223,10 @@ namespace DACS.Areas.KhachHang.Controllers
             // --- Cập nhật entity NguoiMua ---
             bool hasChanges = false; // Biến kiểm tra xem có thay đổi thực sự không
 
-            if (nguoiMuaProfile.Ten_NguoiMua != model.Ten_NguoiMua) { nguoiMuaProfile.Ten_NguoiMua = model.Ten_NguoiMua; hasChanges = true; }
-            if (nguoiMuaProfile.Email_NguoiMua != model.Email_NguoiMua) { nguoiMuaProfile.Email_NguoiMua = model.Email_NguoiMua; hasChanges = true; }
-            if (nguoiMuaProfile.SDT_NguoiMua != model.SDT_NguoiMua) { nguoiMuaProfile.SDT_NguoiMua = model.SDT_NguoiMua; hasChanges = true; }
-            if (nguoiMuaProfile.DiaChi_NguoiMua != model.DiaChi_NguoiMua) { nguoiMuaProfile.DiaChi_NguoiMua = model.DiaChi_NguoiMua; hasChanges = true; }
+            if (nguoiMuaProfile.Ten_KhachHang != model.Ten_NguoiMua) { nguoiMuaProfile.Ten_KhachHang = model.Ten_NguoiMua; hasChanges = true; }
+            if (nguoiMuaProfile.Email_KhachHang != model.Email_NguoiMua) { nguoiMuaProfile.Email_KhachHang = model.Email_NguoiMua; hasChanges = true; }
+            if (nguoiMuaProfile.SDT_KhachHang != model.SDT_NguoiMua) { nguoiMuaProfile.SDT_KhachHang = model.SDT_NguoiMua; hasChanges = true; }
+            if (nguoiMuaProfile.DiaChi_KhachHang != model.DiaChi_NguoiMua) { nguoiMuaProfile.DiaChi_KhachHang = model.DiaChi_NguoiMua; hasChanges = true; }
             if (nguoiMuaProfile.Gender != model.Gender) { nguoiMuaProfile.Gender = model.Gender; hasChanges = true; }
 
 
@@ -311,13 +312,89 @@ namespace DACS.Areas.KhachHang.Controllers
 
             return RedirectToAction(nameof(HoSoCaNhan)); // Chuyển về trang hiển thị
         }
-        public IActionResult LichSuDonHang()
+        public async Task<IActionResult> LichSuDonHang(string statusFilter, string timeFilter, int page = 1)
         {
-            return View();
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Challenge(); // Chưa đăng nhập
+            }
+
+            // --- Xử lý logic lọc và truy vấn ---
+            var query = _context.ChiTietDatHangs // Hoặc _orderRepo.GetOrdersQuery()
+                              .Where(dh => dh.KhachHang.UserId == userId); // Lọc theo User ID
+
+            // 1. Lọc theo trạng thái
+            if (!string.IsNullOrEmpty(statusFilter) && statusFilter != "Tất cả trạng thái") // Giả sử giá trị mặc định là "Tất cả trạng thái"
+            {
+                // Ánh xạ giá trị từ dropdown (pending, shipping, completed, cancelled) sang giá trị thực tế trong DB
+                // Ví dụ:
+                string dbStatus = statusFilter switch
+                {
+                    "pending" => "Đang xử lý", // Thay bằng giá trị thực trong DB của bạn
+                    "shipping" => "Đang giao hàng", // Thay bằng giá trị thực
+                    "completed" => "Đã giao", // Thay bằng giá trị thực
+                    "cancelled" => "Đã hủy", // Thay bằng giá trị thực
+                    _ => null
+                };
+                if (dbStatus != null)
+                {
+                    query = query.Where(dh => dh.TrangThaiDonHang == dbStatus);
+                }
+            }
+
+            // 2. Lọc theo thời gian
+            DateTime? startDate = null;
+            switch (timeFilter)
+            {
+                case "3m":
+                    startDate = DateTime.Now.AddMonths(-3);
+                    break;
+                case "6m":
+                    startDate = DateTime.Now.AddMonths(-6);
+                    break;
+                case "1y":
+                    startDate = DateTime.Now.AddYears(-1);
+                    break;
+                    // Thêm các trường hợp khác nếu cần
+            }
+            if (startDate.HasValue)
+            {
+                query = query.Where(dh => dh.NgayTao >= startDate.Value);
+            }
+
+            // 3. Sắp xếp (Mới nhất lên đầu)
+            query = query.OrderByDescending(dh => dh.NgayTao);
+
+            // 4. Phân trang
+            int pageSize = 10; // Số lượng đơn hàng trên mỗi trang
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            page = Math.Max(1, Math.Min(page, totalPages)); // Đảm bảo page hợp lệ
+
+            var ordersData = await query
+                                    .Skip((page - 1) * pageSize)
+                                    .Take(pageSize)
+                                    .Select(dh => new OrderSummaryViewModel // Map sang ViewModel
+                                    {
+                                        OrderId = dh.M_CTDatHang, // Hoặc mã đơn hàng chính nếu có
+                                        TotalAmount = dh.TongTien, // Đảm bảo kiểu dữ liệu phù hợp
+                                        Status = dh.TrangThaiDonHang
+                                    })
+                                    .ToListAsync();
+
+            // 5. Tạo ViewModel cho View
+            var viewModel = new OrderHistoryViewModel
+            {
+                Orders = ordersData,
+                PageIndex = page,
+                TotalPages = totalPages,
+                CurrentStatusFilter = statusFilter, // Giữ lại giá trị lọc để hiển thị trên form
+                CurrentTimeFilter = timeFilter
+            };
+
+            return View(viewModel); // Trả về View LichSuDonHang.cshtml với ViewModel
         }
-        public IActionResult LichSuGiaoDich()
-        {
-            return View();
-        }
+       
     }
 }

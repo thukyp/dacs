@@ -36,7 +36,16 @@ namespace DACS.Models
 
         public virtual ICollection<ChiTietDatHang> ChiTietDatHangs { get; set; } = new List<ChiTietDatHang>();
         public virtual ICollection<ChiTietHoanTra> ChiTietHoanTras { get; set; } = new List<ChiTietHoanTra>();
-        public virtual ICollection<QuanLyNhap> QuanLyNhaps { get; set; } = new List<QuanLyNhap>();
+        public virtual ICollection<QuanLy> QuanLyNhaps { get; set; } = new List<QuanLy>();
+        public virtual ICollection<ChiTietThuGom> ChiTietThuGoms { get; set; } = new List<ChiTietThuGom>();
+        public virtual ICollection<YeuCauThuGom> YeuCauThuGoms { get; set; } = new List<YeuCauThuGom>();
+
+        [Required]
+        [StringLength(10)]
+
+        public string? M_KhachHang { get; set; }
+        [ForeignKey("M_KhachHang")]
+        public virtual KhachHang KhachHang { get; set; } // FK
 
     }
 }
