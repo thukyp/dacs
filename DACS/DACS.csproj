@@ -11,6 +11,8 @@
     <Folder Include="Areas\KhachHang\Models\" />
     <Folder Include="Areas\Owner\Data\" />
     <Folder Include="Areas\Owner\Models\" />
+    <Folder Include="Areas\QuanLyDH\Data\" />
+    <Folder Include="Areas\QuanLyDH\Models\" />
     <Folder Include="Areas\QuanLyND\Data\" />
     <Folder Include="Areas\QuanLyND\Models\" />
     <Folder Include="Areas\QuanLySP\Data\" />

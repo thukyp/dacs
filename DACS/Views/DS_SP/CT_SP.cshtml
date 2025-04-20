@@ -1,0 +1,423 @@
+﻿@{
+    // Giả sử bạn truyền tên sản phẩm qua ViewData hoặc Model
+    ViewData["Title"] = "Chi tiết: Vỏ trấu xay (Bao 20kg)"; // Hoặc @Model.ProductName
+    // Layout = "_YourLayoutName"; // Đảm bảo dùng đúng Layout
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=DM+Sans&amp;display=swap'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    @* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"> *@ @* Cân nhắc dùng nếu làm slider sản phẩm liên quan *@
+    <title>@ViewData["Title"] - Hahana</title>
+    <style>
+        body {
+            font-family: 'Outfit', Arial, sans-serif; /* Thay đổi font family nếu muốn */
+            background-color: white;
+            /* background-color: var(--bg); */ /* Giữ lại nếu bạn có định nghĩa biến CSS --bg */
+        }
+
+        .product-image-main {
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa; /* Màu nền nhẹ cho ảnh */
+        }
+
+            .product-image-main img {
+                max-width: 100%;
+                height: auto;
+                object-fit: contain;
+                max-height: 400px; /* Giới hạn chiều cao ảnh chính */
+            }
+
+        /* Style cho thumbnails nếu có */
+        .product-thumbnails img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            margin-right: 5px;
+            cursor: pointer;
+            border-radius: 3px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+            .product-thumbnails img:hover,
+            .product-thumbnails img.active {
+                border-color: #0d6efd;
+                opacity: 1;
+            }
+
+
+        .rating-stars .fa-star {
+            color: #ffc107; /* Màu vàng cho sao */
+        }
+
+        .rating-stars .fa-regular.fa-star {
+            color: #e4e5e9; /* Màu xám cho sao rỗng */
+        }
+
+        .quantity-input {
+            max-width: 70px;
+            text-align: center;
+        }
+
+        .review {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+            .review:last-child {
+                border-bottom: none;
+            }
+
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5 mb-5">
+
+        <div class="row">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="product-image-main text-center mb-3">
+                    <img src="https://via.placeholder.com/500x400?text=Vo+Trau+Lon" alt="Vỏ trấu xay (Hình ảnh chính)" id="mainProductImage">
+                </div>
+                <div class="product-thumbnails d-flex justify-content-center">
+                    <img src="https://via.placeholder.com/100x100?text=Vo+Trau+1" alt="Thumbnail 1" class="active" onclick="changeImage('https://via.placeholder.com/500x400?text=Vo+Trau+Lon')">
+                    <img src="https://via.placeholder.com/100x100?text=Vo+Trau+2" alt="Thumbnail 2" onclick="changeImage('https://via.placeholder.com/500x400?text=Vo+Trau+Goc+Nhin+Khac')">
+                    <img src="https://via.placeholder.com/100x100?text=Vo+Trau+3" alt="Thumbnail 3" onclick="changeImage('https://via.placeholder.com/500x400?text=Dong+Bao+20kg')">
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <h1>Vỏ trấu xay (Bao 20kg)</h1> @* Hoặc @Model.ProductName *@
+
+                <div class="mb-2 rating-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                    <i class="fa-regular fa-star"></i>
+                    <a href="#reviews" class="ms-2 text-decoration-none">(Xem 15 đánh giá)</a>
+                    @* Hoặc: <span class="text-muted">Chưa có đánh giá</span> *@
+                </div>
+
+                <p class="mb-1"><small class="text-muted">Mã SP: VT001</small></p> @* Hoặc @Model.SKU *@
+                <p class="mb-2"><small class="text-muted">Loại: Phụ phẩm thô</small></p> @* Hoặc @Model.CategoryName *@
+
+                <p class="h3 text-danger fw-bold mb-3">Giá: 30.000₫</p> @* Hoặc @Model.Price.ToString("N0")₫ *@
+
+                <p class="mb-3"><span class="badge bg-success">Còn hàng</span></p> @* Hoặc kiểm tra @Model.StockStatus *@
+                @* <p class="mb-3"><span class="badge bg-danger">Hết hàng</span></p> *@
+
+                <p class="lead mb-3">
+                    Vỏ trấu đã được xay nhỏ, đóng bao tiện lợi 20kg. Thích hợp làm giá thể trồng cây, đệm lót sinh học, hoặc nguyên liệu đốt.
+                </p> @* Hoặc @Model.ShortDescription *@
+
+                <div class="d-flex align-items-center mb-4">
+                    <label for="quantity" class="form-label me-3 mb-0">Số lượng:</label>
+                    <div class="input-group" style="width: 150px;">
+                        <button class="btn btn-outline-secondary" type="button" id="button-minus">-</button>
+                        <input type="number" id="quantity" class="form-control quantity-input" value="1" min="1" aria-label="Số lượng">
+                        <button class="btn btn-outline-secondary" type="button" id="button-plus">+</button>
+                    </div>
+                    <button class="btn btn-outline-danger ms-3" title="Thêm vào yêu thích"><i class="fa-regular fa-heart"></i></button>
+                </div>
+
+
+                <div class="d-grid gap-2 d-sm-flex">
+                    <button class="btn btn-primary btn-lg flex-grow-1 mb-2 mb-sm-0" type="button">
+                        <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                    </button>
+                    <button class="btn btn-success btn-lg flex-grow-1" type="button">
+                        Mua ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="productTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Mô tả chi tiết</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab" aria-controls="specs" aria-selected="false">Thông số kỹ thuật</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Đánh giá (15)</button>
+                        @* Cập nhật số lượng đánh giá động *@
+                    </li>
+                </ul>
+                <div class="tab-content pt-4" id="productTabContent">
+                    <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                        <h4>Mô tả sản phẩm</h4>
+                        <p>Vỏ trấu xay là phụ phẩm nông nghiệp phổ biến từ quá trình xay xát lúa gạo. Sản phẩm của chúng tôi được xay với kích thước đồng đều, đảm bảo độ tơi xốp và sạch sẽ.</p>
+                        <p><strong>Ứng dụng:</strong></p>
+                        <ul>
+                            <li>Làm giá thể trồng rau, hoa cây cảnh: Giúp đất tơi xốp, thoáng khí, giữ ẩm tốt.</li>
+                            <li>Đệm lót sinh học trong chăn nuôi: Khử mùi hôi, tạo môi trường sạch sẽ cho vật nuôi.</li>
+                            <li>Nguyên liệu đốt lò hơi, lò sấy: Cung cấp nhiệt lượng ổn định, chi phí thấp.</li>
+                            <li>Sản xuất viên nén năng lượng.</li>
+                            <li>Nguyên liệu sản xuất phân bón hữu cơ.</li>
+                        </ul>
+                        <p><em>Sản phẩm được đóng bao 20kg chắc chắn, dễ dàng vận chuyển và bảo quản.</em></p>
+                        @* Hoặc @Html.Raw(Model.FullDescription) *@
+                    </div>
+                    <div class="tab-pane fade" id="specs" role="tabpanel" aria-labelledby="specs-tab">
+                        <h4>Thông số kỹ thuật</h4>
+                        @* Sử dụng dl, table hoặc p tùy cấu trúc dữ liệu *@
+                        <dl class="row">
+                            <dt class="col-sm-3">Thành phần</dt>
+                            <dd class="col-sm-9">100% vỏ trấu tự nhiên</dd>
+
+                            <dt class="col-sm-3">Trạng thái</dt>
+                            <dd class="col-sm-9">Dạng xay nhỏ</dd>
+
+                            <dt class="col-sm-3">Độ ẩm</dt>
+                            <dd class="col-sm-9">~10-15%</dd>
+
+                            <dt class="col-sm-3">Tạp chất</dt>
+                            <dd class="col-sm-9">&lt; 2%</dd>
+
+                            <dt class="col-sm-3">Quy cách</dt>
+                            <dd class="col-sm-9">Bao 20kg (± 0.5kg)</dd>
+
+                            <dt class="col-sm-3">Xuất xứ</dt>
+                            <dd class="col-sm-9">Việt Nam</dd>
+                        </dl>
+                        @* Hoặc render từ @Model.Specifications *@
+                    </div>
+                    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                        <h4>Đánh giá từ khách hàng</h4>
+
+                        <div class="mb-4">
+                            @* Đây là ví dụ, bạn cần lặp qua danh sách đánh giá từ Model *@
+                            <div class="review">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong>Nguyễn Văn A</strong>
+                                    <small class="text-muted">10/04/2025</small>
+                                </div>
+                                <div class="rating-stars mb-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                </div>
+                                <p>Trấu xay khá đều, sạch, không bị ẩm mốc. Dùng trộn đất trồng rau rất tốt.</p>
+                            </div>
+                            <div class="review">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong>Trần Thị B</strong>
+                                    <small class="text-muted">05/04/2025</small>
+                                </div>
+                                <div class="rating-stars mb-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                </div>
+                                <p>Giao hàng nhanh, bao đóng gói cẩn thận. Giá cả hợp lý.</p>
+                            </div>
+                            @* Thêm các đánh giá khác ở đây *@
+                        </div>
+
+                        <hr class="my-4">
+                        <h5>Viết đánh giá của bạn</h5>
+                        <form>
+                            @* Thêm action và method phù hợp *@
+                            <div class="mb-3">
+                                <label for="reviewerName" class="form-label">Tên của bạn</label>
+                                <input type="text" class="form-control" id="reviewerName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Đánh giá của bạn</label>
+                                <div id="ratingInput" class="rating-stars">
+                                    @* Dùng JS để làm phần chọn sao này tương tác được *@
+                                    <i class="fa-regular fa-star" data-value="1"></i>
+                                    <i class="fa-regular fa-star" data-value="2"></i>
+                                    <i class="fa-regular fa-star" data-value="3"></i>
+                                    <i class="fa-regular fa-star" data-value="4"></i>
+                                    <i class="fa-regular fa-star" data-value="5"></i>
+                                    <input type="hidden" name="Rating" id="ratingValue" value="0"> @* Input ẩn để lưu giá trị sao *@
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewComment" class="form-label">Nhận xét</label>
+                                <textarea class="form-control" id="reviewComment" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-4">Sản phẩm bạn có thể thích</h3>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+                @* Hiển thị 4 SP/hàng *@
+                @* Copy cấu trúc card từ trang danh sách sản phẩm, thay đổi data *@
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Rom+Kho" class="card-img-top p-2" alt="Rơm khô" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Phụ phẩm thô</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Rơm khô (Bó 5kg)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 15.000₫</strong></p>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Loi+Ngo" class="card-img-top p-2" alt="Lõi ngô" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Phụ phẩm thô</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Lõi ngô nghiền (kg)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 2.500₫</strong></p>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Phan+Bon" class="card-img-top p-2" alt="Phân bón" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Đã xử lý</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Phân Compost (Bao 10kg)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 50.000₫</strong></p>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="https://via.placeholder.com/250x180?text=Vien+Nen" class="card-img-top p-2" alt="Viên nén" style="object-fit: contain; height:180px;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><small class="text-muted">Loại: Dạng viên nén</small></p>
+                            <h5 class="card-title fs-6 fw-bold">Viên nén trấu (kg)</h5>
+                            <p class="card-text mt-auto mb-2 fs-5 text-danger"><strong>Giá: 3.000₫</strong></p>
+                            <a href="#" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+                @* Thêm các sản phẩm liên quan khác *@
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    @* <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script> *@ @* Nếu dùng SwiperJS cho slider *@
+    @* <script type="text/javascript" src="js/script.js"></script> *@ @* Giữ lại nếu có JS chung *@
+
+    <script>
+        // Basic quantity counter
+        const quantityInput = document.getElementById('quantity');
+        const minusButton = document.getElementById('button-minus');
+        const plusButton = document.getElementById('button-plus');
+
+        minusButton.addEventListener('click', () => {
+            let currentValue = parseInt(quantityInput.value);
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+            }
+        });
+
+        plusButton.addEventListener('click', () => {
+            let currentValue = parseInt(quantityInput.value);
+            // Add max limit check if needed based on stock
+            quantityInput.value = currentValue + 1;
+        });
+
+         // Basic image changer for thumbnails
+         function changeImage(newSrc) {
+             document.getElementById('mainProductImage').src = newSrc;
+             // Optional: update active state on thumbnails
+             document.querySelectorAll('.product-thumbnails img').forEach(img => {
+                 img.classList.remove('active');
+                 if(img.src.includes(newSrc.split('?text=')[1].split('+')[0])) { // Simple check based on URL text
+                    // A more robust check might be needed depending on actual URLs
+                     if(img.src.split('?text=')[1].split('+').join('%20') === newSrc.split('?text=')[1]){
+                         img.classList.add('active');
+                     }
+                 }
+                 // If using actual image URLs, compare img.src directly with newSrc
+                 // if (img.src === newSrc) { img.classList.add('active'); }
+             });
+         }
+
+         // Basic star rating input interaction
+        const ratingStars = document.querySelectorAll('#ratingInput .fa-regular.fa-star');
+        const ratingValueInput = document.getElementById('ratingValue');
+
+        ratingStars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const hoverValue = parseInt(star.dataset.value);
+                ratingStars.forEach(s => {
+                    const sValue = parseInt(s.dataset.value);
+                    if (sValue <= hoverValue) {
+                        s.classList.remove('fa-regular');
+                        s.classList.add('fas'); // Make it solid
+                    } else {
+                         s.classList.remove('fas');
+                         s.classList.add('fa-regular'); // Make it regular
+                    }
+                });
+            });
+
+             star.addEventListener('mouseout', () => {
+                 // Reset to selected value on mouseout
+                 const selectedValue = parseInt(ratingValueInput.value);
+                 ratingStars.forEach(s => {
+                     const sValue = parseInt(s.dataset.value);
+                     if (sValue <= selectedValue) {
+                         s.classList.remove('fa-regular');
+                         s.classList.add('fas');
+                     } else {
+                          s.classList.remove('fas');
+                          s.classList.add('fa-regular');
+                     }
+                 });
+             });
+
+             star.addEventListener('click', () => {
+                 const selectedValue = parseInt(star.dataset.value);
+                 ratingValueInput.value = selectedValue;
+                 // Keep visual state after click
+                 ratingStars.forEach(s => {
+                     const sValue = parseInt(s.dataset.value);
+                     if (sValue <= selectedValue) {
+                         s.classList.remove('fa-regular');
+                         s.classList.add('fas');
+                     } else {
+                          s.classList.remove('fas');
+                          s.classList.add('fa-regular');
+                     }
+                 });
+             });
+         });
+
+    </script>
+
+</body>
+</html>

@@ -25,7 +25,7 @@ namespace DACS.Models
 
         // Navigation Properties
         public virtual ICollection<ChiTietHoanTra> ChiTietHoanTras { get; set; } = new List<ChiTietHoanTra>();
-        public virtual QuanLyNhap QuanLyNhap { get; set; }
+        public virtual QuanLy QuanLyNhap { get; set; }
 
     }
 }

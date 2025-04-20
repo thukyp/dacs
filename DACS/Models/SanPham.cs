@@ -40,9 +40,8 @@ namespace DACS.Models
         [Required]
         public DateTime NgayTao { get; set; } = DateTime.UtcNow;
 
-        [Required]
         [StringLength(500)] // Tăng độ dài cho ảnh
-        public string AnhSanPham { get; set; }
+        public string? AnhSanPham { get; set; }
 
         [Required]
         public int SoLuong { get; set; } // Integer
@@ -52,13 +51,13 @@ namespace DACS.Models
 
         // Navigation Properties
         [ForeignKey("M_LoaiSP")]
-        public virtual LoaiSanPham LoaiSanPham { get; set; }
+        public virtual LoaiSanPham? LoaiSanPham { get; set; }
 
         [ForeignKey("M_DonViTinh")]
-        public virtual DonViTinh DonViTinh { get; set; }
+        public virtual DonViTinh? DonViTinh { get; set; }
 
         [ForeignKey("M_KhoLuuTru")]
-        public virtual KhoLuuTru KhoLuuTru { get; set; }
+        public virtual KhoLuuTru? KhoLuuTru { get; set; }
 
         public virtual ICollection<ChiTietDatHang> ChiTietDatHangs { get; set; } = new List<ChiTietDatHang>();
         public virtual ICollection<ChiTietDanhGia> ChiTietDanhGias { get; set; } = new List<ChiTietDanhGia>();

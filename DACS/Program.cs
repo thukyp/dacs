@@ -1,4 +1,5 @@
 using DACS.Models;
+using DACS.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -33,6 +34,8 @@ builder.Services.ConfigureApplicationCookie(options => {
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddScoped<INguoiMuaRepository, NguoiMuaRepository>();
+builder.Services.AddScoped<ISanPhamRepository, EFSanPhamRepository>();
 
 
 var app = builder.Build();
@@ -62,6 +65,10 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "KhachHang",
         pattern: "{area:exists}/{controller=KhachHang}/{action=Index}/{id?}");
+
+    endpoints.MapControllerRoute(
+        name: "QuanLyDH",
+        pattern: "{area:exists}/{controller=QuanLyDH}/{action=Index}/{id?}");
 
     endpoints.MapControllerRoute(
         name: "QuanLyND",
