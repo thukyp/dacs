@@ -19,6 +19,13 @@
                     Hello, @(UserManager.GetUserName(User) ?? "User")!
                 </a>
             }
+            @if (User.IsInRole("QuanLyDH"))
+            {
+                <a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="Index" class="nav-link">
+                    Hello, @(UserManager.GetUserName(User) ?? "User")!
+                </a>
+            }
+
             @if (User.IsInRole("QuanLyXNK"))
             {
                 <a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link">

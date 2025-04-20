@@ -1,4 +1,5 @@
-﻿using DACS.Models;
+﻿using System.Reflection.Emit;
+using DACS.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -117,6 +118,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
               .WithOne(ctdh => ctdh.KhachHang) // Tên navigation property trong ChiTietDatHang
               .HasForeignKey(ctdh => ctdh.M_KhachHang); // Tên khóa ngoại trong ChiTietDatHang
 
-    });
+
+            builder.Entity<DonHang>() // Chọn thực thể DonHang để cấu hình
+            .HasOne(dh => dh.KhachHang) // Chỉ định mối quan hệ một (một KhachHang...)
+            .WithMany() // (...có nhiều DonHangs) - Bỏ trống nếu không cần navigation ngược lại trong KhachHang
+            // .WithMany(kh => kh.DonHangs) // <<< Dùng dòng này nếu bạn thêm ICollection<DonHang> vào KhachHang
+            .HasForeignKey(dh => dh.M_KhachHang) // Chỉ định khóa ngoại là M_KhachHang
+            .IsRequired(false) // <<< Quan trọng: Đặt là false nếu M_KhachHang cho phép NULL (string?)
+            // .IsRequired(true) // <<< Quan trọng: Đặt là true nếu M_KhachHang KHÔNG cho phép NULL (string)
+            .OnDelete(DeleteBehavior.Restrict); // <<< QUAN TRỌNG: Ngăn chặn xóa xếp tầng (tương đương NO ACTION)
+
+
+        });
     }
 }

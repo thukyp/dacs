@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DACS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250418085125_update18042025")]
-    partial class update18042025
+    [Migration("20250420115742_AllowNullAnhSanPham")]
+    partial class AllowNullAnhSanPham
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -206,6 +206,9 @@ namespace DACS.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<string>("DonHangM_DonHang")
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<string>("M_DonViTinh")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -226,6 +229,8 @@ namespace DACS.Migrations
 
                     b.HasKey("M_YeuCau", "M_KhachHang");
 
+                    b.HasIndex("DonHangM_DonHang");
+
                     b.HasIndex("M_DonViTinh");
 
                     b.HasIndex("M_KhachHang");
@@ -240,6 +245,11 @@ namespace DACS.Migrations
             modelBuilder.Entity("DACS.Models.DonHang", b =>
                 {
                     b.Property<string>("M_DonHang")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("M_KhachHang")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
@@ -265,6 +275,8 @@ namespace DACS.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("M_DonHang");
+
+                    b.HasIndex("M_KhachHang");
 
                     b.HasIndex("M_PhuongThuc");
 
@@ -530,7 +542,6 @@ namespace DACS.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("AnhSanPham")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -625,6 +636,9 @@ namespace DACS.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<string>("DonHangM_DonHang")
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<string>("M_KhachHang")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -639,6 +653,8 @@ namespace DACS.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("M_YeuCau");
+
+                    b.HasIndex("DonHangM_DonHang");
 
                     b.HasIndex("M_KhachHang");
 
@@ -845,6 +861,10 @@ namespace DACS.Migrations
 
             modelBuilder.Entity("DACS.Models.ChiTietThuGom", b =>
                 {
+                    b.HasOne("DACS.Models.DonHang", null)
+                        .WithMany("ChiTietThuGoms")
+                        .HasForeignKey("DonHangM_DonHang");
+
                     b.HasOne("DACS.Models.DonViTinh", "DonViTinh")
                         .WithMany("ChiTietThuGoms")
                         .HasForeignKey("M_DonViTinh")
@@ -888,6 +908,11 @@ namespace DACS.Migrations
 
             modelBuilder.Entity("DACS.Models.DonHang", b =>
                 {
+                    b.HasOne("DACS.Models.KhachHang", "KhachHang")
+                        .WithMany()
+                        .HasForeignKey("M_KhachHang")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("DACS.Models.PhuongThucThanhToan", "PhuongThucThanhToan")
                         .WithMany("DonHangs")
                         .HasForeignKey("M_PhuongThuc")
@@ -899,6 +924,8 @@ namespace DACS.Migrations
                         .HasForeignKey("M_VanDon")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("KhachHang");
 
                     b.Navigation("PhuongThucThanhToan");
 
@@ -1018,6 +1045,10 @@ namespace DACS.Migrations
 
             modelBuilder.Entity("DACS.Models.YeuCauThuGom", b =>
                 {
+                    b.HasOne("DACS.Models.DonHang", null)
+                        .WithMany("YeuCauThuGoms")
+                        .HasForeignKey("DonHangM_DonHang");
+
                     b.HasOne("DACS.Models.KhachHang", "KhachHang")
                         .WithMany("YeuCauThuGoms")
                         .HasForeignKey("M_KhachHang")
@@ -1084,7 +1115,11 @@ namespace DACS.Migrations
 
                     b.Navigation("ChiTietHoanTras");
 
+                    b.Navigation("ChiTietThuGoms");
+
                     b.Navigation("QuanLyNhaps");
+
+                    b.Navigation("YeuCauThuGoms");
                 });
 
             modelBuilder.Entity("DACS.Models.DonViTinh", b =>
