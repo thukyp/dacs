@@ -21,10 +21,32 @@ namespace DACS.Models
         [Required]
         public int SoLuong { get; set; } // Số lượng thu gom
 
+        [Display(Name = "Cồng Kềnh")]
+        public bool DacTinh_CongKenh { get; set; } = false; // Map từ charBulky
+
+        [Display(Name = "Ẩm/Ướt (Dễ hỏng)")]
+        public bool DacTinh_AmUot { get; set; } = false; // Map từ charWet
+
+        [Display(Name = "Khô (Dễ cháy)")]
+        public bool DacTinh_Kho { get; set; } = false; // Map từ charDry
+
+        [Display(Name = "Độ Ẩm Cao (>20%)")]
+        public bool DacTinh_DoAmCao { get; set; } = false; // Map từ charMoisture
+
+        [Display(Name = "Nhiều Tạp Chất")]
+        public bool DacTinh_TapChat { get; set; } = false; // Map từ charImpure
+
+        [Display(Name = "Đã Qua Xử Lý")]
+        public bool DacTinh_DaXuLy { get; set; } = false; // Map từ charProcessed
+
+        // --- THÊM: Danh sách hình ảnh ---
+        [Display(Name = "Hình Ảnh")]
+        public string? DanhSachHinhAnh { get; set; }
+
         // M_QuanLy FK mới
         [Required]
         [StringLength(10)]
-        public string M_QuanLy { get; set; } // FK
+        public string? M_QuanLy { get; set; } // FK
 
         // --- Thêm Khóa Ngoại và Navigation Property đến SanPham ---
         // (Cần thêm cột M_SanPham vào bảng ChiTietThuGom trong CSDL của bạn nếu chưa có)
@@ -48,7 +70,7 @@ namespace DACS.Models
         public virtual KhachHang KhachHang { get; set; }
 
         [ForeignKey("M_QuanLy")]
-        public virtual QuanLy QuanLy { get; set; }
+        public virtual QuanLy? QuanLy { get; set; }
     }
 
 }

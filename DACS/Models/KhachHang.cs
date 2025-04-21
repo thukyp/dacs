@@ -37,7 +37,6 @@ namespace DACS.Models
         public virtual ICollection<ChiTietDanhGia> ChiTietDanhGias { get; set; } = new List<ChiTietDanhGia>();
 
         public virtual ICollection<YeuCauThuGom> YeuCauThuGoms { get; set; } = new List<YeuCauThuGom>();
-        public virtual ICollection<ChiTietThuGom> ChiTietThuGoms { get; set; } = new List<ChiTietThuGom>(); // Nếu có
 
         [Required]
         public string? UserId { get; set; } // <<< SỬA LẠI: Bỏ dấu ?

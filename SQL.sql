@@ -81,3 +81,5 @@ VALUES
 ('KHO_B', 123456, GETUTCDATE(), '2027-01-15'), -- Kho B, tồn nhiều, HSD tháng 1/2027
 ('KHO_ROM', 20000, GETUTCDATE(), '2026-02-28'), -- Ví dụ Kho chuyên chứa Rơm, HSD tháng 2/2026
 ('KHO_TRAU', 50000, GETUTCDATE(), '2026-09-30'); -- Ví dụ Kho chuyên chứa Trấu, HSD tháng 9/2026
+
+

@@ -79,11 +79,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .HasForeignKey(ctg => ctg.M_DonViTinh)
                   .OnDelete(DeleteBehavior.Restrict); // Ngăn cascade delete
 
-            // Quan hệ với NongDan
-            entity.HasOne(ctg => ctg.KhachHang)
-                  .WithMany(nd => nd.ChiTietThuGoms)
-                  .HasForeignKey(ctg => ctg.M_KhachHang)
-                  .OnDelete(DeleteBehavior.Restrict); // Ngăn cascade delete
 
             // Quan hệ với QuanLy
             entity.HasOne(ctg => ctg.QuanLy)

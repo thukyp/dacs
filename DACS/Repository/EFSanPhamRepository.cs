@@ -34,6 +34,7 @@ namespace DACS.Repositories
                                  .FirstOrDefaultAsync(m => m.M_SanPham == id);
         }
 
+
         public async Task AddAsync(SanPham entity)
         {
             _context.SanPhams.Add(entity);

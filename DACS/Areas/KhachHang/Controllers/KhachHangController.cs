@@ -18,19 +18,23 @@ namespace DACS.Areas.KhachHang.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly INguoiMuaRepository _nguoiMuaRepo; // <<< Inject Repository NguoiMua
         private readonly ILogger<KhachHangController> _logger;
+        private readonly ISanPhamRepository _sanPhamRepo; // <<< Inject Repository NguoiMua
+
 
         public KhachHangController(
      ApplicationDbContext context, // <<< Thêm lại tham số context
      UserManager<ApplicationUser> userManager,
      IWebHostEnvironment webHostEnvironment,
      INguoiMuaRepository nguoiMuaRepository,
-     ILogger<KhachHangController> logger)
+     ILogger<KhachHangController> logger,
+     ISanPhamRepository sanPhamRepo)
         {
             _context = context; // <<< Gán lại context
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
             _nguoiMuaRepo = nguoiMuaRepository;
             _logger = logger;
+            _sanPhamRepo = sanPhamRepo;
         }
 
         public async Task<IActionResult> Index()
@@ -395,6 +399,17 @@ namespace DACS.Areas.KhachHang.Controllers
 
             return View(viewModel); // Trả về View LichSuDonHang.cshtml với ViewModel
         }
-       
+
+        public async Task<IActionResult> Details(string id)
+        {
+            if (id == null) return NotFound();
+            // Use the repository to get data including related entities
+            var sanPham = await _sanPhamRepo.GetByIdAsync(id); // Assumes GetByIdAsync includes LoaiSP, DonViTinh, KhoLuuTru
+                                                               // If GetByIdAsync doesn't include them, need to adjust the repo method or load them here if needed for display
+            if (sanPham == null) return NotFound();
+            return View(sanPham);
+        }
+
+
     }
 }
