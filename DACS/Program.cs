@@ -1,5 +1,6 @@
 using DACS.Models;
 using DACS.Repositories;
+using DACS.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -37,6 +38,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<INguoiMuaRepository, NguoiMuaRepository>();
 builder.Services.AddScoped<IThuGomRepository, ThuGomRepository>();
 builder.Services.AddScoped<ISanPhamRepository, EFSanPhamRepository>();
+builder.Services.AddScoped<ITonKhoRepository, TonKhoRepository>();
+builder.Services.AddScoped<IPhieuXuatRepository, PhieuXuatRepository>(); 
+
+
 
 
 var app = builder.Build();

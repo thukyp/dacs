@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DACS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424093316_PhieuXuat")]
+    partial class PhieuXuat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -616,17 +619,10 @@ namespace DACS.Migrations
                     b.Property<string>("LyDoXuat")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MaKho")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
                     b.Property<DateTime>("NgayXuat")
                         .HasColumnType("datetime2");
 
                     b.HasKey("MaPhieuXuat");
-
-                    b.HasIndex("MaKho");
 
                     b.ToTable("PhieuXuats");
                 });
@@ -1302,17 +1298,6 @@ namespace DACS.Migrations
                     b.Navigation("GiamGia");
 
                     b.Navigation("LoaiSanPham");
-                });
-
-            modelBuilder.Entity("DACS.Models.PhieuXuat", b =>
-                {
-                    b.HasOne("DACS.Models.KhoHang", "KhoHang")
-                        .WithMany()
-                        .HasForeignKey("MaKho")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("KhoHang");
                 });
 
             modelBuilder.Entity("DACS.Models.QuanHuyen", b =>

@@ -148,6 +148,16 @@ namespace DACS.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            var isValidProductType = await _context.LoaiSanPhams 
+                                  .AnyAsync(p => p.M_LoaiSP == model.ByproductType);
+            if (!isValidProductType)
+            {
+                ModelState.AddModelError(nameof(model.ByproductType), "Loại sản phẩm được chọn không hợp lệ hoặc không tồn tại.");
+                _logger.LogWarning($"Khách hàng {khachHang?.M_KhachHang} đã cố gửi Loại SP không hợp lệ: {model.ByproductType}");
+                await LoadDropdownDataForThuGomInitial(model); // Tải lại dropdown cơ bản
+                return View(model); // Trả về view với lỗi validation
+            }
+
             using var transaction = await _context.Database.BeginTransactionAsync();
             YeuCauThuGom yeuCau = null; // Khai báo ngoài để dùng trong catch logging
             try

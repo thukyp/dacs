@@ -30,26 +30,47 @@
         color: #fff;
         padding: 15px;
         width: 250px;
-        flex-shrink: 0;
-        min-height: 100vh;
+        flex-shrink: 0; /* Không co lại */
+        /* min-height: 100vh; -> main-container đã xử lý */
+        display: flex; /* Thêm flex để đẩy logout xuống */
+        flex-direction: column; /* Thêm flex để đẩy logout xuống */
     }
 
         .sidebar h2 {
             border-bottom: 1px solid #495057;
             padding-bottom: 10px;
             font-size: 1.5rem;
+            margin-bottom: 1rem; /* Thêm khoảng cách */
+        }
+
+        .sidebar .nav {
+            flex-grow: 1; /* Để các nav item chiếm không gian */
         }
 
         .sidebar .nav-link {
             color: #adb5bd;
             padding: 8px 15px;
-            margin-bottom: 2px; /* Thêm margin */
+            border-radius: 0.25rem; /* Thêm bo góc */
+            margin-bottom: 5px; /* Khoảng cách giữa các link */
         }
 
             .sidebar .nav-link.active, .sidebar .nav-link:hover {
                 color: #fff;
                 background-color: #495057;
-                border-radius: 0.25rem;
+            }
+        /* CSS cho nút logout */
+        .sidebar .nav-item.mt-auto { /* Đảm bảo nó thực sự ở cuối */
+            margin-top: auto;
+        }
+
+        .sidebar .logout-form button { /* Style cho nút logout */
+            padding: 8px 15px;
+            color: #dc3545; /* Màu đỏ */
+        }
+
+            .sidebar .logout-form button:hover {
+                background-color: rgba(220, 53, 69, 0.1); /* Nền đỏ nhẹ khi hover */
+                color: #bd2130;
             }
 
     .main-content-area {

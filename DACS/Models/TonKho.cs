@@ -18,9 +18,9 @@ namespace DACS.Models
         [Required]
         [Display(Name = "Sản phẩm")]
         [StringLength(10)]
-        public string MaSanPham { get; set; } // FK đến SanPham
-        [ForeignKey("MaSanPham")]
-        public virtual SanPham SanPham { get; set; }
+        public string M_LoaiSP { get; set; } // FK đến SanPham
+        [ForeignKey("M_LoaiSP")]
+        public virtual LoaiSanPham LoaiSanPham { get; set; }
 
         [Required]
         [Display(Name = "Số lượng")]

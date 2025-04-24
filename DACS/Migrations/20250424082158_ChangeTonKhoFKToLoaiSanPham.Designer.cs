@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DACS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424082158_ChangeTonKhoFKToLoaiSanPham")]
+    partial class ChangeTonKhoFKToLoaiSanPham
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -191,40 +194,6 @@ namespace DACS.Migrations
                     b.HasIndex("M_DonHang");
 
                     b.ToTable("ChiTietHoanTras");
-                });
-
-            modelBuilder.Entity("DACS.Models.ChiTietPhieuXuat", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("M_DonViTinh")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("M_LoaiSP")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<int>("MaPhieuXuat")
-                        .HasColumnType("int");
-
-                    b.Property<long>("SoLuong")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("M_DonViTinh");
-
-                    b.HasIndex("M_LoaiSP");
-
-                    b.HasIndex("MaPhieuXuat");
-
-                    b.ToTable("ChiTietPhieuXuats");
                 });
 
             modelBuilder.Entity("DACS.Models.ChiTietThuGom", b =>
@@ -603,32 +572,6 @@ namespace DACS.Migrations
                     b.HasKey("M_QuanLy");
 
                     b.ToTable("Owner");
-                });
-
-            modelBuilder.Entity("DACS.Models.PhieuXuat", b =>
-                {
-                    b.Property<int>("MaPhieuXuat")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuXuat"));
-
-                    b.Property<string>("LyDoXuat")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MaKho")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime>("NgayXuat")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("MaPhieuXuat");
-
-                    b.HasIndex("MaKho");
-
-                    b.ToTable("PhieuXuats");
                 });
 
             modelBuilder.Entity("DACS.Models.PhuongThucThanhToan", b =>
@@ -1126,33 +1069,6 @@ namespace DACS.Migrations
                     b.Navigation("HoanTra");
                 });
 
-            modelBuilder.Entity("DACS.Models.ChiTietPhieuXuat", b =>
-                {
-                    b.HasOne("DACS.Models.DonViTinh", "DonViTinh")
-                        .WithMany()
-                        .HasForeignKey("M_DonViTinh")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DACS.Models.LoaiSanPham", "LoaiSanPham")
-                        .WithMany()
-                        .HasForeignKey("M_LoaiSP")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DACS.Models.PhieuXuat", "PhieuXuat")
-                        .WithMany("ChiTietPhieuXuats")
-                        .HasForeignKey("MaPhieuXuat")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DonViTinh");
-
-                    b.Navigation("LoaiSanPham");
-
-                    b.Navigation("PhieuXuat");
-                });
-
             modelBuilder.Entity("DACS.Models.ChiTietThuGom", b =>
                 {
                     b.HasOne("DACS.Models.DonHang", null)
@@ -1302,17 +1218,6 @@ namespace DACS.Migrations
                     b.Navigation("GiamGia");
 
                     b.Navigation("LoaiSanPham");
-                });
-
-            modelBuilder.Entity("DACS.Models.PhieuXuat", b =>
-                {
-                    b.HasOne("DACS.Models.KhoHang", "KhoHang")
-                        .WithMany()
-                        .HasForeignKey("MaKho")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("KhoHang");
                 });
 
             modelBuilder.Entity("DACS.Models.QuanHuyen", b =>
@@ -1560,11 +1465,6 @@ namespace DACS.Migrations
                 {
                     b.Navigation("QuanLy")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("DACS.Models.PhieuXuat", b =>
-                {
-                    b.Navigation("ChiTietPhieuXuats");
                 });
 
             modelBuilder.Entity("DACS.Models.PhuongThucThanhToan", b =>

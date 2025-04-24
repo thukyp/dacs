@@ -517,20 +517,17 @@ namespace DACS.Areas.QuanLyXNK.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Thêm tham số targetMaKho để biết nhập vào kho nào
-        public async Task<IActionResult> MarkComplete(string id, [FromQuery] string targetMaKho) // Lấy MaKho từ query string hoặc form data
+        public async Task<IActionResult> MarkComplete(string id, [FromQuery] string targetMaKho)
         {
             if (string.IsNullOrEmpty(id)) return NotFound("Thiếu ID yêu cầu.");
             if (string.IsNullOrEmpty(targetMaKho))
             {
-                // Nếu không có targetMaKho, thông báo lỗi và quay lại Index
-                // Hoặc bạn có thể chuyển hướng đến một trang chọn kho
                 TempData["ErrorMessage"] = $"Vui lòng chọn kho đích để hoàn thành yêu cầu {id}.";
                 _logger.LogWarning("MarkComplete được gọi cho YC {YeuCauId} nhưng thiếu targetMaKho.", id);
                 return RedirectToAction(nameof(Index));
             }
 
-            // Kiểm tra xem kho đích có tồn tại không
+            // Kiểm tra xem kho đích có tồn tại không (Optional but good practice)
             var khoDicExists = await _context.KhoHangs.AnyAsync(kh => kh.MaKho == targetMaKho);
             if (!khoDicExists)
             {
@@ -539,38 +536,38 @@ namespace DACS.Areas.QuanLyXNK.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            _logger.LogInformation("Bắt đầu xử lý hoàn thành YC {YeuCauId} vào Kho {targetMaKho}.", id, targetMaKho);
 
             // Bắt đầu một transaction để đảm bảo tính toàn vẹn
             using var transaction = await _context.Database.BeginTransactionAsync();
-            _logger.LogInformation("Bắt đầu transaction cho việc hoàn thành YC {YeuCauId} vào Kho {targetMaKho}.", id, targetMaKho);
-
+            _logger.LogInformation("Bắt đầu transaction cho YC {YeuCauId}.", id);
 
             try
             {
-                // Lấy yêu cầu và các chi tiết liên quan (quan trọng: Include ChiTietThuGoms)
+                // Lấy yêu cầu và các chi tiết liên quan
                 var yeuCau = await _context.YeuCauThuGoms
-                                     .Include(yc => yc.ChiTietThuGoms) // *** Quan trọng: Nạp chi tiết thu gom ***
-                                                                       // .ThenInclude(ct => ct.DonViTinh) // Nạp ĐVT nếu cần truy cập trực tiếp tên ĐVT
-                                     .FirstOrDefaultAsync(yc => yc.M_YeuCau == id);
+                                         .Include(yc => yc.ChiTietThuGoms) // *** Quan trọng: Nạp chi tiết thu gom ***
+                                         .FirstOrDefaultAsync(yc => yc.M_YeuCau == id);
 
                 // Kiểm tra trạng thái yêu cầu
                 if (yeuCau == null || yeuCau.TrangThai != "Đang thu gom")
                 {
-                    await transaction.RollbackAsync(); // Hủy transaction
+                    // Không cần RollbackAsync nếu chưa có thay đổi nào được chuẩn bị
                     TempData["ErrorMessage"] = "Không thể đánh dấu hoàn thành cho yêu cầu này (không tồn tại hoặc không ở trạng thái 'Đang thu gom').";
                     _logger.LogWarning("Thất bại khi MarkComplete YC {YeuCauId}: Không tìm thấy hoặc trạng thái không hợp lệ ({TrangThai}).", id, yeuCau?.TrangThai ?? "Không tìm thấy");
+                    // Rollback ngay cả khi không có thay đổi để đảm bảo transaction đóng đúng cách
+                    await transaction.RollbackAsync();
+                    _logger.LogInformation("Đã rollback transaction do YC {YeuCauId} không hợp lệ.", id);
                     return RedirectToAction(nameof(Index));
                 }
 
                 // 1. Cập nhật trạng thái và thời gian hoàn thành của YeuCauThuGom
                 yeuCau.TrangThai = "Hoàn thành"; // Hoặc "Thu gom thành công"
                 yeuCau.ThoiGianHoanThanh = DateTime.UtcNow;
-                _context.Update(yeuCau);
-                await _context.SaveChangesAsync(); // Lưu thay đổi trạng thái YC trước
-                _logger.LogInformation("Đã cập nhật trạng thái YC {YeuCauId} thành 'Hoàn thành'.", id);
+                _context.Update(yeuCau); // Đánh dấu YeuCau để được cập nhật
+                _logger.LogInformation("Đã chuẩn bị cập nhật trạng thái YC {YeuCauId} thành 'Hoàn thành'.", id);
 
-
-                // 2. Cập nhật hoặc thêm mới vào bảng TonKho cho từng ChiTietThuGom
+                // 2. Chuẩn bị cập nhật hoặc thêm mới vào bảng TonKho cho từng ChiTietThuGom
                 if (yeuCau.ChiTietThuGoms != null && yeuCau.ChiTietThuGoms.Any())
                 {
                     foreach (var ct in yeuCau.ChiTietThuGoms)
@@ -578,69 +575,74 @@ namespace DACS.Areas.QuanLyXNK.Controllers
                         if (ct.SoLuong <= 0 || string.IsNullOrEmpty(ct.M_LoaiSP) || string.IsNullOrEmpty(ct.M_DonViTinh))
                         {
                             _logger.LogWarning("Bỏ qua ChiTietThuGom Id {ChiTietId} của YC {YeuCauId} do thiếu thông tin (Số lượng: {SoLuong}, SP: {MaSP}, DVT: {MaDVT}).", ct.M_ChiTiet, id, ct.SoLuong, ct.M_LoaiSP, ct.M_DonViTinh);
-                            continue; // Bỏ qua nếu chi tiết không hợp lệ (số lượng <= 0, thiếu mã SP hoặc ĐVT)
+                            continue; // Bỏ qua chi tiết không hợp lệ
                         }
 
-                        string maSanPham = ct.M_LoaiSP; // Giả định M_LoaiSanPham là MaSanPham
-                        long soLuongCollected = ct.SoLuong;
-                        string maDonViTinh = ct.M_DonViTinh; // Lấy mã đơn vị tính
+                        string maSanPham = ct.M_LoaiSP;
+                        long soLuongCollected = ct.SoLuong; // Should be long based on TonKho.SoLuong type
+                        string maDonViTinh = ct.M_DonViTinh;
 
-                        // Tìm bản ghi tồn kho hiện có cho sản phẩm này trong kho đích
+
+                        // Tìm bản ghi tồn kho hiện có
                         var existingTonKho = await _context.TonKhos
                             .FirstOrDefaultAsync(tk => tk.MaKho == targetMaKho
-                                                   && tk.MaSanPham == maSanPham
-                                                   && tk.M_DonViTinh == maDonViTinh); // Thêm ĐVT vào bộ lọc nếu cần phân biệt
+                                                    && tk.M_LoaiSP == maSanPham
+                                                    && tk.M_DonViTinh == maDonViTinh);
 
                         if (existingTonKho != null)
                         {
-                            // Nếu đã tồn tại -> Cập nhật số lượng
                             existingTonKho.SoLuong += soLuongCollected;
-                            // Có thể cập nhật NgayNhapKho thành ngày mới nhất nếu muốn
-                            // existingTonKho.NgayNhapKho = DateTime.UtcNow.Date;
-                            _context.Update(existingTonKho);
-                            _logger.LogInformation("Cập nhật TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng +{SoLuong}. Tổng mới: {TongSoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected, existingTonKho.SoLuong);
-
+                            _context.Update(existingTonKho); // Đánh dấu TonKho để được cập nhật
+                            _logger.LogInformation("Chuẩn bị cập nhật TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng +{SoLuong}. Tổng mới: {TongSoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected, existingTonKho.SoLuong);
                         }
                         else
                         {
-                            // Nếu chưa tồn tại -> Thêm mới bản ghi TonKho
                             var newTonKho = new TonKho
                             {
                                 MaKho = targetMaKho,
-                                MaSanPham = maSanPham,
+                                // Fix for the error CS0103: The name 'maLoaiSP' does not exist in the current context
+                                // The variable 'maLoaiSP' was not defined in the context. It should be replaced with the correct variable name 'maSanPham'.
+
+                                // With this corrected line:
+                                M_LoaiSP = maSanPham,
                                 SoLuong = soLuongCollected,
                                 M_DonViTinh = maDonViTinh,
-                                NgayNhapKho = DateTime.UtcNow.Date, // Ngày hiện tại
-                                HanSuDung = null, // Chưa có thông tin
-                                SoLo = null       // Chưa có thông tin
+                                NgayNhapKho = DateTime.UtcNow.Date,
+                                HanSuDung = null,
+                                SoLo = null
                             };
-                            _context.Add(newTonKho);
-                            _logger.LogInformation("Thêm mới TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng: {SoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected);
-
+                            _context.Add(newTonKho); // Đánh dấu TonKho mới để được thêm
+                            _logger.LogInformation("Chuẩn bị thêm mới TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng: {SoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected);
                         }
                     }
-                    // Lưu tất cả thay đổi của TonKho
-                    await _context.SaveChangesAsync();
-                    _logger.LogInformation("Đã lưu các thay đổi TonKho cho YC {YeuCauId}.", id);
                 }
                 else
                 {
                     _logger.LogWarning("YC {YeuCauId} không có ChiTietThuGom hợp lệ để cập nhật TonKho.", id);
                 }
 
+                // 3. Lưu tất cả các thay đổi đã chuẩn bị vào database trong transaction
+                await _context.SaveChangesAsync(); // *** Chỉ gọi SaveChangesAsync một lần ***
+                _logger.LogInformation("Đã lưu thành công các thay đổi vào DB cho YC {YeuCauId}.", id);
 
-                // Nếu mọi thứ thành công, commit transaction
+
+                // 4. Nếu mọi thứ thành công, commit transaction
                 await transaction.CommitAsync();
-                _logger.LogInformation("Đã commit transaction cho YC {YeuCauId}.", id);
+                _logger.LogInformation("Đã commit transaction thành công cho YC {YeuCauId}.", id);
                 TempData["SuccessMessage"] = $"Yêu cầu {id} đã hoàn thành và cập nhật tồn kho vào kho {targetMaKho}.";
 
             }
-            catch (Exception ex)
+            catch (Exception ex) // Bắt DbUpdateException hoặc Exception chung
             {
-                // Nếu có lỗi, rollback transaction
+                // Nếu có lỗi trong quá trình chuẩn bị hoặc SaveChangesAsync, rollback transaction
                 await transaction.RollbackAsync();
-                _logger.LogError(ex, "Lỗi trong quá trình MarkComplete và cập nhật TonKho cho YC {YeuCauId}.", id);
-                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi cập nhật trạng thái và tồn kho: " + ex.Message;
+                _logger.LogError(ex, "Lỗi trong quá trình MarkComplete và cập nhật TonKho cho YC {YeuCauId}. Transaction đã được rollback.", id);
+                // **Quan trọng: Log cả ex.InnerException nếu có**
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError(ex.InnerException, "Inner Exception details for YC {YeuCauId}:", id);
+                }
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi cập nhật trạng thái và tồn kho: " + ex.Message + (ex.InnerException != null ? " Inner Error: " + ex.InnerException.Message : "");
             }
 
             return RedirectToAction(nameof(Index));

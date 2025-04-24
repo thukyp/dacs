@@ -2,6 +2,20 @@
 
 @{
     ViewData["Title"] = "Quản Lý Thu Gom Phụ Phẩm";
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 }
 <style>
     /* Copy CSS từ code #53 vào đây hoặc file CSS riêng */
@@ -23,25 +37,47 @@
         color: #fff;
         padding: 15px;
         width: 250px;
-        flex-shrink: 0;
-        min-height: 100vh;
+        flex-shrink: 0; /* Không co lại */
+        /* min-height: 100vh; -> main-container đã xử lý */
+        display: flex; /* Thêm flex để đẩy logout xuống */
+        flex-direction: column; /* Thêm flex để đẩy logout xuống */
     }
 
         .sidebar h2 {
             border-bottom: 1px solid #495057;
             padding-bottom: 10px;
             font-size: 1.5rem;
+            margin-bottom: 1rem; /* Thêm khoảng cách */
+        }
+
+        .sidebar .nav {
+            flex-grow: 1; /* Để các nav item chiếm không gian */
         }
 
         .sidebar .nav-link {
             color: #adb5bd;
             padding: 8px 15px;
+            border-radius: 0.25rem; /* Thêm bo góc */
+            margin-bottom: 5px; /* Khoảng cách giữa các link */
         }
 
             .sidebar .nav-link.active, .sidebar .nav-link:hover {
                 color: #fff;
                 background-color: #495057;
-                border-radius: 0.25rem;
+            }
+        /* CSS cho nút logout */
+        .sidebar .nav-item.mt-auto { /* Đảm bảo nó thực sự ở cuối */
+            margin-top: auto;
+        }
+
+        .sidebar .logout-form button { /* Style cho nút logout */
+            padding: 8px 15px;
+            color: #dc3545; /* Màu đỏ */
+        }
+
+            .sidebar .logout-form button:hover {
+                background-color: rgba(220, 53, 69, 0.1); /* Nền đỏ nhẹ khi hover */
+                color: #bd2130;
             }
 
     .main-content-area {
@@ -106,7 +142,7 @@
             <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="TonKho" asp-action="Index" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
             <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="ThongKe" asp-action="Index" class="nav-link"><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
             @* Nút Đăng xuất *@
-            <li class="nav-item mt-auto pt-3 border-top border-secondary">
+            <div class="mt-auto pt-3 border-top border-secondary logout-form">
                 <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
                     <button type="submit" class="nav-link text-danger" style="background:none; border:none; width:100%; text-align:left;">
                         <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
@@ -231,7 +267,7 @@
                                         }
                                         else if (request.TrangThai == "Đang thu gom")
                                         {
-                                            @* *** SỬA LẠI THÀNH NÚT NÀY - KHÔNG CÓ FORM BAO QUANH *** *@
+                                            @* *** NÚT ĐÚNG ĐỂ MỞ MODAL *** *@
                                             <button type="button" class="btn btn-sm btn-success btn-mark-complete"
                                                     data-bs-toggle="modal" data-bs-target="#completeConfirmationModal"
                                                     data-request-id="@request.M_YeuCau"
@@ -239,7 +275,7 @@
                                                 <i class="fas fa-check-circle"></i>
                                             </button>
 
-                                            @* Giữ lại form cho nút Thất bại *@
+                                            @* Form cho nút Thất bại *@
                                             <form asp-action="MarkFailed" asp-route-id="@request.M_YeuCau" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn đánh dấu yêu cầu này là THẤT BẠI không?');">
                                                 @Html.AntiForgeryToken() @* <-- THÊM TOKEN *@
                                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="Thất bại">
@@ -370,195 +406,123 @@
     }
 }
 
+<div class="modal fade" id="completeConfirmationModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="completeModalLabel">Xác nhận Hoàn thành Yêu cầu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc muốn đánh dấu yêu cầu <strong id="modal-request-id-display">[Mã YC]</strong> là HOÀN THÀNH?</p>
+                <hr />
+                <p class="fw-bold">Vui lòng chọn kho đích để nhập hàng:</p>
+                <div class="mb-3">
+                    <label for="targetKhoSelect" class="form-label">Kho Đích <span class="text-danger">*</span></label>
+                    <select id="targetKhoSelect" class="form-select form-select-sm" required>
+                        <option value="" selected disabled>-- Chọn kho hàng --</option>
+                        @if (Model?.ActiveKhoHangOptions != null && Model.ActiveKhoHangOptions.Any())
+                        {
+                            @foreach (var khoOption in Model.ActiveKhoHangOptions)
+                            {
+                                <option value="@khoOption.Value">@khoOption.Text</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="" disabled>Không tải được danh sách kho</option>
+                        }
+                    </select>
+                    <div id="khoSelectError" class="text-danger mt-1" style="display: none;">Vui lòng chọn kho đích.</div>
+                </div>
+                <input type="hidden" id="modal-request-id-hidden" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Hủy
+                </button>
+                <button type="button" class="btn btn-success" id="confirmCompleteBtn">
+                    <i class="fas fa-check me-1"></i> Xác nhận Hoàn thành
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="hiddenCompleteForm" method="post" style="display: none;">
+    @Html.AntiForgeryToken() @* ĐÃ THÊM TOKEN *@
+</form>
+
 @section Scripts {
-        @* Thêm link Bootstrap JS nếu Layout chưa có hoặc cần bản mới hơn *@
-        @*<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>*@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    @* Đảm bảo jQuery đã được load trước script này *@
     <script>
-        // Kích hoạt Tooltip (nếu dùng)
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')) // Sử dụng data-bs-toggle
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-
-        // Thêm JS cho datepicker hoặc các filter khác nếu cần
-        // Ví dụ: Gắn datepicker cho input DateFilter
-        // flatpickr("#DateFilter", { // Cần thư viện flatpickr
-        //     dateFormat: "Y-m-d",
-        // });
-
-        // Thêm confirm dialog cho nút Hủy YC
-        document.querySelectorAll('a[asp-action="AdminCancel"]').forEach(button => {
-            button.addEventListener('click', function (event) {
-                if (!confirm('Bạn có chắc chắn muốn hủy yêu cầu này không?')) {
-                    event.preventDefault(); // Ngăn chặn hành động mặc định (chuyển hướng)
-                } else {
-                     // Nếu người dùng đồng ý, cần submit form POST thay vì GET qua link <a>
-                     event.preventDefault(); // Ngăn link <a>
-                     const form = document.createElement('form');
-                     form.method = 'post';
-                     form.action = this.href; // Lấy URL từ link
-
-                     // Thêm token chống CSRF nếu cần (quan trọng!)
-                     // Cách lấy token có thể khác nhau tùy phiên bản .NET Core
-                     // Ví dụ đơn giản (cần thẻ input chứa token trong trang):
-                     // const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
-                     // if (tokenInput) {
-                     //    const token = document.createElement('input');
-                     //    token.type = 'hidden';
-                     //    token.name = '__RequestVerificationToken';
-                     //    token.value = tokenInput.value;
-                     //    form.appendChild(token);
-                     // }
-
-                     document.body.appendChild(form);
-                     form.submit();
-                }
-            });
-        });
-         // Thêm confirm dialog cho nút Thất bại (tương tự Hủy YC)
-          document.querySelectorAll('a[asp-action="MarkFailed"]').forEach(button => {
-            button.addEventListener('click', function (event) {
-                if (!confirm('Bạn có chắc chắn muốn đánh dấu yêu cầu này là thất bại không?')) {
-                    event.preventDefault();
-                } else {
-                     // Tương tự nút Hủy, nên dùng form POST
-                     event.preventDefault();
-                     const form = document.createElement('form');
-                     form.method = 'post';
-                     form.action = this.href;
-                     // Thêm input cho lý do thất bại nếu cần
-                     // const reason = prompt("Nhập lý do thất bại (không bắt buộc):");
-                     // if (reason !== null) { // Nếu người dùng không bấm Cancel trên prompt
-                     //      const reasonInput = document.createElement('input');
-                     //      reasonInput.type = 'hidden';
-                     //      reasonInput.name = 'failureReason'; // Phải khớp với tham số Action
-                     //      reasonInput.value = reason;
-                     //      form.appendChild(reasonInput);
-                     // }
-                     // Thêm token chống CSRF
-                     document.body.appendChild(form);
-                     form.submit();
-                }
-            });
-        });
-
-         // Các confirm dialog khác nếu cần (StartCollection, MarkComplete...)
-         // Nếu các action đó là POST, cách làm tương tự như Hủy/Thất bại
-         // Nếu là GET thì chỉ cần confirm đơn giản
-
-         document.querySelectorAll('a[asp-action="StartCollection"], a[asp-action="MarkComplete"]').forEach(button => {
-             button.addEventListener('click', function(event) {
-                 // Chỉ cần confirm đơn giản nếu action là GET
-                 // Nếu là POST, làm như Hủy/Thất bại
-                 const action = this.getAttribute('asp-action');
-                 let message = `Bạn có chắc muốn ${action === 'StartCollection' ? 'Bắt đầu' : 'Hoàn thành'} yêu cầu này?`;
-                 if (!confirm(message)) {
-                     event.preventDefault();
-                 } else {
-                    // NẾU LÀ POST, THÊM CODE TẠO FORM VÀ SUBMIT Ở ĐÂY
-                     event.preventDefault();
-                     const form = document.createElement('form');
-                     form.method = 'post';
-                     form.action = this.href;
-                     // Thêm token chống CSRF
-                     document.body.appendChild(form);
-                     form.submit();
-                 }
-             });
-         });
-
-
-    </script>
-
-    {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} // Giữ lại nếu có validation khác
-
-    @* Đảm bảo jQuery đã được load trước script này (thường trong _Layout.cshtml) *@
-    <script>
-        // Sử dụng jQuery cho ngắn gọn, đảm bảo jQuery đã được load trước
         $(document).ready(function () {
             var completeModalElement = document.getElementById('completeConfirmationModal');
-            // Kiểm tra xem modal element có tồn tại không trước khi tạo đối tượng Bootstrap Modal
             if (completeModalElement) {
                 var completeModal = new bootstrap.Modal(completeModalElement);
-                var requestIdToComplete = null; // Biến lưu ID yêu cầu đang xử lý
+                var requestIdToComplete = null;
 
-                // 1. Xử lý khi bấm nút Hoàn thành (dấu check xanh) trong bảng
-                // Dùng class 'btn-mark-complete' mà bạn đã thêm vào nút button
+                // 1. Handler cho nút .btn-mark-complete
                 $(document).on('click', '.btn-mark-complete', function () {
-                    requestIdToComplete = $(this).data('request-id'); // Lấy ID từ data-request-id
-
-                    // Cập nhật ID hiển thị trong modal và input ẩn
+                    requestIdToComplete = $(this).data('request-id');
                     $('#modal-request-id-display').text(requestIdToComplete);
                     $('#modal-request-id-hidden').val(requestIdToComplete);
-
-                    // Reset dropdown chọn kho và thông báo lỗi
                     $('#targetKhoSelect').val('');
                     $('#khoSelectError').hide();
-
-                    // Mở modal (Bootstrap 5 tự xử lý qua data-bs-toggle/target,
-                    // nhưng gọi .show() đảm bảo nó mở bằng JS nếu cần)
                      completeModal.show();
                 });
 
-                // 2. Xử lý khi bấm nút "Xác nhận Hoàn thành" TRONG MODAL
+                // 2. Handler cho nút #confirmCompleteBtn trong modal
                 $('#confirmCompleteBtn').on('click', function () {
-                    console.log("Confirm button clicked!"); // * Log để debug *
-
+                    console.log("Confirm button clicked!");
                     var selectedKho = $('#targetKhoSelect').val();
                     var requestId = $('#modal-request-id-hidden').val();
-                    console.log("Request ID:", requestId); // * Log để debug *
-                    console.log("Selected Kho:", selectedKho); // * Log để debug *
+                    console.log("Request ID:", requestId);
+                    console.log("Selected Kho:", selectedKho);
 
-
-                    // Kiểm tra xem đã chọn kho chưa
                     if (!selectedKho) {
-                        console.log("Validation failed: Kho not selected."); // * Log để debug *
-                        $('#khoSelectError').show(); // Hiển thị lỗi
-                        return; // Dừng lại
+                        console.log("Validation failed: Kho not selected.");
+                        $('#khoSelectError').show();
+                        return;
                     } else {
-                        $('#khoSelectError').hide(); // Ẩn lỗi
+                        $('#khoSelectError').hide();
                     }
 
-                    // Tạo URL cho action POST
                     var postUrl = '@Url.Action("MarkComplete", "QuanLyXNK", new { Area = "QuanLyXNK" })'
                                 + '/' + requestId
                                 + '?targetMaKho=' + encodeURIComponent(selectedKho);
-                    console.log("Generated POST URL:", postUrl); // * Log để debug *
+                    console.log("Generated POST URL:", postUrl);
 
-
-                    // Lấy form ẩn và cập nhật action
                     var hiddenForm = $('#hiddenCompleteForm');
-                    console.log("Hidden form found:", hiddenForm.length); // * Log để debug * (Phải là 1)
+                    console.log("Hidden form found:", hiddenForm.length);
 
                     if(hiddenForm.length === 0) {
                         console.error("Hidden form #hiddenCompleteForm not found!");
-                        alert("Lỗi: Không tìm thấy form ẩn để gửi yêu cầu.");
+                        alert("Lỗi: Không tìm thấy form ẩn để gửi yêu cầu."); // Lỗi bạn gặp
                         return;
                     }
                     hiddenForm.attr('action', postUrl);
-                    console.log("Form action set to:", hiddenForm.attr('action')); // * Log để debug *
+                    console.log("Form action set to:", hiddenForm.attr('action'));
 
-
-                    // Submit form ẩn
-                    console.log("Submitting hidden form..."); // * Log để debug *
+                    console.log("Submitting hidden form...");
                     try {
                          hiddenForm.submit();
-                         console.log("Form submitted."); // * Log để debug * (Có thể không thấy log này nếu trang redirect nhanh)
+                         console.log("Form submitted.");
                     } catch (e) {
-                         console.error("Error submitting form:", e); // * Log lỗi submit *
+                         console.error("Error submitting form:", e);
                     }
-
-
-                    // Đóng modal
-                    // completeModal.hide(); // Có thể tạm comment dòng này để xem log dễ hơn
+                    // completeModal.hide();
                 });
 
-                 // (Tùy chọn) Reset khi modal đóng
+                // Reset khi modal đóng
                 $(completeModalElement).on('hidden.bs.modal', function () {
-                    requestIdToComplete = null;
-                    $('#modal-request-id-hidden').val('');
-                    $('#modal-request-id-display').text('[Mã YC]');
+                     requestIdToComplete = null;
+                     $('#modal-request-id-hidden').val('');
+                     $('#modal-request-id-display').text('[Mã YC]');
                      $('#targetKhoSelect').val('');
                      $('#khoSelectError').hide();
                 });
@@ -567,7 +531,7 @@
                  console.error("Modal element #completeConfirmationModal not found!");
             }
 
-            // Kích hoạt Tooltip (giữ lại nếu muốn)
+            // Tooltip initialization (nếu bạn vẫn muốn dùng)
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -575,5 +539,4 @@
 
         }); // End document ready
     </script>
-}
 }
