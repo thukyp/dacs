@@ -7,18 +7,39 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\KhachHang\Data\" />
-    <Folder Include="Areas\KhachHang\Models\" />
+    <Compile Remove="Areas\KhachHang\Data\**" />
+    <Compile Remove="Areas\KhachHang\Models\**" />
+    <Compile Remove="Areas\QuanLySP\Data\**" />
+    <Compile Remove="Areas\QuanLySP\Models\**" />
+    <Compile Remove="Areas\QuanLyXNK\Data\**" />
+    <Compile Remove="Areas\QuanLyXNK\Models\**" />
+    <Content Remove="Areas\KhachHang\Data\**" />
+    <Content Remove="Areas\KhachHang\Models\**" />
+    <Content Remove="Areas\QuanLySP\Data\**" />
+    <Content Remove="Areas\QuanLySP\Models\**" />
+    <Content Remove="Areas\QuanLyXNK\Data\**" />
+    <Content Remove="Areas\QuanLyXNK\Models\**" />
+    <EmbeddedResource Remove="Areas\KhachHang\Data\**" />
+    <EmbeddedResource Remove="Areas\KhachHang\Models\**" />
+    <EmbeddedResource Remove="Areas\QuanLySP\Data\**" />
+    <EmbeddedResource Remove="Areas\QuanLySP\Models\**" />
+    <EmbeddedResource Remove="Areas\QuanLyXNK\Data\**" />
+    <EmbeddedResource Remove="Areas\QuanLyXNK\Models\**" />
+    <None Remove="Areas\KhachHang\Data\**" />
+    <None Remove="Areas\KhachHang\Models\**" />
+    <None Remove="Areas\QuanLySP\Data\**" />
+    <None Remove="Areas\QuanLySP\Models\**" />
+    <None Remove="Areas\QuanLyXNK\Data\**" />
+    <None Remove="Areas\QuanLyXNK\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Areas\Owner\Data\" />
     <Folder Include="Areas\Owner\Models\" />
     <Folder Include="Areas\QuanLyDH\Data\" />
     <Folder Include="Areas\QuanLyDH\Models\" />
     <Folder Include="Areas\QuanLyND\Data\" />
     <Folder Include="Areas\QuanLyND\Models\" />
-    <Folder Include="Areas\QuanLySP\Data\" />
-    <Folder Include="Areas\QuanLySP\Models\" />
-    <Folder Include="Areas\QuanLyXNK\Data\" />
-    <Folder Include="Areas\QuanLyXNK\Models\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,83 +1,181 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering; // Cần thêm using này cho SelectListItem
 
-namespace DACS.Models.ViewModels
+using System.ComponentModel.DataAnnotations;
+
+using System.ComponentModel.DataAnnotations.Schema; // Cho [NotMapped] (tùy chọn nhưng nên có)
+
+
+
+namespace DACS.Models.ViewModels // <<< Thay namespace cho đúng với project của bạn
+
 {
+
     public class ThuGomViewModel
+
     {
-        // --- Thông tin người cung cấp ---
-        [Required(ErrorMessage = "Vui lòng nhập họ và tên.")]
-        [Display(Name = "Họ và Tên")]
-        public string? SupplierName { get; set; }
+
+        public string? M_YeuCau { get; set; }
+
+
+
+        // --- Các thuộc tính hiện có để lưu giá trị người dùng nhập ---
+
+        [Display(Name = "Tên người cung cấp")]
+
+        [Required(ErrorMessage = "Vui lòng nhập tên người cung cấp.")]
+
+        public string SupplierName { get; set; }
+
+
+
+        [Display(Name = "Số điện thoại")]
 
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
-        [Phone(ErrorMessage = "Định dạng số điện thoại không hợp lệ.")]
-        [Display(Name = "Số điện thoại")]
-        public string? SupplierPhone { get; set; }
+
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]
+
+        public string SupplierPhone { get; set; }
+
+
+
+        [Display(Name = "Tỉnh/Thành phố")]
 
         [Required(ErrorMessage = "Vui lòng chọn Tỉnh/Thành phố.")]
-        [Display(Name = "Tỉnh/Thành phố")]
-        public string? SupplierProvince { get; set; }
+
+        public string SupplierProvince { get; set; } // Lưu Mã Tỉnh được chọn
+
+
+
+        [Display(Name = "Quận/Huyện")]
 
         [Required(ErrorMessage = "Vui lòng chọn Quận/Huyện.")]
-        [Display(Name = "Quận/Huyện")]
-        public string? SupplierDistrict { get; set; }
+
+        public string SupplierDistrict { get; set; } // Lưu Mã Quận được chọn
+
+
+
+        [Display(Name = "Xã/Phường")]
 
         [Required(ErrorMessage = "Vui lòng chọn Xã/Phường.")]
-        [Display(Name = "Xã/Phường")]
-        public string? SupplierWard { get; set; }
 
-        [Display(Name = "Số nhà, Đường/Ấp/Thôn")]
-        public string? SupplierStreet { get; set; } // Không bắt buộc trong HTML
+        public string SupplierWard { get; set; }     // Lưu Mã Xã được chọn
 
-        [Required(ErrorMessage = "Vui lòng chọn thời gian sẵn sàng thu gom.")]
-        [Display(Name = "Thời gian sẵn sàng thu gom")]
-        public DateTime? PickupReadyTime { get; set; }
 
-        [Display(Name = "Ghi chú thêm")]
-        public string? SupplierNotes { get; set; }
 
-        // --- Thông tin phụ phẩm ---
-        [Required(ErrorMessage = "Vui lòng chọn loại phụ phẩm.")]
-        [Display(Name = "Loại phụ phẩm")]
-        public string? ByproductType { get; set; }
+        [Display(Name = "Địa chỉ chi tiết (Số nhà, đường, thôn...)")]
 
-        [Display(Name = "Mô tả chi tiết")]
+        [Required(ErrorMessage = "Vui lòng nhập địa chỉ chi tiết.")]
+
+        public string SupplierStreet { get; set; }
+
+
+
+        [Display(Name = "Thời gian sẵn sàng lấy")]
+
+        [Required(ErrorMessage = "Vui lòng chọn thời gian.")]
+
+        public DateTime? PickupReadyTime { get; set; } // Dùng nullable DateTime
+
+
+
+        [Display(Name = "Ghi chú thêm")]
+
+        public string? SupplierNotes { get; set; } // Dùng nullable string
+
+
+
+        [Display(Name = "Loại sản phẩm")]
+
+        [Required(ErrorMessage = "Vui lòng chọn loại sản phẩm.")]
+
+        public string ByproductType { get; set; } // Lưu Mã Loại SP được chọn
+
+
+
+        [Display(Name = "Mô tả chi tiết phụ phẩm")]
+
         public string? ByproductDescription { get; set; }
 
-        [Required(ErrorMessage = "Vui lòng nhập số lượng ước tính.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0.")]
+
+
         [Display(Name = "Số lượng ước tính")]
-        public int? ByproductQuantity { get; set; } // Dùng int? hoặc double? tùy theo yêu cầu
+
+        [Required(ErrorMessage = "Vui lòng nhập số lượng.")]
+
+        [Range(0.01, double.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0.")]
+
+        public double? ByproductQuantity { get; set; } // Dùng nullable double/decimal
+
+
+
+        [Display(Name = "Đơn vị tính")]
 
         [Required(ErrorMessage = "Vui lòng chọn đơn vị tính.")]
-        [Display(Name = "Đơn vị tính")]
-        public string? ByproductUnit { get; set; }
 
-        [Range(0, double.MaxValue, ErrorMessage = "Giá trị mong muốn không được âm.")]
-        [Display(Name = "Giá trị mong muốn (Nếu có)")]
-        public decimal? ByproductValue { get; set; } // Dùng decimal cho tiền tệ
+        public string ByproductUnit { get; set; } // Lưu Mã ĐVT được chọn
 
-        // Đặc tính phụ phẩm (bool vì là checkbox)
-        [Display(Name = "Cồng kềnh")]
+
+
+        [Display(Name = "Giá trị mong muốn (ước tính)")]
+
+        [Range(0, double.MaxValue, ErrorMessage = "Giá trị phải lớn hơn hoặc bằng 0.")]
+
+        public decimal? ByproductValue { get; set; } // Dùng nullable decimal
+
+
+
+        [Display(Name = "Cồng kềnh / Khó vận chuyển")]
+
         public bool CharBulky { get; set; }
-        [Display(Name = "Ẩm / Ướt")]
+
         public bool CharWet { get; set; }
-        [Display(Name = "Khô")]
+
         public bool CharDry { get; set; }
-        [Display(Name = "Độ ẩm cao (>20%)")]
+
         public bool CharMoisture { get; set; }
-        [Display(Name = "Nhiều tạp chất")]
+
         public bool CharImpure { get; set; }
-        [Display(Name = "Đã qua xử lý")]
+
         public bool CharProcessed { get; set; }
 
-        [Display(Name = "Hình ảnh (Nếu có)")]
-        public List<IFormFile>? ByproductImages { get; set; } // List để cho phép nhiều file
 
-        // --- Điều khoản ---
-        [Required(ErrorMessage = "Bạn phải đồng ý với Điều khoản & Quy định.")]
-        [Range(typeof(bool), "true", "true", ErrorMessage = "Bạn phải đồng ý với Điều khoản & Quy định.")]
-        [Display(Name = "Đồng ý điều khoản")]
-        public bool TermsCheck { get; set; }
+
+        [Display(Name = "Ảnh chụp phụ phẩm")]
+
+        public List<IFormFile>? ByproductImages { get; set; } // Danh sách file ản
+
+        // --- THÊM CÁC THUỘC TÍNH ĐỂ CHỨA DANH SÁCH DROPDOWN ---
+
+        [NotMapped] // Không ánh xạ vào DB
+
+        public IEnumerable<SelectListItem>? LoaiSanPhamOptions { get; set; }
+
+
+
+        [NotMapped]
+
+        public IEnumerable<SelectListItem>? DonViTinhOptions { get; set; }
+
+
+
+        [NotMapped]
+
+        public IEnumerable<SelectListItem>? ProvinceOptions { get; set; }
+
+
+
+        [NotMapped]
+
+        public IEnumerable<SelectListItem>? DistrictOptions { get; set; }
+
+
+
+        [NotMapped]
+
+        public IEnumerable<SelectListItem>? WardOptions { get; set; }
+
+
+
     }
+
 }

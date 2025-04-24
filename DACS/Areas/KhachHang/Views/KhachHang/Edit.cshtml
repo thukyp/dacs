@@ -46,8 +46,43 @@
                 <div class="mb-3 row"> <label asp-for="Ten_NguoiMua" class="col-sm-3 col-form-label"></label> <div class="col-sm-9"> <input asp-for="Ten_NguoiMua" class="form-control" /> <span asp-validation-for="Ten_NguoiMua" class="text-danger"></span> </div> </div>
                 <div class="mb-3 row"> <label asp-for="Email_NguoiMua" class="col-sm-3 col-form-label"></label> <div class="col-sm-9"> <input asp-for="Email_NguoiMua" class="form-control" /> <span asp-validation-for="Email_NguoiMua" class="text-danger"></span> </div> </div>
                 <div class="mb-3 row"> <label asp-for="SDT_NguoiMua" class="col-sm-3 col-form-label"></label> <div class="col-sm-9"> <input asp-for="SDT_NguoiMua" class="form-control" /> <span asp-validation-for="SDT_NguoiMua" class="text-danger"></span> </div> </div>
-                <div class="mb-3 row"> <label asp-for="DiaChi_NguoiMua" class="col-sm-3 col-form-label"></label> <div class="col-sm-9"> <textarea asp-for="DiaChi_NguoiMua" class="form-control" rows="3"></textarea> <span asp-validation-for="DiaChi_NguoiMua" class="text-danger"></span> </div> </div>
-                <div class="mb-3 row"> <label asp-for="Gender" class="col-sm-3 col-form-label"></label> <div class="col-sm-9"> <select asp-for="Gender" class="form-select"> <option value="">-- Chọn giới tính --</option> <option value="Nam">Nam</option> <option value="Nữ">Nữ</option> <option value="Khác">Khác</option> </select> <span asp-validation-for="Gender" class="text-danger"></span> </div> </div>
+                <div class="mb-3 row">
+                    <label asp-for="Edit_DiaChi_TinhTP" class="col-sm-3 col-form-label"></label>
+                    <div class="col-sm-9">
+                        <select asp-for="Edit_DiaChi_TinhTP" asp-items="@ViewBag.ProvinceOptions" class="form-select" id="provinceSelect">
+                            <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                        </select>
+                        <span asp-validation-for="Edit_DiaChi_TinhTP" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="Edit_DiaChi_QuanHuyen" class="col-sm-3 col-form-label"></label>
+                    <div class="col-sm-9">
+                        <select asp-for="Edit_DiaChi_QuanHuyen" asp-items="@ViewBag.DistrictOptions" class="form-select" id="districtSelect">
+                            <option value="">-- Chọn Quận/Huyện --</option>
+                        </select>
+                        <span asp-validation-for="Edit_DiaChi_QuanHuyen" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="Edit_DiaChi_XaPhuong" class="col-sm-3 col-form-label"></label>
+                    <div class="col-sm-9">
+                        <select asp-for="Edit_DiaChi_XaPhuong" asp-items="@ViewBag.WardOptions" class="form-select" id="wardSelect">
+                            <option value="">-- Chọn Xã/Phường --</option>
+                        </select>
+                        <span asp-validation-for="Edit_DiaChi_XaPhuong" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="Edit_DiaChi_DuongApThon" class="col-sm-3 col-form-label"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="Edit_DiaChi_DuongApThon" class="form-control" />
+                        <span asp-validation-for="Edit_DiaChi_DuongApThon" class="text-danger"></span>
+                    </div>
+                </div> <div class="mb-3 row"> <label asp-for="Gender" class="col-sm-3 col-form-label"></label> <div class="col-sm-9"> <select asp-for="Gender" class="form-select"> <option value="">-- Chọn giới tính --</option> <option value="Nam">Nam</option> <option value="Nữ">Nữ</option> <option value="Khác">Khác</option> </select> <span asp-validation-for="Gender" class="text-danger"></span> </div> </div>
 
 
                 <div class="mt-4 row">

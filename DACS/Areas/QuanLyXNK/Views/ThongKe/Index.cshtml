@@ -15,6 +15,7 @@
             padding: 0;
             flex-direction: row;
         }
+
         .sidebar {
             background-color: #212529;
             color: #fff;
@@ -62,7 +63,7 @@
             box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
         }
 
-        
+
         .positive {
             color: green;
             font-weight: bold;
@@ -79,14 +80,19 @@
         <div class="sidebar">
             <h2>Kho Hàng</h2>
             <ul class="nav flex-column">
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link "><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="QuanLyDSKH" class="nav-link "><i class="fas fa-warehouse me-2"></i> Danh sách Kho hàng</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="QuanLyDSPX" class="nav-link "><i class="fas fa-file-export me-2"></i> Phiếu xuất</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="TonKho" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
-				<li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="ThongKe" class="nav-link active"><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
-
-                <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
-                <li class="nav-item mt-auto pt-3 border-top border-secondary"><a href="#" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link active"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
+                @* Thay thế bằng các link đúng của bạn *@
+                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="KhoHang" asp-action="Index" class="nav-link"><i class="fas fa-warehouse me-2"></i> Danh sách Kho hàng</a></li>
+                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="TonKho" asp-action="Index" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
+                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="ThongKe" asp-action="Index" class="nav-link"><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
+                @* Nút Đăng xuất *@
+                <li class="nav-item mt-auto pt-3 border-top border-secondary">
+                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                        <button type="submit" class="nav-link text-danger" style="background:none; border:none; width:100%; text-align:left;">
+                            <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                        </button>
+                    </form>
+                </li>
             </ul>
         </div>
 

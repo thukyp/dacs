@@ -25,6 +25,13 @@ namespace DACS.Models
 
         // Navigation Property
         public virtual ICollection<ChiTietThuGom> ChiTietThuGoms { get; set; } = new List<ChiTietThuGom>();
+        public DateTime ThoiGianSanSang { get; set; }
+        public string? GhiChu { get; set; }
+        [Column("Thoi_Gian_HT")]
+        public DateTime ThoiGianHoanThanh { get;  set; }
+        public string? M_QuanLy { get; set; } // Thuộc tính khóa ngoại
 
+        [ForeignKey("M_QuanLy")] // <<< THÊM DÒNG NÀY
+        public virtual ApplicationUser? QuanLy { get; set; } // Thuộc tính navigation
     }
 }

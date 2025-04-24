@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DACS.Migrations
 {
     /// <inheritdoc />
-    public partial class intailli : Migration
+    public partial class intalli : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -151,6 +151,18 @@ namespace DACS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TinhThanhPhos",
+                columns: table => new
+                {
+                    MaTinh = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    TenTinh = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TinhThanhPhos", x => x.MaTinh);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VanChuyens",
                 columns: table => new
                 {
@@ -269,30 +281,6 @@ namespace DACS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "KhachHangs",
-                columns: table => new
-                {
-                    M_KhachHang = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Ten_KhachHang = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Email_KhachHang = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    SDT_KhachHang = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    DiaChi_KhachHang = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    AvatarUrl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_KhachHangs", x => x.M_KhachHang);
-                    table.ForeignKey(
-                        name: "FK_KhachHangs_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "LoaiSanPhamGiamGias",
                 columns: table => new
                 {
@@ -329,7 +317,7 @@ namespace DACS.Migrations
                     MoTa = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
                     TrangThai = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     NgayTao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AnhSanPham = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    AnhSanPham = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     SoLuong = table.Column<int>(type: "int", nullable: false),
                     HanSuDung = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -353,6 +341,140 @@ namespace DACS.Migrations
                         column: x => x.M_LoaiSP,
                         principalTable: "LoaiSanPhams",
                         principalColumn: "M_LoaiSP",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuanHuyens",
+                columns: table => new
+                {
+                    MaQuan = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    TenQuan = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MaTinh = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuanHuyens", x => x.MaQuan);
+                    table.ForeignKey(
+                        name: "FK_QuanHuyens_TinhThanhPhos_MaTinh",
+                        column: x => x.MaTinh,
+                        principalTable: "TinhThanhPhos",
+                        principalColumn: "MaTinh",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SanPhamGiamGias",
+                columns: table => new
+                {
+                    M_SanPham = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    M_GiamGia = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SanPhamGiamGias", x => new { x.M_SanPham, x.M_GiamGia });
+                    table.ForeignKey(
+                        name: "FK_SanPhamGiamGias_GiamGias_M_GiamGia",
+                        column: x => x.M_GiamGia,
+                        principalTable: "GiamGias",
+                        principalColumn: "M_GiamGia",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SanPhamGiamGias_SanPhams_M_SanPham",
+                        column: x => x.M_SanPham,
+                        principalTable: "SanPhams",
+                        principalColumn: "M_SanPham",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "XaPhuongs",
+                columns: table => new
+                {
+                    MaXa = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    TenXa = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MaQuan = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_XaPhuongs", x => x.MaXa);
+                    table.ForeignKey(
+                        name: "FK_XaPhuongs_QuanHuyens_MaQuan",
+                        column: x => x.MaQuan,
+                        principalTable: "QuanHuyens",
+                        principalColumn: "MaQuan",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "KhachHangs",
+                columns: table => new
+                {
+                    M_KhachHang = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Ten_KhachHang = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email_KhachHang = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    SDT_KhachHang = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    MaTinh = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    MaQuan = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    MaXa = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    DiaChi_DuongApThon = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    AvatarUrl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KhachHangs", x => x.M_KhachHang);
+                    table.ForeignKey(
+                        name: "FK_KhachHangs_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_KhachHangs_QuanHuyens_MaQuan",
+                        column: x => x.MaQuan,
+                        principalTable: "QuanHuyens",
+                        principalColumn: "MaQuan",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_KhachHangs_TinhThanhPhos_MaTinh",
+                        column: x => x.MaTinh,
+                        principalTable: "TinhThanhPhos",
+                        principalColumn: "MaTinh",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_KhachHangs_XaPhuongs_MaXa",
+                        column: x => x.MaXa,
+                        principalTable: "XaPhuongs",
+                        principalColumn: "MaXa",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChiTietDanhGias",
+                columns: table => new
+                {
+                    M_KhachHang = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    M_SanPham = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    MucDoHaiLong = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    MoTa_DanhGia = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
+                    NgayDanhGia = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChiTietDanhGias", x => new { x.M_KhachHang, x.M_SanPham });
+                    table.ForeignKey(
+                        name: "FK_ChiTietDanhGias_KhachHangs_M_KhachHang",
+                        column: x => x.M_KhachHang,
+                        principalTable: "KhachHangs",
+                        principalColumn: "M_KhachHang",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChiTietDanhGias_SanPhams_M_SanPham",
+                        column: x => x.M_SanPham,
+                        principalTable: "SanPhams",
+                        principalColumn: "M_SanPham",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -388,57 +510,6 @@ namespace DACS.Migrations
                         column: x => x.M_VanDon,
                         principalTable: "VanChuyens",
                         principalColumn: "M_VanDon",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ChiTietDanhGias",
-                columns: table => new
-                {
-                    M_KhachHang = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    M_SanPham = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    MucDoHaiLong = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    MoTa_DanhGia = table.Column<string>(type: "nvarchar(MAX)", nullable: true),
-                    NgayDanhGia = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChiTietDanhGias", x => new { x.M_KhachHang, x.M_SanPham });
-                    table.ForeignKey(
-                        name: "FK_ChiTietDanhGias_KhachHangs_M_KhachHang",
-                        column: x => x.M_KhachHang,
-                        principalTable: "KhachHangs",
-                        principalColumn: "M_KhachHang",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ChiTietDanhGias_SanPhams_M_SanPham",
-                        column: x => x.M_SanPham,
-                        principalTable: "SanPhams",
-                        principalColumn: "M_SanPham",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SanPhamGiamGias",
-                columns: table => new
-                {
-                    M_SanPham = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    M_GiamGia = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SanPhamGiamGias", x => new { x.M_SanPham, x.M_GiamGia });
-                    table.ForeignKey(
-                        name: "FK_SanPhamGiamGias_GiamGias_M_GiamGia",
-                        column: x => x.M_GiamGia,
-                        principalTable: "GiamGias",
-                        principalColumn: "M_GiamGia",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SanPhamGiamGias_SanPhams_M_SanPham",
-                        column: x => x.M_SanPham,
-                        principalTable: "SanPhams",
-                        principalColumn: "M_SanPham",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -553,6 +624,8 @@ namespace DACS.Migrations
                     NgayYeuCau = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TrangThai = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     M_KhachHang = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    ThoiGianSanSang = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    GhiChu = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DonHangM_DonHang = table.Column<string>(type: "nvarchar(10)", nullable: true)
                 },
                 constraints: table =>
@@ -575,17 +648,33 @@ namespace DACS.Migrations
                 name: "ChiTietThuGoms",
                 columns: table => new
                 {
+                    M_ChiTiet = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     M_YeuCau = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    M_KhachHang = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     M_DonViTinh = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    M_KhachHang = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     SoLuong = table.Column<int>(type: "int", nullable: false),
+                    DacTinh_CongKenh = table.Column<bool>(type: "bit", nullable: false),
+                    DacTinh_AmUot = table.Column<bool>(type: "bit", nullable: false),
+                    DacTinh_Kho = table.Column<bool>(type: "bit", nullable: false),
+                    DacTinh_DoAmCao = table.Column<bool>(type: "bit", nullable: false),
+                    DacTinh_TapChat = table.Column<bool>(type: "bit", nullable: false),
+                    DacTinh_DaXuLy = table.Column<bool>(type: "bit", nullable: false),
+                    DanhSachHinhAnh = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     M_QuanLy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     M_SanPham = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    DonHangM_DonHang = table.Column<string>(type: "nvarchar(10)", nullable: true)
+                    MaTinh = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    MaQuan = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    MaXa = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    DiaChi_DuongApThon = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    MoTa = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    M_LoaiSP = table.Column<string>(type: "nvarchar(10)", nullable: false),
+                    GiaTriMongMuon = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DonHangM_DonHang = table.Column<string>(type: "nvarchar(10)", nullable: true),
+                    QuanLyM_QuanLy = table.Column<string>(type: "nvarchar(10)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChiTietThuGoms", x => new { x.M_YeuCau, x.M_KhachHang });
+                    table.PrimaryKey("PK_ChiTietThuGoms", x => x.M_ChiTiet);
                     table.ForeignKey(
                         name: "FK_ChiTietThuGoms_DonHangs_DonHangM_DonHang",
                         column: x => x.DonHangM_DonHang,
@@ -602,7 +691,19 @@ namespace DACS.Migrations
                         column: x => x.M_KhachHang,
                         principalTable: "KhachHangs",
                         principalColumn: "M_KhachHang",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChiTietThuGoms_LoaiSanPhams_M_LoaiSP",
+                        column: x => x.M_LoaiSP,
+                        principalTable: "LoaiSanPhams",
+                        principalColumn: "M_LoaiSP",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ChiTietThuGoms_QuanHuyens_MaQuan",
+                        column: x => x.MaQuan,
+                        principalTable: "QuanHuyens",
+                        principalColumn: "MaQuan",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ChiTietThuGoms_QuanLys_M_QuanLy",
                         column: x => x.M_QuanLy,
@@ -610,11 +711,28 @@ namespace DACS.Migrations
                         principalColumn: "M_QuanLy",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_ChiTietThuGoms_QuanLys_QuanLyM_QuanLy",
+                        column: x => x.QuanLyM_QuanLy,
+                        principalTable: "QuanLys",
+                        principalColumn: "M_QuanLy");
+                    table.ForeignKey(
                         name: "FK_ChiTietThuGoms_SanPhams_M_SanPham",
                         column: x => x.M_SanPham,
                         principalTable: "SanPhams",
                         principalColumn: "M_SanPham",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChiTietThuGoms_TinhThanhPhos_MaTinh",
+                        column: x => x.MaTinh,
+                        principalTable: "TinhThanhPhos",
+                        principalColumn: "MaTinh",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChiTietThuGoms_XaPhuongs_MaXa",
+                        column: x => x.MaXa,
+                        principalTable: "XaPhuongs",
+                        principalColumn: "MaXa",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ChiTietThuGoms_YeuCauThuGoms_M_YeuCau",
                         column: x => x.M_YeuCau,
@@ -698,6 +816,11 @@ namespace DACS.Migrations
                 column: "M_KhachHang");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ChiTietThuGoms_M_LoaiSP",
+                table: "ChiTietThuGoms",
+                column: "M_LoaiSP");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ChiTietThuGoms_M_QuanLy",
                 table: "ChiTietThuGoms",
                 column: "M_QuanLy");
@@ -706,6 +829,31 @@ namespace DACS.Migrations
                 name: "IX_ChiTietThuGoms_M_SanPham",
                 table: "ChiTietThuGoms",
                 column: "M_SanPham");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChiTietThuGoms_M_YeuCau",
+                table: "ChiTietThuGoms",
+                column: "M_YeuCau");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChiTietThuGoms_MaQuan",
+                table: "ChiTietThuGoms",
+                column: "MaQuan");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChiTietThuGoms_MaTinh",
+                table: "ChiTietThuGoms",
+                column: "MaTinh");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChiTietThuGoms_MaXa",
+                table: "ChiTietThuGoms",
+                column: "MaXa");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChiTietThuGoms_QuanLyM_QuanLy",
+                table: "ChiTietThuGoms",
+                column: "QuanLyM_QuanLy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DonHangs_M_KhachHang",
@@ -723,6 +871,21 @@ namespace DACS.Migrations
                 column: "M_VanDon");
 
             migrationBuilder.CreateIndex(
+                name: "IX_KhachHangs_MaQuan",
+                table: "KhachHangs",
+                column: "MaQuan");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KhachHangs_MaTinh",
+                table: "KhachHangs",
+                column: "MaTinh");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KhachHangs_MaXa",
+                table: "KhachHangs",
+                column: "MaXa");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_KhachHangs_UserId",
                 table: "KhachHangs",
                 column: "UserId",
@@ -732,6 +895,11 @@ namespace DACS.Migrations
                 name: "IX_LoaiSanPhamGiamGias_M_GiamGia",
                 table: "LoaiSanPhamGiamGias",
                 column: "M_GiamGia");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuanHuyens_MaTinh",
+                table: "QuanHuyens",
+                column: "MaTinh");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuanLys_M_DonHang",
@@ -768,6 +936,11 @@ namespace DACS.Migrations
                 name: "IX_SanPhams_M_LoaiSP",
                 table: "SanPhams",
                 column: "M_LoaiSP");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_XaPhuongs_MaQuan",
+                table: "XaPhuongs",
+                column: "MaQuan");
 
             migrationBuilder.CreateIndex(
                 name: "IX_YeuCauThuGoms_DonHangM_DonHang",
@@ -860,6 +1033,15 @@ namespace DACS.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "XaPhuongs");
+
+            migrationBuilder.DropTable(
+                name: "QuanHuyens");
+
+            migrationBuilder.DropTable(
+                name: "TinhThanhPhos");
         }
     }
 }

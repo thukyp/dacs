@@ -1,415 +1,1997 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
+using System.Security.Claims;
 using DACS.Models;
 using DACS.Models.ViewModels;
 using DACS.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 namespace DACS.Areas.KhachHang.Controllers
+
 {
     [Area("KhachHang")]
     [Authorize(Roles = SD.Role_KhachHang)]
+
     public class KhachHangController : Controller
+
     {
+
         private readonly ApplicationDbContext _context; // <<< Giữ lại DbContext để truy vấn DonHang (trừ khi bạn tạo OrderRepository)
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly INguoiMuaRepository _nguoiMuaRepo; // <<< Inject Repository NguoiMua
-        private readonly ILogger<KhachHangController> _logger;
-        private readonly ISanPhamRepository _sanPhamRepo; // <<< Inject Repository NguoiMua
-
-
+        private readonly ILogger<KhachHangController> _logger;
+        private readonly ISanPhamRepository _sanPhamRepo; // <<< Inject Repository NguoiMu
+        private readonly IThuGomRepository _thuGomRepository;
         public KhachHangController(
-     ApplicationDbContext context, // <<< Thêm lại tham số context
-     UserManager<ApplicationUser> userManager,
-     IWebHostEnvironment webHostEnvironment,
-     INguoiMuaRepository nguoiMuaRepository,
-     ILogger<KhachHangController> logger,
-     ISanPhamRepository sanPhamRepo)
-        {
+      ApplicationDbContext context, // <<< Thêm lại tham số context
+         UserManager<ApplicationUser> userManager,
+      IWebHostEnvironment webHostEnvironment,
+      INguoiMuaRepository nguoiMuaRepository,
+      ILogger<KhachHangController> logger,
+      ISanPhamRepository sanPhamRepo,
+      IThuGomRepository thuGomRepository
+      )
+       {
             _context = context; // <<< Gán lại context
-            _userManager = userManager;
+            _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
             _nguoiMuaRepo = nguoiMuaRepository;
             _logger = logger;
             _sanPhamRepo = sanPhamRepo;
+            _thuGomRepository = thuGomRepository;
         }
 
+
+
         public async Task<IActionResult> Index()
+
         {
             var userId = _userManager.GetUserId(User);
             if (userId == null)
             {
                 return Challenge(); // Chưa đăng nhập
-            }
+            }
 
-            // Tạo ViewModel để chứa dữ liệu
-            var viewModel = new KhachHangDashboardViewModel();
+            // Tạo ViewModel để chứa dữ liệu
+            var dashboardViewModel = new KhachHangDashboardViewModel(); // Renamed variable to avoid conflict
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.UserId == userId);
 
-            // 1. Lấy thông tin profile Người Mua
             var nguoiMuaProfile = await _context.KhachHangs
-                                        .AsNoTracking()
-                                        .FirstOrDefaultAsync(nm => nm.UserId == userId);
+                                     .Include(kh => kh.TinhThanhPho) // Tải TinhThanhPho
+                                     .Include(kh => kh.QuanHuyen)    // Tải QuanHuyen
+                                     .Include(kh => kh.XaPhuong)     // Tải XaPhuong
+                                     .AsNoTracking() // Vẫn có thể dùng AsNoTracking nếu chỉ đọc
+                                     .FirstOrDefaultAsync(kh => kh.UserId == userId);
 
             if (nguoiMuaProfile != null)
             {
-                viewModel.TenNguoiMua = nguoiMuaProfile.Ten_KhachHang;
-                viewModel.EmailNguoiMua = nguoiMuaProfile.Email_KhachHang; // Email liên hệ
-                viewModel.SdtNguoiMua = nguoiMuaProfile.SDT_KhachHang;
+                dashboardViewModel.TenNguoiMua = nguoiMuaProfile.Ten_KhachHang;
+                dashboardViewModel.EmailNguoiMua = nguoiMuaProfile.Email_KhachHang; // Email liên hệ
+                dashboardViewModel.SdtNguoiMua = nguoiMuaProfile.SDT_KhachHang;
                 // Lấy địa chỉ mặc định (ví dụ lấy từ DiaChi_NguoiMua, hoặc từ bảng Sổ Địa Chỉ nếu có)
-                viewModel.DiaChiMacDinh = nguoiMuaProfile.DiaChi_KhachHang;
+                List<string> addressParts = new List<string>();
+                // Giữ lại phần đường/ấp/thôn vì nó vẫn là string trực tiếp
+                if (!string.IsNullOrWhiteSpace(nguoiMuaProfile.DiaChi_DuongApThon))
+                {
+                    addressParts.Add(nguoiMuaProfile.DiaChi_DuongApThon);
+                }
+
+                // SỬA LẠI: Lấy tên từ navigation property XaPhuong
+                // Kiểm tra cả nguoiMuaProfile.XaPhuong và nguoiMuaProfile.XaPhuong.TenXa
+                string? tenXa = nguoiMuaProfile.XaPhuong?.TenXa; // Giả sử tên thuộc tính là TenXa
+                if (!string.IsNullOrWhiteSpace(tenXa))
+                {
+                    addressParts.Add(tenXa);
+                }
+
+                // SỬA LẠI: Lấy tên từ navigation property QuanHuyen
+                // Kiểm tra cả nguoiMuaProfile.QuanHuyen và nguoiMuaProfile.QuanHuyen.TenQuan
+                string? tenQuan = nguoiMuaProfile.QuanHuyen?.TenQuan; // Giả sử tên thuộc tính là TenQuan
+                if (!string.IsNullOrWhiteSpace(tenQuan))
+                {
+                    addressParts.Add(tenQuan);
+                }
+
+                // SỬA LẠI: Lấy tên từ navigation property TinhThanhPho
+                // Kiểm tra cả nguoiMuaProfile.TinhThanhPho và nguoiMuaProfile.TinhThanhPho.TenTinh
+                string? tenTinh = nguoiMuaProfile.TinhThanhPho?.TenTinh; // Giả sử tên thuộc tính là TenTinh
+                if (!string.IsNullOrWhiteSpace(tenTinh))
+                {
+                    addressParts.Add(tenTinh);
+                }
+
+                // Phần Join giữ nguyên
+                if (addressParts.Any())
+                {
+                    dashboardViewModel.DiaChiMacDinh = string.Join(", ", addressParts);
+                }
+                else
+                {
+                    dashboardViewModel.DiaChiMacDinh = "Chưa cập nhật địa chỉ";
+                }
             }
             else
             {
-                // Lấy thông tin cơ bản từ ApplicationUser nếu không có profile NguoiMua
-                var user = await _userManager.GetUserAsync(User);
+                var user = await _userManager.GetUserAsync(User);
                 if (user != null)
+
                 {
-                    viewModel.TenNguoiMua = user.FullName ?? user.UserName;
-                    viewModel.EmailNguoiMua = user.Email; // Email đăng nhập
-                    viewModel.SdtNguoiMua = user.PhoneNumber;
-                    viewModel.DiaChiMacDinh = user.Address ?? "Chưa cập nhật";
+
+                    dashboardViewModel.TenNguoiMua = user.FullName ?? user.UserName;
+
+                    dashboardViewModel.EmailNguoiMua = user.Email; // Email đăng nhập
+
+                    dashboardViewModel.SdtNguoiMua = user.PhoneNumber;
+
+                    dashboardViewModel.DiaChiMacDinh = user.Address ?? "Chưa cập nhật";
+
                 }
+
             }
-            var recentOrdersData = await _context.ChiTietDatHangs
-                             .Where(dh => dh.KhachHang.UserId == userId)
-                             .OrderByDescending(dh => dh.NgayTao) // <<< Sửa ở đây
-                             .Take(3)
-                             .Select(dh => new OrderSummaryViewModel
-                             {
-                                 OrderId = dh.M_CTDatHang,
-                                 OrderDate = (DateTime)dh.NgayTao, // <<< Sửa cả ở đây
-                                 Status = dh.TrangThaiDonHang,
-                                 TotalAmount = dh.TongTien
-                             })
-                             .ToListAsync();
-
-            viewModel.RecentOrders = recentOrdersData;
 
 
-            // 3. Truyền ViewModel tới View Index.cshtml
-            return View(viewModel);
+
+            // 2. Lấy danh sách đơn hàng gần đây
+
+            var recentOrdersData = await _context.ChiTietDatHangs
+
+                .Where(dh => dh.KhachHang.UserId == userId)
+
+                .OrderByDescending(dh => dh.NgayTao)
+
+                .Take(3)
+
+                .Select(dh => new OrderSummaryViewModel
+
+                {
+
+                    OrderId = dh.M_CTDatHang,
+
+                    OrderDate = (DateTime)dh.NgayTao,
+
+                    Status = dh.TrangThaiDonHang,
+
+                    TotalAmount = dh.TongTien
+
+                })
+
+                .ToListAsync();
+
+
+
+            // 3. Lấy đơn thu gom gần đây (nếu có)
+            List<YeuCauThuGom> recentCollectionRequestsData = new List<YeuCauThuGom>(); // Initialize empty
+            if (khachHang != null) // Check if khachHang was found
+            {
+                recentCollectionRequestsData = await _context.YeuCauThuGoms
+                    .Where(yc => yc.M_KhachHang == khachHang.M_KhachHang) // Now safe to access M_KhachHang
+                    .Include(yc => yc.ChiTietThuGoms)
+                        .ThenInclude(ct => ct.LoaiSanPham) // Corrected property name? Check LoaiSanPham model
+                    .OrderByDescending(yc => yc.NgayYeuCau)
+                    .Take(5)
+                    .ToListAsync();
+            }
+
+
+
+            // Assign data to the ViewModel
+
+            dashboardViewModel.RecentOrders = recentOrdersData;
+
+            dashboardViewModel.RecentCollectionRequests = recentCollectionRequestsData.ToList();
+
+
+
+            // 4. Truyền ViewModel tới View Index.cshtml
+
+            return View(dashboardViewModel);
+
         }
 
+
+
         // GET: /KhachHang/KhachHang/HoSoCaNhan
+
         public async Task<IActionResult> HoSoCaNhan()
         {
             var userId = _userManager.GetUserId(User);
             if (userId == null) { return Challenge(); } // Đảm bảo người dùng đăng nhập
 
-            var nguoiMuaProfile = await _nguoiMuaRepo.GetByUserIdAsync(userId);
+            // Lấy hồ sơ từ Repo (Giả sử ban đầu không Include)
+            var nguoiMuaProfileBasic = await _nguoiMuaRepo.GetByUserIdAsync(userId);
 
             // --- Tùy chọn: Tự động tạo hồ sơ nếu chưa có ---
-            if (nguoiMuaProfile == null)
+            if (nguoiMuaProfileBasic == null)
             {
                 var user = await _userManager.FindByIdAsync(userId);
-                // Kiểm tra user có tồn tại không (dù hiếm khi xảy ra nếu GetUserId thành công)
                 if (user == null) { return NotFound("Lỗi: Không tìm thấy tài khoản người dùng."); }
 
-                // Tạo hồ sơ NguoiMua cơ bản
-                nguoiMuaProfile = new Models.KhachHang
+                nguoiMuaProfileBasic = new Models.KhachHang
                 {
-                    // Tạo khóa chính - Đảm bảo logic này giống với RegisterModel
                     M_KhachHang = Guid.NewGuid().ToString("N").Substring(0, 10),
                     UserId = userId,
-                    // Lấy thông tin mặc định từ ApplicationUser nếu có
-                    Ten_KhachHang = user.FullName ?? user.UserName ?? "Chưa đặt tên", // Ưu tiên FullName, rồi UserName
-                    Email_KhachHang = user.Email ?? "Chưa có email", // Email này là email liên hệ, có thể khác email đăng nhập
+                    Ten_KhachHang = user.FullName ?? user.UserName ?? "Chưa đặt tên",
+                    Email_KhachHang = user.Email ?? "Chưa có email",
                     SDT_KhachHang = user.PhoneNumber ?? "Chưa có SĐT",
-                    DiaChi_KhachHang = user.Address ?? "Chưa có địa chỉ", // Giả sử ApplicationUser có Address
-
+                    // Để null nếu DB cho phép và người dùng sẽ cập nhật sau
+                    MaTinh = null,
+                    MaQuan = null,
+                    MaXa = null,
+                    DiaChi_DuongApThon = null
                 };
 
                 try
                 {
-                    await _nguoiMuaRepo.AddAsync(nguoiMuaProfile);
+                    await _nguoiMuaRepo.AddAsync(nguoiMuaProfileBasic);
                     await _nguoiMuaRepo.SaveChangesAsync();
-                    _logger.LogInformation($"Auto-created NguoiMua profile for User ID: {userId}"); // Cần inject ILogger nếu muốn ghi log
+                    _logger.LogInformation($"Auto-created NguoiMua profile for User ID: {userId}");
                     TempData["InfoMessage"] = "Hồ sơ của bạn đã được khởi tạo. Vui lòng cập nhật thông tin chi tiết.";
-                    // Sau khi tạo thành công, nguoiMuaProfile đã có giá trị và code sẽ chạy tiếp xuống dưới
+                    // nguoiMuaProfileBasic bây giờ đã có ID nhưng chưa có thông tin địa chỉ đi kèm
                 }
-                catch (Exception ex) // Bắt lỗi chung hoặc DbUpdateException
+                catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error auto-creating NguoiMua profile for User ID: {userId}"); // Ghi log lỗi
+                    _logger.LogError(ex, $"Error auto-creating NguoiMua profile for User ID: {userId}");
                     TempData["ErrorMessage"] = "Đã xảy ra lỗi khi tạo hồ sơ Người mua của bạn.";
-                    // Không tìm thấy hồ sơ, trả về View lỗi hoặc null
-                    return View("HoSoCaNhan", null); // Hoặc return View("Error");
+                    return View("HoSoCaNhan", null); // Trả về view lỗi
                 }
             }
             // --- Kết thúc Tùy chọn tự động tạo ---
 
-            // Nếu vẫn là null (do tạo lỗi hoặc không bật tùy chọn trên)
+            // === BẮT BUỘC: Truy vấn lại hoặc truy vấn ban đầu với Include để lấy tên Tỉnh/Huyện/Xã ===
+            // Sử dụng _context trực tiếp hoặc đảm bảo Repo có phương thức hỗ trợ Include
+            var nguoiMuaProfile = await _context.KhachHangs // <-- Dùng DbContext hoặc sửa Repo
+                                          .Include(kh => kh.TinhThanhPho) // <<< THÊM INCLUDE
+                                          .Include(kh => kh.QuanHuyen)    // <<< THÊM INCLUDE
+                                          .Include(kh => kh.XaPhuong)     // <<< THÊM INCLUDE
+                                          .AsNoTracking() // Dùng AsNoTracking vì chỉ để hiển thị
+                                          .FirstOrDefaultAsync(kh => kh.UserId == userId); // Lấy theo UserId
+
+            // Nếu không tìm thấy hồ sơ (kể cả sau khi cố tạo) -> báo lỗi
             if (nguoiMuaProfile == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy hồ sơ Người mua.";
-                return View("HoSoCaNhan", null);
+                // Có thể TempData đã được set ở phần tạo lỗi
+                if (TempData["ErrorMessage"] == null)
+                {
+                    TempData["ErrorMessage"] = "Không thể tải thông tin hồ sơ Người mua.";
+                }
+                return View("HoSoCaNhan", null); // Trả về View với model null
             }
 
+            // --- Xây dựng chuỗi địa chỉ đầy đủ ---
+            var addressParts = new List<string>();
+            // Thêm đường/ấp/thôn trước nếu có
+            if (!string.IsNullOrWhiteSpace(nguoiMuaProfile.DiaChi_DuongApThon) && nguoiMuaProfile.DiaChi_DuongApThon != "Chưa cập nhật")
+            {
+                addressParts.Add(nguoiMuaProfile.DiaChi_DuongApThon);
+            }
+            // Thêm tên Xã (dùng ?. để kiểm tra null an toàn)
+            if (nguoiMuaProfile.XaPhuong?.TenXa != null)
+            {
+                addressParts.Add(nguoiMuaProfile.XaPhuong.TenXa);
+            }
+            // Thêm tên Huyện (dùng ?. để kiểm tra null an toàn)
+            if (nguoiMuaProfile.QuanHuyen?.TenQuan != null)
+            {
+                addressParts.Add(nguoiMuaProfile.QuanHuyen.TenQuan);
+            }
+            // Thêm tên Tỉnh (dùng ?. để kiểm tra null an toàn)
+            if (nguoiMuaProfile.TinhThanhPho?.TenTinh != null)
+            {
+                addressParts.Add(nguoiMuaProfile.TinhThanhPho.TenTinh);
+            }
+            // Ghép các phần lại, nếu không có phần nào thì hiển thị thông báo
+            string fullAddress = addressParts.Any() ? string.Join(", ", addressParts) : "Chưa cập nhật địa chỉ";
+            // ------------------------------------
 
-            // Map dữ liệu từ NguoiMua sang ViewModel để hiển thị
-            // Giả sử bạn dùng EditNguoiMuaProfile ViewModel để hiển thị luôn
+
+            // Map dữ liệu từ NguoiMua (đã Include) sang ViewModel để hiển thị
             var viewModel = new EditNguoiMuaProfile
             {
-                // Gán các thuộc tính từ nguoiMuaProfile sang viewModel
                 Ten_NguoiMua = nguoiMuaProfile.Ten_KhachHang,
                 Email_NguoiMua = nguoiMuaProfile.Email_KhachHang,
                 SDT_NguoiMua = nguoiMuaProfile.SDT_KhachHang,
-                DiaChi_NguoiMua = nguoiMuaProfile.DiaChi_KhachHang,
+                // Vẫn có thể gán các trường Edit_... nếu ViewModel này dùng chung cho cả View Edit
+                Edit_DiaChi_TinhTP = nguoiMuaProfile.MaTinh,
+                Edit_DiaChi_QuanHuyen = nguoiMuaProfile.MaQuan,
+                Edit_DiaChi_XaPhuong = nguoiMuaProfile.MaXa,
+                Edit_DiaChi_DuongApThon = nguoiMuaProfile.DiaChi_DuongApThon,
                 Gender = nguoiMuaProfile.Gender,
-                AvatarUrl = nguoiMuaProfile.AvatarUrl
-                // Gán thêm các trường khác nếu ViewModel của bạn có
+                AvatarUrl = nguoiMuaProfile.AvatarUrl,
+
+                // <<< GÁN CHUỖI ĐỊA CHỈ ĐÃ TẠO VÀO VIEWMODEL >>>
+                HienThiDiaChiDayDu = fullAddress
             };
 
-            return View("HoSoCaNhan", viewModel);
+            return View("HoSoCaNhan", viewModel); // Truyền viewModel đã được chuẩn bị đầy đủ
         }
 
-        // GET: /KhachHang/KhachHang/Edit
-        public async Task<IActionResult> Edit()
+
+
+        // GET: /KhachHang/KhachHang/Edit
+
+        public async Task<IActionResult> Edit()
+
         {
+
             var userId = _userManager.GetUserId(User);
+
             if (userId == null) { return Challenge(); }
+
+
 
             var nguoiMuaProfile = await _nguoiMuaRepo.GetByUserIdAsync(userId);
 
-            // Nếu không tìm thấy, chuyển hướng về HoSoCaNhan
-            // HoSoCaNhan sẽ xử lý việc hiển thị lỗi hoặc tự động tạo hồ sơ
-            if (nguoiMuaProfile == null)
+
+
+            // Nếu không tìm thấy, chuyển hướng về HoSoCaNhan
+
+            // HoSoCaNhan sẽ xử lý việc hiển thị lỗi hoặc tự động tạo hồ sơ
+
+            if (nguoiMuaProfile == null)
+
             {
+
                 TempData["InfoMessage"] = "Không tìm thấy hồ sơ, đang kiểm tra..."; // Thông báo nhẹ nhàng
-                return RedirectToAction(nameof(HoSoCaNhan));
+
+                return RedirectToAction(nameof(HoSoCaNhan));
+
             }
 
-            // Map sang ViewModel để hiển thị form Edit
-            var viewModel = new EditNguoiMuaProfile
+
+
+            // Map sang ViewModel để hiển thị form Edit
+
+            var viewModel = new EditNguoiMuaProfile
+
             {
-                // Gán các thuộc tính từ nguoiMuaProfile sang viewModel
-                Ten_NguoiMua = nguoiMuaProfile.Ten_KhachHang,
+
+                // Gán các thuộc tính từ nguoiMuaProfile sang viewModel
+
+                Ten_NguoiMua = nguoiMuaProfile.Ten_KhachHang,
+
                 Email_NguoiMua = nguoiMuaProfile.Email_KhachHang,
+
                 SDT_NguoiMua = nguoiMuaProfile.SDT_KhachHang,
-                DiaChi_NguoiMua = nguoiMuaProfile.DiaChi_KhachHang,
+
+                Edit_DiaChi_TinhTP = nguoiMuaProfile.MaTinh,
+
+                Edit_DiaChi_QuanHuyen = nguoiMuaProfile.MaQuan,
+
+                Edit_DiaChi_XaPhuong = nguoiMuaProfile.MaXa,
+
+                Edit_DiaChi_DuongApThon = nguoiMuaProfile.DiaChi_DuongApThon,
+
                 Gender = nguoiMuaProfile.Gender,
+
                 AvatarUrl = nguoiMuaProfile.AvatarUrl
-                // Gán M_NguoiMua nếu bạn cần nó trong form (ví dụ: hidden field)
-                // viewModel.M_NguoiMua = nguoiMuaProfile.M_NguoiMua;
-            };
 
-            return View("Edit", viewModel); // Truyền ViewModel tới View Edit.cshtml
-        }
+                // Gán M_NguoiMua nếu bạn cần nó trong form (ví dụ: hidden field)
+
+                // viewModel.M_NguoiMua = nguoiMuaProfile.M_NguoiMua;
+
+            };
 
 
-        // POST: /KhachHang/KhachHang/Edit
-        // Action POST Edit của bạn về cơ bản đã ổn với việc dùng Repository.
-        // Giữ nguyên logic đó vì nó phù hợp với cấu trúc NguoiMua riêng biệt.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(EditNguoiMuaProfile model) // Giả sử ViewModel tên là EditNguoiMuaProfile
-        {
-            if (!ModelState.IsValid)
+
+            var provinces = await _context.TinhThanhPhos.OrderBy(p => p.TenTinh).ToListAsync();
+            // Truyền MaTinh hiện tại của người dùng làm selected value
+            ViewBag.ProvinceOptions = new SelectList(provinces, "MaTinh", "TenTinh", viewModel.Edit_DiaChi_TinhTP);
+
+            // 2. Tải Quận/Huyện DỰA VÀO Tỉnh/TP hiện tại (nếu có)
+            if (!string.IsNullOrEmpty(viewModel.Edit_DiaChi_TinhTP))
             {
-                // Load lại AvatarUrl nếu validation fail (logic này có vẻ ổn)
-                var userIdForUrl = _userManager.GetUserId(User);
-                var profileForUrl = await _nguoiMuaRepo.GetByUserIdAsync(userIdForUrl);
-                if (profileForUrl != null) { model.AvatarUrl = profileForUrl.AvatarUrl; }
-                return View("Edit", model);
-            }
-
-            var userId = _userManager.GetUserId(User);
-            var nguoiMuaProfile = await _nguoiMuaRepo.GetByUserIdAsync(userId); // Lấy entity từ Repo
-
-            if (nguoiMuaProfile == null)
-            {
-                TempData["ErrorMessage"] = "Lỗi: Không tìm thấy hồ sơ để cập nhật.";
-                return RedirectToAction(nameof(HoSoCaNhan)); // Hoặc trang lỗi
-            }
-
-            // --- Cập nhật entity NguoiMua ---
-            bool hasChanges = false; // Biến kiểm tra xem có thay đổi thực sự không
-
-            if (nguoiMuaProfile.Ten_KhachHang != model.Ten_NguoiMua) { nguoiMuaProfile.Ten_KhachHang = model.Ten_NguoiMua; hasChanges = true; }
-            if (nguoiMuaProfile.Email_KhachHang != model.Email_NguoiMua) { nguoiMuaProfile.Email_KhachHang = model.Email_NguoiMua; hasChanges = true; }
-            if (nguoiMuaProfile.SDT_KhachHang != model.SDT_NguoiMua) { nguoiMuaProfile.SDT_KhachHang = model.SDT_NguoiMua; hasChanges = true; }
-            if (nguoiMuaProfile.DiaChi_KhachHang != model.DiaChi_NguoiMua) { nguoiMuaProfile.DiaChi_KhachHang = model.DiaChi_NguoiMua; hasChanges = true; }
-            if (nguoiMuaProfile.Gender != model.Gender) { nguoiMuaProfile.Gender = model.Gender; hasChanges = true; }
-
-
-            // --- Xử lý upload ảnh ---
-            string? oldImagePath = nguoiMuaProfile.AvatarUrl; // Lưu đường dẫn cũ
-            if (model.ProfileImageFile != null && model.ProfileImageFile.Length > 0)
-            {
-                // Thêm kiểm tra kiểu file và kích thước nếu cần
-                if (model.ProfileImageFile.Length > 2 * 1024 * 1024) // Ví dụ giới hạn 2MB
-                {
-                    ModelState.AddModelError("ProfileImageFile", "Kích thước ảnh không được vượt quá 2MB.");
-                    // Không gán lại AvatarUrl vì cần giữ ảnh cũ khi có lỗi
-                    return View("Edit", model);
-                }
-                // Kiểm tra kiểu file MIME Type nếu cần
-
-                try
-                {
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "avatars");
-                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfileImageFile.FileName); // Thêm phần mở rộng file
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    Directory.CreateDirectory(uploadsFolder); // Tạo thư mục nếu chưa có
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await model.ProfileImageFile.CopyToAsync(fileStream);
-                    }
-                    var newAvatarUrl = "/images/avatars/" + uniqueFileName; // Đường dẫn lưu trong DB
-
-                    if (nguoiMuaProfile.AvatarUrl != newAvatarUrl)
-                    {
-                        nguoiMuaProfile.AvatarUrl = newAvatarUrl;
-                        hasChanges = true;
-
-                        // Xóa ảnh cũ sau khi đã chắc chắn lưu ảnh mới thành công (hoặc sau khi SaveChanges)
-                        if (!string.IsNullOrEmpty(oldImagePath))
-                        {
-                            string oldPhysicalPath = Path.Combine(_webHostEnvironment.WebRootPath, oldImagePath.TrimStart('/'));
-                            if (System.IO.File.Exists(oldPhysicalPath))
-                            {
-                                try { System.IO.File.Delete(oldPhysicalPath); } catch (Exception ex) { _logger.LogError(ex, $"Error deleting old avatar: {oldPhysicalPath}"); } // Ghi log nếu xóa lỗi
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error uploading profile image."); // Ghi log
-                    ModelState.AddModelError("ProfileImageFile", "Lỗi xảy ra khi tải ảnh lên.");
-                    model.AvatarUrl = oldImagePath; // Giữ lại ảnh cũ khi có lỗi upload
-                    return View("Edit", model);
-                }
-            }
-
-            // Chỉ lưu nếu thực sự có thay đổi
-            if (hasChanges)
-            {
-                try
-                {
-                    _nguoiMuaRepo.Update(nguoiMuaProfile); // Đánh dấu Update
-                    await _nguoiMuaRepo.SaveChangesAsync(); // Lưu thay đổi vào DB
-                    TempData["SuccessMessage"] = "Cập nhật hồ sơ thành công!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    TempData["ErrorMessage"] = "Lỗi: Dữ liệu đã bị thay đổi bởi người khác. Vui lòng tải lại trang và thử lại.";
-                    model.AvatarUrl = oldImagePath; // Giữ ảnh cũ
-                    return View("Edit", model);
-                }
-                catch (Exception ex) // Bắt lỗi chung hoặc DbUpdateException
-                {
-                    TempData["ErrorMessage"] = "Có lỗi xảy ra khi cập nhật hồ sơ.";
-                    _logger.LogError(ex, "Error updating NguoiMua profile."); // Ghi log lỗi
-                    model.AvatarUrl = oldImagePath; // Giữ ảnh cũ
-                    return View("Edit", model);
-                }
+                var districts = await _context.QuanHuyens
+                                        .Where(q => q.MaTinh == viewModel.Edit_DiaChi_TinhTP)
+                                        .OrderBy(q => q.TenQuan)
+                                        .ToListAsync();
+                // Truyền MaQuan hiện tại của người dùng làm selected value
+                ViewBag.DistrictOptions = new SelectList(districts, "MaQuan", "TenQuan", viewModel.Edit_DiaChi_QuanHuyen);
             }
             else
             {
-                TempData["InfoMessage"] = "Không có thông tin nào được thay đổi.";
+                ViewBag.DistrictOptions = new SelectList(Enumerable.Empty<SelectListItem>(), "MaQuan", "TenQuan");
             }
+
+            // 3. Tải Xã/Phường DỰA VÀO Quận/Huyện hiện tại (nếu có)
+            if (!string.IsNullOrEmpty(viewModel.Edit_DiaChi_QuanHuyen))
+            {
+                var wards = await _context.XaPhuongs
+                                      .Where(w => w.MaQuan == viewModel.Edit_DiaChi_QuanHuyen)
+                                      .OrderBy(w => w.TenXa)
+                                      .ToListAsync();
+                // Truyền MaXa hiện tại của người dùng làm selected value
+                ViewBag.WardOptions = new SelectList(wards, "MaXa", "TenXa", viewModel.Edit_DiaChi_XaPhuong);
+            }
+            else
+            {
+                ViewBag.WardOptions = new SelectList(Enumerable.Empty<SelectListItem>(), "MaXa", "TenXa");
+            }
+
+
+            return View("Edit", viewModel); // Truyền ViewModel tới View Edit.cshtml
+
+        }
+
+
+
+
+
+        // POST: /KhachHang/KhachHang/Edit
+
+        // Action POST Edit của bạn về cơ bản đã ổn với việc dùng Repository.
+
+        // Giữ nguyên logic đó vì nó phù hợp với cấu trúc NguoiMua riêng biệt.
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> Edit(EditNguoiMuaProfile model) // Giả sử ViewModel tên là EditNguoiMuaProfile
+
+        {
+
+            if (!ModelState.IsValid)
+
+            {
+
+                // Load lại AvatarUrl nếu validation fail (logic này có vẻ ổn)
+
+                var userIdForUrl = _userManager.GetUserId(User);
+
+                var profileForUrl = await _nguoiMuaRepo.GetByUserIdAsync(userIdForUrl);
+
+                if (profileForUrl != null) { model.AvatarUrl = profileForUrl.AvatarUrl; }
+
+                return View("Edit", model);
+
+            }
+
+
+
+            var userId = _userManager.GetUserId(User);
+
+            var nguoiMuaProfile = await _nguoiMuaRepo.GetByUserIdAsync(userId); // Lấy entity từ Repo
+
+
+
+            if (nguoiMuaProfile == null)
+
+            {
+
+                TempData["ErrorMessage"] = "Lỗi: Không tìm thấy hồ sơ để cập nhật.";
+
+                return RedirectToAction(nameof(HoSoCaNhan)); // Hoặc trang lỗi
+
+            }
+
+
+
+            // --- Cập nhật entity NguoiMua ---
+
+            bool hasChanges = false; // Biến kiểm tra xem có thay đổi thực sự không
+
+
+
+            if (nguoiMuaProfile.Ten_KhachHang != model.Ten_NguoiMua) { nguoiMuaProfile.Ten_KhachHang = model.Ten_NguoiMua; hasChanges = true; }
+
+            if (nguoiMuaProfile.Email_KhachHang != model.Email_NguoiMua) { nguoiMuaProfile.Email_KhachHang = model.Email_NguoiMua; hasChanges = true; }
+
+            if (nguoiMuaProfile.SDT_KhachHang != model.SDT_NguoiMua) { nguoiMuaProfile.SDT_KhachHang = model.SDT_NguoiMua; hasChanges = true; }
+
+            if (nguoiMuaProfile.MaTinh != model.Edit_DiaChi_TinhTP) { nguoiMuaProfile.MaTinh = model.Edit_DiaChi_TinhTP; hasChanges = true; }
+
+            if (nguoiMuaProfile.MaQuan != model.Edit_DiaChi_QuanHuyen) { nguoiMuaProfile.MaQuan = model.Edit_DiaChi_QuanHuyen; hasChanges = true; }
+
+            if (nguoiMuaProfile.MaXa != model.Edit_DiaChi_XaPhuong) { nguoiMuaProfile.MaXa = model.Edit_DiaChi_XaPhuong; hasChanges = true; }
+
+            if (nguoiMuaProfile.DiaChi_DuongApThon != model.Edit_DiaChi_DuongApThon) { nguoiMuaProfile.DiaChi_DuongApThon = model.Edit_DiaChi_DuongApThon; hasChanges = true; }
+
+            if (nguoiMuaProfile.Gender != model.Gender) { nguoiMuaProfile.Gender = model.Gender; hasChanges = true; }
+
+
+
+
+
+            // --- Xử lý upload ảnh ---
+
+            string? oldImagePath = nguoiMuaProfile.AvatarUrl; // Lưu đường dẫn cũ
+
+            if (model.ProfileImageFile != null && model.ProfileImageFile.Length > 0)
+
+            {
+
+                // Thêm kiểm tra kiểu file và kích thước nếu cần
+
+                if (model.ProfileImageFile.Length > 2 * 1024 * 1024) // Ví dụ giới hạn 2MB
+
+                {
+
+                    ModelState.AddModelError("ProfileImageFile", "Kích thước ảnh không được vượt quá 2MB.");
+
+                    // Không gán lại AvatarUrl vì cần giữ ảnh cũ khi có lỗi
+
+                    return View("Edit", model);
+
+                }
+
+                // Kiểm tra kiểu file MIME Type nếu cần
+
+
+
+                try
+
+                {
+
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "avatars");
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfileImageFile.FileName); // Thêm phần mở rộng file
+
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    Directory.CreateDirectory(uploadsFolder); // Tạo thư mục nếu chưa có
+
+
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+
+                    {
+
+                        await model.ProfileImageFile.CopyToAsync(fileStream);
+
+                    }
+
+                    var newAvatarUrl = "/images/avatars/" + uniqueFileName; // Đường dẫn lưu trong DB
+
+
+
+                    if (nguoiMuaProfile.AvatarUrl != newAvatarUrl)
+
+                    {
+
+                        nguoiMuaProfile.AvatarUrl = newAvatarUrl;
+
+                        hasChanges = true;
+
+
+
+                        // Xóa ảnh cũ sau khi đã chắc chắn lưu ảnh mới thành công (hoặc sau khi SaveChanges)
+
+                        if (!string.IsNullOrEmpty(oldImagePath))
+
+                        {
+
+                            string oldPhysicalPath = Path.Combine(_webHostEnvironment.WebRootPath, oldImagePath.TrimStart('/'));
+
+                            if (System.IO.File.Exists(oldPhysicalPath))
+
+                            {
+
+                                try { System.IO.File.Delete(oldPhysicalPath); } catch (Exception ex) { _logger.LogError(ex, $"Error deleting old avatar: {oldPhysicalPath}"); } // Ghi log nếu xóa lỗi
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                catch (Exception ex)
+
+                {
+
+                    _logger.LogError(ex, "Error uploading profile image."); // Ghi log
+
+                    ModelState.AddModelError("ProfileImageFile", "Lỗi xảy ra khi tải ảnh lên.");
+
+                    model.AvatarUrl = oldImagePath; // Giữ lại ảnh cũ khi có lỗi upload
+
+                    return View("Edit", model);
+
+                }
+
+            }
+
+
+
+            // Chỉ lưu nếu thực sự có thay đổi
+
+            if (hasChanges)
+
+            {
+
+                try
+
+                {
+
+                    _nguoiMuaRepo.Update(nguoiMuaProfile); // Đánh dấu Update
+
+                    await _nguoiMuaRepo.SaveChangesAsync(); // Lưu thay đổi vào DB
+
+                    TempData["SuccessMessage"] = "Cập nhật hồ sơ thành công!";
+
+                }
+
+                catch (DbUpdateConcurrencyException)
+
+                {
+
+                    TempData["ErrorMessage"] = "Lỗi: Dữ liệu đã bị thay đổi bởi người khác. Vui lòng tải lại trang và thử lại.";
+
+                    model.AvatarUrl = oldImagePath; // Giữ ảnh cũ
+
+                    return View("Edit", model);
+
+                }
+
+                catch (Exception ex) // Bắt lỗi chung hoặc DbUpdateException
+
+                {
+
+                    TempData["ErrorMessage"] = "Có lỗi xảy ra khi cập nhật hồ sơ.";
+
+                    _logger.LogError(ex, "Error updating NguoiMua profile."); // Ghi log lỗi
+
+                    model.AvatarUrl = oldImagePath; // Giữ ảnh cũ
+
+                    return View("Edit", model);
+
+                }
+
+            }
+
+            else
+
+            {
+
+                TempData["InfoMessage"] = "Không có thông tin nào được thay đổi.";
+
+            }
+
+
+
 
 
             return RedirectToAction(nameof(HoSoCaNhan)); // Chuyển về trang hiển thị
-        }
+
+        }
+
         public async Task<IActionResult> LichSuDonHang(string statusFilter, string timeFilter, int page = 1)
+
         {
+
             var userId = _userManager.GetUserId(User);
+
             if (userId == null)
+
             {
+
                 return Challenge(); // Chưa đăng nhập
-            }
 
-            // --- Xử lý logic lọc và truy vấn ---
-            var query = _context.ChiTietDatHangs // Hoặc _orderRepo.GetOrdersQuery()
-                              .Where(dh => dh.KhachHang.UserId == userId); // Lọc theo User ID
+            }
 
-            // 1. Lọc theo trạng thái
-            if (!string.IsNullOrEmpty(statusFilter) && statusFilter != "Tất cả trạng thái") // Giả sử giá trị mặc định là "Tất cả trạng thái"
-            {
-                // Ánh xạ giá trị từ dropdown (pending, shipping, completed, cancelled) sang giá trị thực tế trong DB
-                // Ví dụ:
-                string dbStatus = statusFilter switch
+
+
+            // --- Xử lý logic lọc và truy vấn ---
+
+            var query = _context.ChiTietDatHangs // Hoặc _orderRepo.GetOrdersQuery()
+
+                              .Where(dh => dh.KhachHang.UserId == userId); // Lọc theo User ID
+
+
+
+            // 1. Lọc theo trạng thái
+
+            if (!string.IsNullOrEmpty(statusFilter) && statusFilter != "Tất cả trạng thái") // Giả sử giá trị mặc định là "Tất cả trạng thái"
+
+            {
+
+                // Ánh xạ giá trị từ dropdown (pending, shipping, completed, cancelled) sang giá trị thực tế trong DB
+
+                // Ví dụ:
+
+                string dbStatus = statusFilter switch
+
                 {
+
                     "pending" => "Đang xử lý", // Thay bằng giá trị thực trong DB của bạn
-                    "shipping" => "Đang giao hàng", // Thay bằng giá trị thực
-                    "completed" => "Đã giao", // Thay bằng giá trị thực
-                    "cancelled" => "Đã hủy", // Thay bằng giá trị thực
-                    _ => null
+
+                    "shipping" => "Đang giao hàng", // Thay bằng giá trị thực
+
+                    "completed" => "Đã giao", // Thay bằng giá trị thực
+
+                    "cancelled" => "Đã hủy", // Thay bằng giá trị thực
+
+                    _ => null
+
                 };
+
                 if (dbStatus != null)
+
                 {
+
                     query = query.Where(dh => dh.TrangThaiDonHang == dbStatus);
+
                 }
+
             }
 
-            // 2. Lọc theo thời gian
-            DateTime? startDate = null;
+
+
+            // 2. Lọc theo thời gian
+
+            DateTime? startDate = null;
+
             switch (timeFilter)
+
             {
+
                 case "3m":
+
                     startDate = DateTime.Now.AddMonths(-3);
+
                     break;
+
                 case "6m":
+
                     startDate = DateTime.Now.AddMonths(-6);
+
                     break;
+
                 case "1y":
+
                     startDate = DateTime.Now.AddYears(-1);
+
                     break;
-                    // Thêm các trường hợp khác nếu cần
-            }
+
+                    // Thêm các trường hợp khác nếu cần
+
+            }
+
             if (startDate.HasValue)
+
             {
+
                 query = query.Where(dh => dh.NgayTao >= startDate.Value);
+
             }
 
-            // 3. Sắp xếp (Mới nhất lên đầu)
-            query = query.OrderByDescending(dh => dh.NgayTao);
 
-            // 4. Phân trang
-            int pageSize = 10; // Số lượng đơn hàng trên mỗi trang
-            int totalItems = await query.CountAsync();
+
+            // 3. Sắp xếp (Mới nhất lên đầu)
+
+            query = query.OrderByDescending(dh => dh.NgayTao);
+
+
+
+            // 4. Phân trang
+
+            int pageSize = 10; // Số lượng đơn hàng trên mỗi trang
+
+            int totalItems = await query.CountAsync();
+
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
             page = Math.Max(1, Math.Min(page, totalPages)); // Đảm bảo page hợp lệ
 
-            var ordersData = await query
-                                    .Skip((page - 1) * pageSize)
-                                    .Take(pageSize)
-                                    .Select(dh => new OrderSummaryViewModel // Map sang ViewModel
-                                    {
-                                        OrderId = dh.M_CTDatHang, // Hoặc mã đơn hàng chính nếu có
-                                        TotalAmount = dh.TongTien, // Đảm bảo kiểu dữ liệu phù hợp
-                                        Status = dh.TrangThaiDonHang
-                                    })
-                                    .ToListAsync();
 
-            // 5. Tạo ViewModel cho View
-            var viewModel = new OrderHistoryViewModel
+
+            var ordersData = await query
+
+                  .Skip((page - 1) * pageSize)
+
+                  .Take(pageSize)
+
+                  .Select(dh => new OrderSummaryViewModel // Map sang ViewModel
+
+                  {
+
+                      OrderId = dh.M_CTDatHang, // Hoặc mã đơn hàng chính nếu có
+
+                      TotalAmount = dh.TongTien, // Đảm bảo kiểu dữ liệu phù hợp
+
+                      Status = dh.TrangThaiDonHang
+
+                  })
+
+                  .ToListAsync();
+
+
+
+            // 5. Tạo ViewModel cho View
+
+            var viewModel = new OrderHistoryViewModel
+
             {
+
                 Orders = ordersData,
+
                 PageIndex = page,
+
                 TotalPages = totalPages,
+
                 CurrentStatusFilter = statusFilter, // Giữ lại giá trị lọc để hiển thị trên form
-                CurrentTimeFilter = timeFilter
+
+                CurrentTimeFilter = timeFilter
+
             };
 
+
+
             return View(viewModel); // Trả về View LichSuDonHang.cshtml với ViewModel
-        }
+
+        }
+
+
 
         public async Task<IActionResult> Details(string id)
+
         {
+
             if (id == null) return NotFound();
-            // Use the repository to get data including related entities
-            var sanPham = await _sanPhamRepo.GetByIdAsync(id); // Assumes GetByIdAsync includes LoaiSP, DonViTinh, KhoLuuTru
-                                                               // If GetByIdAsync doesn't include them, need to adjust the repo method or load them here if needed for display
+
+            // Use the repository to get data including related entities
+
+            var sanPham = await _sanPhamRepo.GetByIdAsync(id); // Assumes GetByIdAsync includes LoaiSP, DonViTinh, KhoLuuTru
+
+            // If GetByIdAsync doesn't include them, need to adjust the repo method or load them here if needed for display
+
             if (sanPham == null) return NotFound();
+
             return View(sanPham);
+
         }
+
+
+
+        [HttpGet]
+
+        public IActionResult ThuGom() // Đổi tên Controller nếu cần (ví dụ: thành ThuGomController)
+
+        {
+
+            // ... có thể load dropdown từ DB nếu cần ...
+
+            return View(new ThuGomViewModel());
+
+        }
+
+
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> ThuGom(ThuGomViewModel model) // Đổi tên Controller nếu cần
+
+        {
+
+            if (!ModelState.IsValid)
+
+            {
+
+                _logger.LogWarning("Dữ liệu gửi lên không hợp lệ.");
+
+                return View(model);
+
+            }
+
+
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+
+            {
+
+                ModelState.AddModelError("", "Không thể xác định người dùng.");
+
+                return View(model);
+
+            }
+
+
+
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.UserId == userId);
+
+            if (khachHang == null)
+
+            {
+
+                _logger.LogError($"Không tìm thấy KhachHang cho UserId: {userId}");
+
+                TempData["ErrorMessage"] = "Không tìm thấy thông tin khách hàng liên kết.";
+
+                return RedirectToAction("Index");
+
+            }
+
+
+
+            // Transaction vẫn quản lý ở đây (Controller hoặc Service layer)
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+
+            {
+
+                // Tạo YeuCauThuGom và ChiTietThuGom (logic như trước)
+
+                var yeuCau = new YeuCauThuGom
+
+                {
+
+                    M_YeuCau = GenerateRequestCode(), // Hàm tạo mã (có thể chuyển vào service)
+
+                    M_KhachHang = khachHang.M_KhachHang,
+
+                    NgayYeuCau = DateTime.UtcNow,
+
+                    ThoiGianSanSang = model.PickupReadyTime.Value,
+
+                    GhiChu = model.SupplierNotes,
+
+                    TrangThai = "Chờ xử lý"
+
+                };
+
+
+
+                // Xử lý ảnh (logic như trước)
+
+                List<string> savedImagePaths = await ProcessUploadedImages(model.ByproductImages, yeuCau.M_YeuCau);
+
+                if (savedImagePaths == null) // Nếu có lỗi upload ảnh trong hàm helper
+
+                {
+
+                    await transaction.RollbackAsync();
+
+                    ModelState.AddModelError("ByproductImages", "Đã xảy ra lỗi khi tải lên hình ảnh.");
+
+                    return View(model);
+
+                }
+
+
+
+
+
+                var chiTiet = new ChiTietThuGom
+
+                {
+
+                    M_LoaiSP = model.ByproductType,
+
+                    M_DonViTinh = model.ByproductUnit,
+
+                    SoLuong = (int)model.ByproductQuantity.Value,
+
+                    MoTa = model.ByproductDescription,
+
+                    GiaTriMongMuon = model.ByproductValue,
+
+                    DacTinh_CongKenh = model.CharBulky,
+
+                    DacTinh_AmUot = model.CharWet,
+
+                    DacTinh_Kho = model.CharDry,
+
+                    DacTinh_DoAmCao = model.CharMoisture,
+
+                    DacTinh_TapChat = model.CharImpure,
+
+                    DacTinh_DaXuLy = model.CharProcessed,
+
+                    DanhSachHinhAnh = savedImagePaths.Any() ? string.Join(";", savedImagePaths) : null,
+
+
+
+                };
+
+
+
+                yeuCau.ChiTietThuGoms.Add(chiTiet);
+
+
+
+                // --- SỬ DỤNG REPOSITORY ĐỂ ADD ---
+
+                await _thuGomRepository.AddAsync(yeuCau);
+
+                //----------------------------------
+
+
+
+                // --- LƯU THAY ĐỔI QUA DBCONTEXT ---
+
+                // Repository chỉ chuẩn bị, controller/service quyết định lưu cuối cùng
+
+                await _context.SaveChangesAsync();
+
+                //------------------------------------
+
+
+
+                await transaction.CommitAsync();
+
+
+
+                _logger.LogInformation($"Đã tạo yêu cầu thu gom {yeuCau.M_YeuCau} bởi khách hàng {khachHang.M_KhachHang} thông qua Repository.");
+
+                TempData["SuccessMessage"] = $"Yêu cầu thu gom ({yeuCau.M_YeuCau}) của bạn đã được gửi thành công!";
+
+                return RedirectToAction("Index");
+
+
+
+            }
+
+            catch (Exception ex) // Bắt lỗi chung hoặc DbUpdateException cụ thể hơn
+
+            {
+
+                await transaction.RollbackAsync();
+
+                _logger.LogError(ex, "Lỗi khi xử lý POST ThuGom.");
+
+                ModelState.AddModelError("", "Đã xảy ra lỗi khi tạo yêu cầu. Vui lòng thử lại.");
+
+                return View(model);
+
+            }
+
+        }
+
+
+
+        // --- Action LichSuYeuCauThuGom (Ví dụ cập nhật) ---
+
+        public async Task<IActionResult> LichSuYeuCauThuGom()
+
+        {
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.UserId == userId);
+
+            if (khachHang == null) return Challenge();
+
+
+
+            // --- SỬ DỤNG REPOSITORY ĐỂ LẤY DỮ LIỆU ---
+
+            var allRequests = await _thuGomRepository.GetAllForKhachHangAsync(khachHang.M_KhachHang);
+
+            //------------------------------------------
+
+
+
+            return View("LichSuYeuCauThuGom", allRequests);
+
+        }
+
+
+
+
+
+        // Hàm helper xử lý ảnh (tách ra cho gọn)
+
+        private async Task<List<string>?> ProcessUploadedImages(List<IFormFile>? images, string requestCode)
+
+        {
+
+            if (images == null || images.Count == 0)
+
+            {
+
+                return new List<string>(); // Trả về list rỗng nếu không có ảnh
+
+            }
+
+
+
+            List<string> savedImagePaths = new List<string>();
+
+            string requestUploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "thugom", requestCode);
+
+            Directory.CreateDirectory(requestUploadFolder);
+
+
+
+            foreach (var file in images)
+
+            {
+
+                if (file.Length > 0 && file.ContentType.StartsWith("image/")) // Chỉ xử lý file ảnh
+
+                {
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Dùng extension gốc
+
+                    string filePath = Path.Combine(requestUploadFolder, uniqueFileName);
+
+                    try
+
+                    {
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+
+                        {
+
+                            await file.CopyToAsync(fileStream);
+
+                        }
+
+                        savedImagePaths.Add(Path.Combine("/uploads/thugom", requestCode, uniqueFileName).Replace("\\", "/"));
+
+                    }
+
+                    catch (Exception ex)
+
+                    {
+
+                        _logger.LogError(ex, $"Lỗi khi lưu file ảnh: {file.FileName} cho yêu cầu {requestCode}");
+
+                        // Nếu muốn dừng ngay khi có lỗi 1 file: return null;
+
+                        // Nếu muốn bỏ qua file lỗi và tiếp tục: // continue; (và không add vào savedImagePaths)
+
+                        return null; // Trả về null để báo lỗi cho action gọi nó
+
+                    }
+
+                }
+
+            }
+
+            return savedImagePaths;
+
+        }
+
+
+
+        // GET: /KhachHang/KhachHang/YeuCauThuGomDetails/{id}
+
+        public async Task<IActionResult> YeuCauThuGomDetails(string id) // id là M_YeuCau
+
+        {
+
+            if (string.IsNullOrEmpty(id))
+
+            {
+
+                return NotFound("Mã yêu cầu không được để trống.");
+
+            }
+
+
+
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null) return Challenge(); // Chưa đăng nhập
+
+
+
+            var khachHang = await _context.KhachHangs.AsNoTracking()
+
+                   .FirstOrDefaultAsync(kh => kh.UserId == userId);
+
+            if (khachHang == null)
+
+            {
+
+                // Có thể không cần thiết nếu mọi user đăng nhập đều có KhachHang
+
+                TempData["ErrorMessage"] = "Không tìm thấy hồ sơ khách hàng.";
+
+                return RedirectToAction("Index", "Home", new { area = "" });
+
+            }
+
+
+
+            // Lấy yêu cầu bằng Repository (cần đảm bảo repo method include đủ dữ liệu)
+
+            // Giả sử GetByIdAsync include ChiTietThuGoms -> LoaiSanPham và DonViTinh
+
+            var yeuCau = await _thuGomRepository.GetByIdAsync(id, includeDetails: true);
+
+
+
+            // Kiểm tra yêu cầu tồn tại và thuộc về đúng khách hàng này
+
+            if (yeuCau == null || yeuCau.M_KhachHang != khachHang.M_KhachHang)
+
+            {
+
+                _logger.LogWarning($"User {userId} attempted to access unauthorized request {id}");
+
+                return NotFound("Không tìm thấy yêu cầu hoặc bạn không có quyền xem yêu cầu này.");
+
+            }
+
+
+
+            // Trả về View chi tiết (cần tạo View này)
+
+            return View("YeuCauThuGomDetails", yeuCau); // Truyền đối tượng YeuCauThuGom vào View
+
+        }
+
+
+
+        public async Task<IActionResult> YeuCauThuGomCancel(string id)
+
+        {
+
+            if (string.IsNullOrEmpty(id)) return NotFound();
+
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null) return Challenge();
+
+            var khachHang = await _context.KhachHangs.AsNoTracking().FirstOrDefaultAsync(kh => kh.UserId == userId);
+
+            if (khachHang == null) return NotFound("Không tìm thấy khách hàng.");
+
+
+
+            var yeuCau = await _thuGomRepository.GetByIdAsync(id, includeDetails: false);
+
+
+
+            if (yeuCau == null || yeuCau.M_KhachHang != khachHang.M_KhachHang)
+
+            {
+
+                return NotFound("Không tìm thấy yêu cầu hoặc bạn không có quyền hủy yêu cầu này.");
+
+            }
+
+
+
+            // --- KIỂM TRA TRẠNG THÁI CHO PHÉP HỦY ---
+
+            if (yeuCau.TrangThai?.Equals("Chờ xử lý", StringComparison.OrdinalIgnoreCase) != true)
+
+            {
+
+                TempData["ErrorMessage"] = $"Không thể hủy yêu cầu ở trạng thái '{yeuCau.TrangThai}'.";
+
+                return RedirectToAction(nameof(YeuCauThuGomDetails), new { id = id });
+
+            }
+
+
+
+            return View("YeuCauThuGomCancel", yeuCau); // Truyền vào View xác nhận
+
+        }
+
+
+
+        // --- Action Hủy Yêu Cầu - POST (Xác nhận hủy - Đã có ví dụ ở câu trả lời trước) ---
+
+        [HttpPost, ActionName("YeuCauThuGomCancel")] // Đặt tên rõ ràng cho route post
+
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> YeuCauThuGomCancelConfirmed(string id) // Tham số id lấy từ route
+
+        {
+
+            if (string.IsNullOrEmpty(id)) return NotFound();
+
+
+
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null) return Challenge();
+
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.UserId == userId);
+
+            if (khachHang == null) return NotFound("Không tìm thấy khách hàng.");
+
+
+
+            // Lấy entity từ DbContext để update (dùng context vì repo có thể không có hàm Update)
+
+            var yeuCau = await _context.YeuCauThuGoms.FirstOrDefaultAsync(yc => yc.M_YeuCau == id);
+
+
+
+            if (yeuCau == null || yeuCau.M_KhachHang != khachHang.M_KhachHang)
+
+            {
+
+                return NotFound("Không tìm thấy yêu cầu hoặc bạn không có quyền hủy yêu cầu này.");
+
+            }
+
+
+
+            // --- KIỂM TRA LẠI TRẠNG THÁI TRƯỚC KHI HỦY ---
+
+            if (yeuCau.TrangThai?.Equals("Chờ xử lý", StringComparison.OrdinalIgnoreCase) != true)
+
+            {
+
+                TempData["ErrorMessage"] = $"Không thể hủy yêu cầu vì trạng thái đã thay đổi thành '{yeuCau.TrangThai}'.";
+
+                return RedirectToAction(nameof(YeuCauThuGomDetails), new { id = id });
+
+            }
+
+
+
+            try
+
+            {
+
+                yeuCau.TrangThai = "Đã hủy"; // Cập nhật trạng thái
+
+                _context.YeuCauThuGoms.Update(yeuCau); // Đánh dấu là cần update
+
+                await _context.SaveChangesAsync(); // Lưu thay đổi
+
+                _logger.LogInformation($"User {userId} cancelled request {id}.");
+
+                TempData["SuccessMessage"] = $"Đã hủy thành công yêu cầu #{id}.";
+
+                return RedirectToAction(nameof(LichSuYeuCauThuGom)); // Về trang lịch sử
+
+            }
+
+            catch (Exception ex) // Bắt lỗi chung hoặc DbUpdateConcurrencyException
+
+            {
+
+                _logger.LogError(ex, $"Error cancelling request {id} by user {userId}.");
+
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi hủy yêu cầu.";
+
+                return RedirectToAction(nameof(YeuCauThuGomDetails), new { id = id });
+
+            }
+
+        }
+
+
+
+
+
+        // ========== PHẦN THÊM MỚI CHO TẠO/SỬA ==========
+
+
+
+        // --- Action Tạo Yêu Cầu - GET (Di chuyển từ HomeController) ---
+
+        [HttpGet]
+
+        public async Task<IActionResult> Create() // Đổi tên từ ThuGom thành Create
+
+        {
+
+            // Load dữ liệu cho dropdowns (Đã sửa để lấy đúng SanPhams/LoaiSanPhams theo lựa chọn cuối)
+
+            await LoadDropdownDataAsync(); // Gọi hàm helper load dropdown
+
+
+
+            return View("Create", new ThuGomViewModel()); // Trả về View Create.cshtml
+
+        }
+
+
+
+        // --- Action Tạo Yêu Cầu - POST (Di chuyển từ HomeController) ---
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> Create(ThuGomViewModel model) // Đổi tên từ ThuGom thành Create
+
+        {
+
+            // --- KIỂM TRA MODELSTATE ---
+
+            if (!ModelState.IsValid)
+
+            {
+
+                _logger.LogWarning("Dữ liệu tạo yêu cầu không hợp lệ.");
+
+                await LoadDropdownDataAsync(model); // Load lại dropdown và giữ giá trị đã chọn
+
+                return View("Create", model); // Trả về View Create.cshtml với lỗi
+
+            }
+
+
+
+            // --- Lấy Khách Hàng ---
+
+            var userId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrEmpty(userId)) return Challenge();
+
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.UserId == userId);
+
+            if (khachHang == null)
+
+            {
+
+                TempData["ErrorMessage"] = "Không tìm thấy thông tin khách hàng liên kết.";
+
+                return RedirectToAction("Index", "Home", new { area = "" }); // Hoặc trang profile
+
+            }
+
+
+
+            // --- Xử lý Tạo Yêu Cầu và Chi Tiết ---
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+
+            {
+
+                var yeuCau = new YeuCauThuGom
+
+                {
+
+                    M_YeuCau = GenerateRequestCode(),
+
+                    M_KhachHang = khachHang.M_KhachHang,
+
+                    NgayYeuCau = DateTime.UtcNow,
+
+                    ThoiGianSanSang = model.PickupReadyTime.Value,
+
+                    GhiChu = model.SupplierNotes,
+
+                    TrangThai = "Chờ xử lý",
+
+                    // M_QuanLy = null, // Gán ở đây nếu M_QuanLy thuộc YeuCauThuGom
+
+                };
+
+
+
+                // Xử lý ảnh
+
+                List<string> savedImagePaths = await ProcessUploadedImages(model.ByproductImages, yeuCau.M_YeuCau);
+
+                if (savedImagePaths == null) // Có lỗi upload
+
+                {
+
+                    await transaction.RollbackAsync();
+
+                    ModelState.AddModelError("ByproductImages", "Đã xảy ra lỗi khi tải lên hình ảnh.");
+
+                    await LoadDropdownDataAsync(model);
+
+                    return View("Create", model);
+
+                }
+
+
+
+                // Tạo Chi Tiết (Đã sửa để dùng M_LoaiSP theo yêu cầu cuối)
+
+                var chiTiet = new ChiTietThuGom
+
+                {
+
+                    // M_ChiTiet tự tăng
+
+                    M_YeuCau = yeuCau.M_YeuCau, // Gán FK
+
+                    M_LoaiSP = model.ByproductType, // <<< Lưu Mã Loại Sản Phẩm
+
+                    M_DonViTinh = model.ByproductUnit,
+
+                    SoLuong = (int)model.ByproductQuantity.Value,
+
+                    MoTa = model.ByproductDescription, // <<< Đảm bảo tên này đúng trong Model
+
+                    GiaTriMongMuon = model.ByproductValue,
+
+                    DacTinh_CongKenh = model.CharBulky,
+
+                    DacTinh_AmUot = model.CharWet,
+
+                    DacTinh_Kho = model.CharDry,
+
+                    DacTinh_DoAmCao = model.CharMoisture,
+
+                    DacTinh_TapChat = model.CharImpure,
+
+                    DacTinh_DaXuLy = model.CharProcessed,
+
+                    DanhSachHinhAnh = savedImagePaths.Any() ? string.Join(";", savedImagePaths) : null
+
+                    // Không có M_SanPham, M_QuanLy
+
+                };
+
+                yeuCau.ChiTietThuGoms.Add(chiTiet);
+
+
+
+
+
+                // Lưu bằng Repository hoặc DbContext
+
+                await _thuGomRepository.AddAsync(yeuCau); // Dùng repo Add
+
+                await _context.SaveChangesAsync();      // Lưu qua context
+
+
+
+                await transaction.CommitAsync();
+
+
+
+                _logger.LogInformation($"Đã tạo yêu cầu thu gom {yeuCau.M_YeuCau} bởi KH {khachHang.M_KhachHang}.");
+
+                TempData["SuccessMessage"] = $"Yêu cầu thu gom ({yeuCau.M_YeuCau}) đã được gửi thành công!";
+
+                return RedirectToAction(nameof(LichSuYeuCauThuGom)); // Về trang lịch sử
+
+
+
+            }
+
+            catch (Exception ex) // Bắt lỗi chung hoặc DbUpdateException
+
+            {
+
+                await transaction.RollbackAsync();
+
+                _logger.LogError(ex, "Lỗi khi xử lý POST Create ThuGom.");
+
+                ModelState.AddModelError("", "Đã xảy ra lỗi khi tạo yêu cầu. Vui lòng thử lại.");
+
+                await LoadDropdownDataAsync(model); // Load lại dropdown khi có lỗi
+
+                return View("Create", model);
+
+            }
+
+        }
+
+
+
+        // --- Action Sửa Yêu Cầu - GET ---
+
+        [HttpGet]
+
+        public async Task<IActionResult> YeuCauThuGomEdit(string id)
+
+        {
+
+            if (string.IsNullOrEmpty(id)) return NotFound();
+
+
+
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null) return Challenge();
+
+            var khachHang = await _context.KhachHangs.AsNoTracking().FirstOrDefaultAsync(kh => kh.UserId == userId);
+
+            if (khachHang == null) return NotFound("Không tìm thấy khách hàng.");
+
+
+
+            // Lấy dữ liệu hiện tại, include đủ thông tin cần thiết
+
+            var yeuCau = await _thuGomRepository.GetByIdAsync(id, includeDetails: true);
+
+
+
+            if (yeuCau == null || yeuCau.M_KhachHang != khachHang.M_KhachHang)
+
+            {
+
+                return NotFound("Không tìm thấy yêu cầu hoặc bạn không có quyền sửa yêu cầu này.");
+
+            }
+
+
+
+            // --- KIỂM TRA TRẠNG THÁI CHO PHÉP SỬA ---
+
+            if (yeuCau.TrangThai?.Equals("Chờ xử lý", StringComparison.OrdinalIgnoreCase) != true)
+
+            {
+
+                TempData["ErrorMessage"] = $"Không thể sửa yêu cầu ở trạng thái '{yeuCau.TrangThai}'.";
+
+                return RedirectToAction(nameof(YeuCauThuGomDetails), new { id = id });
+
+            }
+
+            // ---------------------------------------
+
+
+
+            var firstDetail = yeuCau.ChiTietThuGoms?.FirstOrDefault();
+
+            if (firstDetail == null)
+
+            {
+
+                // Xử lý trường hợp không có chi tiết (lỗi dữ liệu?)
+
+                TempData["ErrorMessage"] = "Lỗi: Không tìm thấy chi tiết của yêu cầu.";
+
+                return RedirectToAction(nameof(LichSuYeuCauThuGom));
+
+            }
+
+
+
+            // Map dữ liệu từ Entity sang ViewModel để hiển thị trên form Edit
+
+            // Có thể dùng lại ThuGomViewModel hoặc tạo EditThuGomViewModel riêng
+
+            var model = new ThuGomViewModel
+
+            {
+
+                M_YeuCau = yeuCau.M_YeuCau, // << Cần thêm M_YeuCau vào ViewModel nếu dùng lại ThuGomViewModel
+
+                SupplierName = khachHang.Ten_KhachHang, // Lấy thông tin mới nhất của KH
+
+                SupplierPhone = khachHang.SDT_KhachHang,
+
+                SupplierProvince = khachHang.MaTinh,
+
+                SupplierDistrict = khachHang.MaQuan,
+
+                SupplierWard = khachHang.MaXa,
+
+                SupplierStreet = khachHang.DiaChi_DuongApThon,
+
+                PickupReadyTime = yeuCau.ThoiGianSanSang,
+
+                SupplierNotes = yeuCau.GhiChu,
+
+
+
+                ByproductType = firstDetail.M_LoaiSP, // Map từ M_LoaiSP
+
+                ByproductDescription = firstDetail.MoTa,
+
+                ByproductQuantity = firstDetail.SoLuong,
+
+                ByproductUnit = firstDetail.M_DonViTinh,
+
+                ByproductValue = firstDetail.GiaTriMongMuon,
+
+                CharBulky = firstDetail.DacTinh_CongKenh,
+
+                CharWet = firstDetail.DacTinh_AmUot,
+
+                CharDry = firstDetail.DacTinh_Kho,
+
+                CharMoisture = firstDetail.DacTinh_DoAmCao,
+
+                CharImpure = firstDetail.DacTinh_TapChat,
+
+                CharProcessed = firstDetail.DacTinh_DaXuLy,
+
+                // Không load lại ByproductImages, người dùng cần chọn lại nếu muốn thay đổi
+
+
+            };
+
+
+
+            await LoadThuGomDropdownsAsync(model); // Load dropdown và giữ giá trị đang được chọn
+
+            return View("YeuCauThuGomEdit", model); // Trả về View Edit
+
+        }
+
+        // --- Action Sửa Yêu Cầu - POST ---
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> YeuCauThuGomEdit(ThuGomViewModel model) // Model nhận về từ form Edit
+
+        {
+
+            // --- KIỂM TRA MODELSTATE ---
+
+            // Cần đảm bảo ViewModel có M_YeuCau để biết sửa yêu cầu nào
+
+            if (string.IsNullOrEmpty(model.M_YeuCau))
+
+            {
+
+                ModelState.AddModelError("", "Thiếu mã yêu cầu để cập nhật.");
+
+            }
+
+            if (!ModelState.IsValid)
+
+            {
+
+                _logger.LogWarning("Dữ liệu cập nhật yêu cầu không hợp lệ.");
+
+                await LoadDropdownDataAsync(model); // Load lại dropdown
+
+                return View("YeuCauThuGomEdit", model);
+
+            }
+
+
+
+            // --- Lấy User/KhachHang ---
+
+            var userId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrEmpty(userId)) return Challenge();
+
+            var khachHang = await _context.KhachHangs.AsNoTracking().FirstOrDefaultAsync(kh => kh.UserId == userId);
+
+            if (khachHang == null) return NotFound("Không tìm thấy khách hàng.");
+
+
+
+            // --- Lấy Yêu cầu gốc từ DB để cập nhật (Include ChiTiet) ---
+
+            var yeuCauGoc = await _context.YeuCauThuGoms
+
+                  .Include(yc => yc.ChiTietThuGoms)
+
+                  .FirstOrDefaultAsync(yc => yc.M_YeuCau == model.M_YeuCau);
+
+
+
+            // --- Kiểm tra quyền và trạng thái ---
+
+            if (yeuCauGoc == null || yeuCauGoc.M_KhachHang != khachHang.M_KhachHang)
+
+            {
+
+                return NotFound("Không tìm thấy yêu cầu hoặc bạn không có quyền sửa yêu cầu này.");
+
+            }
+
+            if (yeuCauGoc.TrangThai?.Equals("Chờ xử lý", StringComparison.OrdinalIgnoreCase) != true)
+
+            {
+
+                TempData["ErrorMessage"] = $"Không thể sửa yêu cầu vì trạng thái đã thay đổi thành '{yeuCauGoc.TrangThai}'.";
+
+                await LoadDropdownDataAsync(model);
+
+                return View("YeuCauThuGomEdit", model);
+
+            }
+
+
+
+            var chiTietGoc = yeuCauGoc.ChiTietThuGoms.FirstOrDefault(); // Lấy chi tiết gốc
+
+            if (chiTietGoc == null)
+
+            {
+
+                TempData["ErrorMessage"] = "Lỗi: Không tìm thấy chi tiết gốc của yêu cầu.";
+
+                await LoadDropdownDataAsync(model);
+
+                return View("YeuCauThuGomEdit", model);
+
+            }
+
+
+
+            // --- Cập nhật dữ liệu ---
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+
+            {
+
+                // Cập nhật YeuCauThuGom
+
+                yeuCauGoc.ThoiGianSanSang = model.PickupReadyTime.Value;
+
+                yeuCauGoc.GhiChu = model.SupplierNotes;
+
+                // Cập nhật địa chỉ nếu cho phép sửa ở đây? Thường nên sửa ở profile KhachHang
+
+                // yeuCauGoc.KhachHang.DiaChi_... = model.Supplier...; // KHÔNG NÊN LÀM THẾ NÀY TRỰC TIẾP
+
+
+
+                // Xử lý ảnh (phức tạp hơn: xóa ảnh cũ nếu có ảnh mới, lưu ảnh mới)
+
+                // Tạm thời bỏ qua xử lý ảnh trong Edit để đơn giản
+
+                // Nếu cần, tham khảo logic upload/delete trong Action Edit Profile
+
+
+
+                // Cập nhật ChiTietThuGom
+
+                chiTietGoc.M_LoaiSP = model.ByproductType; // Cập nhật loại SP
+
+                chiTietGoc.M_DonViTinh = model.ByproductUnit;
+
+                chiTietGoc.SoLuong =(int) model.ByproductQuantity.Value;
+
+                chiTietGoc.MoTa = model.ByproductDescription;
+
+                chiTietGoc.GiaTriMongMuon = model.ByproductValue;
+
+                chiTietGoc.DacTinh_CongKenh = model.CharBulky;
+
+                chiTietGoc.DacTinh_AmUot = model.CharWet;
+
+                chiTietGoc.DacTinh_Kho = model.CharDry;
+
+                chiTietGoc.DacTinh_DoAmCao = model.CharMoisture;
+
+                chiTietGoc.DacTinh_TapChat = model.CharImpure;
+
+                chiTietGoc.DacTinh_DaXuLy = model.CharProcessed;
+
+                // Cập nhật DanhSachHinhAnh nếu có xử lý ảnh
+
+
+
+                // Đánh dấu là đã sửa (EF Core tự động làm nếu lấy entity từ context)
+
+                _context.YeuCauThuGoms.Update(yeuCauGoc); // Hoặc chỉ cần SaveChanges nếu đã lấy từ context
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+
+
+                TempData["SuccessMessage"] = $"Đã cập nhật thành công yêu cầu #{yeuCauGoc.M_YeuCau}.";
+
+                return RedirectToAction(nameof(YeuCauThuGomDetails), new { id = yeuCauGoc.M_YeuCau });
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                await transaction.RollbackAsync();
+
+                _logger.LogError(ex, $"Lỗi khi cập nhật yêu cầu {model.M_YeuCau}.");
+
+                ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật yêu cầu.");
+
+                await LoadDropdownDataAsync(model);
+
+                return View("YeuCauThuGomEdit", model);
+
+            }
+
+        }
+        // Thêm hàm này vào KhachHangController.cs
+        private async Task LoadThuGomDropdownsAsync(ThuGomViewModel model)
+        {
+            if (model == null || _context == null) return;
+            try
+            {
+                // Load Loại Sản Phẩm
+                var loaiSpList = await _context.LoaiSanPhams.OrderBy(lsp => lsp.TenLoai).ToListAsync();
+                model.LoaiSanPhamOptions = new SelectList(loaiSpList, "M_LoaiSP", "TenLoai", model.ByproductType);
+
+                // Load Đơn vị tính
+                var donViTinhList = await _context.DonViTinhs.OrderBy(dvt => dvt.TenLoaiTinh).ToListAsync();
+                model.DonViTinhOptions = new SelectList(donViTinhList, "M_DonViTinh", "TenLoaiTinh", model.ByproductUnit);
+
+                // Load Tỉnh/Thành phố
+                var provinces = await _context.TinhThanhPhos.OrderBy(p => p.TenTinh).ToListAsync();
+                model.ProvinceOptions = new SelectList(provinces, "MaTinh", "TenTinh", model.SupplierProvince);
+
+                // Load Quận/Huyện nếu có Tỉnh được chọn sẵn
+                var districts = Enumerable.Empty<QuanHuyen>();
+                if (!string.IsNullOrEmpty(model.SupplierProvince))
+                {
+                    districts = await _context.QuanHuyens.Where(q => q.MaTinh == model.SupplierProvince).OrderBy(q => q.TenQuan).ToListAsync();
+                }
+                model.DistrictOptions = new SelectList(districts, "MaQuan", "TenQuan", model.SupplierDistrict);
+
+                // Load Xã/Phường nếu có Quận/Huyện được chọn sẵn
+                var wards = Enumerable.Empty<XaPhuong>();
+                if (!string.IsNullOrEmpty(model.SupplierDistrict))
+                {
+                    wards = await _context.XaPhuongs.Where(w => w.MaQuan == model.SupplierDistrict).OrderBy(w => w.TenXa).ToListAsync();
+                }
+                model.WardOptions = new SelectList(wards, "MaXa", "TenXa", model.SupplierWard);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading dropdown data for ThuGom Edit/Create");
+                // Gán rỗng khi lỗi để tránh lỗi View
+                model.LoaiSanPhamOptions ??= Enumerable.Empty<SelectListItem>();
+                model.DonViTinhOptions ??= Enumerable.Empty<SelectListItem>();
+                model.ProvinceOptions ??= Enumerable.Empty<SelectListItem>();
+                model.DistrictOptions ??= Enumerable.Empty<SelectListItem>();
+                model.WardOptions ??= Enumerable.Empty<SelectListItem>();
+            }
+        }
+
+
+
+
+        // Hàm helper tạo mã (giữ lại hoặc chuyển vào service)
+
+        private string GenerateRequestCode()
+
+        {
+
+            string prefix = "YC";
+
+            string timestamp = DateTime.UtcNow.ToString("yyMMddHHmm");
+
+            string randomPart = new Random().Next(1000, 9999).ToString();
+
+            return $"{prefix}{timestamp}{randomPart}".Substring(0, 10);
+
+        }
+
+
+
+        // Action Error
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+
+        public IActionResult Error()
+
+        {
+
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+
+        }
+
+
+
+        private async Task LoadDropdownDataAsync(ThuGomViewModel? model = null)
+
+        {
+
+            var sanPhamList = await _context.LoaiSanPhams.OrderBy(sp => sp.TenLoai).ToListAsync(); // Dùng LoaiSanPham theo yêu cầu cuối
+
+            ViewData["LoaiSanPhamOptions"] = new SelectList(sanPhamList, "M_LoaiSP", "TenLoai", model?.ByproductType); // Giữ giá trị chọn nếu có
+
+
+
+            var donViTinhList = await _context.DonViTinhs.OrderBy(dvt => dvt.TenLoaiTinh).ToListAsync(); // Dùng TenDonViTinh
+
+            ViewData["DonViTinhOptions"] = new SelectList(donViTinhList, "M_DonViTinh", "TenDonViTinh", model?.ByproductUnit);
+
+        }
+
 
 
     }
+
 }

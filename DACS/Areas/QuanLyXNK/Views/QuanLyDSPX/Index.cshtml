@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Danh Sách Kho Hàng</title>
+    <title>Admin - Danh Sách Phiếu Xuất</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
@@ -17,7 +17,6 @@
             width: 100%;
             margin: 0;
             padding: 0;
-            flex-direction: row;
         }
 
         .sidebar {
@@ -25,8 +24,8 @@
             color: #fff;
             padding: 15px;
             width: 250px;
-            flex-shrink: 0;
             min-height: 100vh;
+            flex-shrink: 0;
         }
 
             .sidebar h2 {
@@ -50,7 +49,6 @@
             padding: 25px;
             background-color: #f8f9fa;
             flex-grow: 1;
-            overflow-y: auto;
         }
 
         .page-header {
@@ -88,7 +86,6 @@
             box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
         }
 
-       
     </style>
 </head>
 <body>
@@ -96,43 +93,48 @@
         <div class="sidebar">
             <h2>Quản Lý XNK</h2>
             <ul class="nav flex-column">
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link "><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
-				<li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="QuanLyDSKH" class="nav-link active"><i class="fas fa-warehouse me-2"></i> Danh sách Kho hàng</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="QuanLyDSPX" class="nav-link "><i class="fas fa-file-export me-2"></i> Phiếu xuất</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="TonKho" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="ThongKe" class="nav-link "><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
-
-                <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
-                <li class="nav-item mt-auto pt-3 border-top border-secondary"><a href="#" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link active"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
+                @* Thay thế bằng các link đúng của bạn *@
+                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="KhoHang" asp-action="Index" class="nav-link"><i class="fas fa-warehouse me-2"></i> Danh sách Kho hàng</a></li>
+                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="TonKho" asp-action="Index" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
+                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="ThongKe" asp-action="Index" class="nav-link"><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
+                @* Nút Đăng xuất *@
+                <li class="nav-item mt-auto pt-3 border-top border-secondary">
+                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                        <button type="submit" class="nav-link text-danger" style="background:none; border:none; width:100%; text-align:left;">
+                            <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                        </button>
+                    </form>
+                </li>
             </ul>
         </div>
 
         <div class="main-content-area">
-            <div class="page-header">Danh Sách Kho Hàng</div>
+            <div class="page-header">Danh Sách Phiếu Xuất</div>
 
             <div class="row">
                 <div class="col-lg-3 col-md-6">
                     <div class="stat-card">
-                        <div class="value text-primary">5</div>
-                        <div class="label">Tổng kho</div>
+                        <div class="value text-primary">10</div>
+                        <div class="label">Tổng phiếu xuất</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="stat-card">
-                        <div class="value text-success">3</div>
-                        <div class="label">Còn trống</div>
+                        <div class="value text-success">6</div>
+                        <div class="label">Đã giao</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="stat-card">
-                        <div class="value text-warning">2</div>
-                        <div class="label">Gần đầy</div>
+                        <div class="value text-warning">3</div>
+                        <div class="label">Đang xử lý</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="stat-card">
                         <div class="value text-danger">1</div>
-                        <div class="label">Đang bảo trì</div>
+                        <div class="label">Đã hủy</div>
                     </div>
                 </div>
             </div>
@@ -140,21 +142,21 @@
             <div class="filter-card">
                 <div class="row g-3 align-items-center">
                     <div class="col-md-4">
-                        <input type="text" class="form-control form-control-sm" placeholder="Tìm tên kho, địa chỉ...">
+                        <input type="text" class="form-control form-control-sm" placeholder="Tìm mã phiếu, người nhận...">
                     </div>
                     <div class="col-md-3">
                         <select class="form-select form-select-sm">
                             <option value="">Lọc theo trạng thái</option>
-                            <option value="available">Còn trống</option>
-                            <option value="full">Gần đầy</option>
-                            <option value="maintenance">Bảo trì</option>
+                            <option value="done">Đã giao</option>
+                            <option value="pending">Đang xử lý</option>
+                            <option value="cancelled">Đã hủy</option>
                         </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" class="form-control form-control-sm">
                     </div>
                     <div class="col-md-2">
                         <button class="btn btn-sm btn-primary w-100"><i class="fas fa-filter"></i> Lọc</button>
-                    </div>
-                    <div class="col-md-3 text-end">
-                        <button class="btn btn-sm btn-success"><i class="fas fa-plus me-1"></i> Thêm kho mới</button>
                     </div>
                 </div>
             </div>
@@ -164,43 +166,43 @@
                     <table class="table table-striped table-hover table-sm align-middle">
                         <thead>
                             <tr>
-                                <th>Mã Kho</th>
-                                <th>Tên Kho</th>
-                                <th>Địa chỉ</th>
-                                <th>Sức chứa</th>
+                                <th>Mã Phiếu</th>
+                                <th>Người Nhận</th>
+                                <th>Ngày Xuất</th>
+                                <th>Khối lượng</th>
                                 <th>Trạng thái</th>
                                 <th class="text-center">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>KHO01</td>
-                                <td>Kho Miền Tây</td>
-                                <td>123 Tỉnh Lộ 1, Cần Thơ</td>
-                                <td>~10 tấn</td>
-                                <td><span class="badge bg-success">Còn trống</span></td>
+                                <td>PX001</td>
+                                <td>Nguyễn Văn A</td>
+                                <td>2025-04-01</td>
+                                <td>2.5 tấn</td>
+                                <td><span class="badge bg-success">Đã giao</span></td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-outline-info"><i class="fas fa-eye"></i></button>
                                     <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>
                             <tr>
-                                <td>KHO02</td>
-                                <td>Kho TP.HCM</td>
-                                <td>456 Quốc Lộ 13, Bình Thạnh</td>
-                                <td>~8 tấn</td>
-                                <td><span class="badge bg-warning text-dark">Gần đầy</span></td>
+                                <td>PX002</td>
+                                <td>Lê Thị B</td>
+                                <td>2025-04-08</td>
+                                <td>1.2 tấn</td>
+                                <td><span class="badge bg-warning text-dark">Đang xử lý</span></td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-outline-info"><i class="fas fa-eye"></i></button>
                                     <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
                                 </td>
                             </tr>
                             <tr>
-                                <td>KHO03</td>
-                                <td>Kho Hà Nội</td>
-                                <td>789 Trần Duy Hưng, Cầu Giấy</td>
-                                <td>~5 tấn</td>
-                                <td><span class="badge bg-danger">Bảo trì</span></td>
+                                <td>PX003</td>
+                                <td>Trần Văn C</td>
+                                <td>2025-03-28</td>
+                                <td>3 tấn</td>
+                                <td><span class="badge bg-danger">Đã hủy</span></td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-outline-info"><i class="fas fa-eye"></i></button>
                                     <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
@@ -209,7 +211,8 @@
                         </tbody>
                     </table>
                 </div>
-                <nav class="mt-3 d-flex justify-content-center" aria-label="Warehouse navigation">
+
+                <nav class="mt-3 d-flex justify-content-center" aria-label="Export note navigation">
                     <ul class="pagination pagination-sm">
                         <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
                         <li class="page-item active"><a class="page-link" href="#">1</a></li>
@@ -222,11 +225,5 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    </script>
 </body>
 </html>

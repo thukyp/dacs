@@ -5,10 +5,15 @@ namespace DACS.Models
 {
     public class ChiTietThuGom // Collection Detail
     {
-        [Required]
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // <<< THÊM ATTRIBUTE NÀY
+        public String? M_ChiTiet { get;  set; }
+        [Required] // M_YeuCau is Required
         [StringLength(10)]
         public string M_YeuCau { get; set; } // PFK
 
+        [ForeignKey("M_YeuCau")]
+        public virtual YeuCauThuGom YeuCauThuGom { get; set; }
         [Required]
         [StringLength(10)]
         public string M_DonViTinh { get; set; } // FK
@@ -43,25 +48,11 @@ namespace DACS.Models
         [Display(Name = "Hình Ảnh")]
         public string? DanhSachHinhAnh { get; set; }
 
-        // M_QuanLy FK mới
-        [Required]
-        [StringLength(10)]
-        public string? M_QuanLy { get; set; } // FK
+
 
         // --- Thêm Khóa Ngoại và Navigation Property đến SanPham ---
         // (Cần thêm cột M_SanPham vào bảng ChiTietThuGom trong CSDL của bạn nếu chưa có)
-        [Required(ErrorMessage = "Cần chỉ định sản phẩm được thu gom")]
-        [StringLength(10)]
-        public string M_SanPham { get; set; } // FK to SanPham - Đây là FK gây lỗi cascade
-
-        [ForeignKey("M_SanPham")]
-        public virtual SanPham SanPham { get; set; }
         // --- Hết phần thêm ---
-
-
-        // Navigation Properties khác đã có
-        [ForeignKey("M_YeuCau")]
-        public virtual YeuCauThuGom YeuCauThuGom { get; set; }
 
         [ForeignKey("M_DonViTinh")]
         public virtual DonViTinh DonViTinh { get; set; }
@@ -69,8 +60,46 @@ namespace DACS.Models
         [ForeignKey("M_KhachHang")]
         public virtual KhachHang KhachHang { get; set; }
 
-        [ForeignKey("M_QuanLy")]
-        public virtual QuanLy? QuanLy { get; set; }
+        // --- CÁC TRƯỜNG MÃ ĐỊA CHỈ LÀM KHÓA NGOẠI ---
+        // Kiểu dữ liệu (string/int) và độ dài phải khớp với Khóa chính của bảng ĐVHC
+        [Required(ErrorMessage = "Vui lòng chọn Tỉnh/Thành phố.")]
+        [StringLength(10)] // Hoặc int
+        [Display(Name = "Tỉnh/Thành phố")]
+        public string MaTinh { get; set; } // <<< Lưu Mã Tỉnh (FK)
+
+        [Required(ErrorMessage = "Vui lòng chọn Quận/Huyện.")]
+        [StringLength(10)] // Hoặc int
+        [Display(Name = "Quận/Huyện")]
+        public string MaQuan { get; set; } // <<< Lưu Mã Quận (FK)
+
+        [Required(ErrorMessage = "Vui lòng chọn Xã/Phường.")]
+        [StringLength(10)] // Hoặc int
+        [Display(Name = "Xã/Phường")]
+        public string MaXa { get; set; } // <<< Lưu Mã Xã (FK)
+                                         // --- KẾT THÚC MÃ ĐỊA CHỈ ---
+
+        // --- Trường địa chỉ chi tiết (Số nhà/Đường) ---
+        [StringLength(200)]
+        [Display(Name = "Số nhà, Đường/Ấp/Thôn")]
+        public string? DiaChi_DuongApThon { get; set; } // Lưu phần còn lại
+                                                        // -----------------------------------------
+
+        // --- Navigation Properties đến các bảng địa chỉ ---
+        [ForeignKey("MaTinh")]
+        public virtual TinhThanhPho? TinhThanhPho { get; set; }
+
+        [ForeignKey("MaQuan")]
+        public virtual QuanHuyen? QuanHuyen { get; set; }
+
+        [ForeignKey("MaXa")]
+        public virtual XaPhuong? XaPhuong { get; set; }
+        public string? MoTa { get;  set; }
+        public string M_LoaiSP { get;  set; }
+        [ForeignKey("M_LoaiSP")] // Link to the FK property
+        public virtual LoaiSanPham LoaiSanPham { get; set; } // Add the navigation property
+        public decimal? GiaTriMongMuon { get;  set; }
+
+        // --- Kết thúc Navigation địa chỉ ---
     }
 
 }

@@ -35,6 +35,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<INguoiMuaRepository, NguoiMuaRepository>();
+builder.Services.AddScoped<IThuGomRepository, ThuGomRepository>();
 builder.Services.AddScoped<ISanPhamRepository, EFSanPhamRepository>();
 
 

@@ -1,247 +1,579 @@
-﻿<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Quản Lý Thu Gom</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="/css/AdminLayout.css" />
-    <link rel="stylesheet" href="/css/AdminCollectionManagement.css" />
-    <style>
-        /* Copy CSS từ code #53 vào đây hoặc file CSS riêng */
-        body, html {
-            height: 100%;
+﻿@model DACS.Models.ViewModels.QuanLyThuGomViewModel
+
+@{
+    ViewData["Title"] = "Quản Lý Thu Gom Phụ Phẩm";
+}
+<style>
+    /* Copy CSS từ code #53 vào đây hoặc file CSS riêng */
+    body, html {
+        height: 100%;
+    }
+
+    .container {
+        display: grid;
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        flex-direction: row;
+    }
+
+    .sidebar {
+        background-color: #212529;
+        color: #fff;
+        padding: 15px;
+        width: 250px;
+        flex-shrink: 0;
+        min-height: 100vh;
+    }
+
+        .sidebar h2 {
+            border-bottom: 1px solid #495057;
+            padding-bottom: 10px;
+            font-size: 1.5rem;
         }
 
-        .container {
-            display: grid;
-            max-width: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            flex-direction: row;
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 8px 15px;
         }
 
-        .sidebar {
-            background-color: #212529;
-            color: #fff;
-            padding: 15px;
-            width: 250px;
-            flex-shrink: 0;
-            min-height: 100vh;
-        }
-
-            .sidebar h2 {
-                border-bottom: 1px solid #495057;
-                padding-bottom: 10px;
-                font-size: 1.5rem;
+            .sidebar .nav-link.active, .sidebar .nav-link:hover {
+                color: #fff;
+                background-color: #495057;
+                border-radius: 0.25rem;
             }
 
-            .sidebar .nav-link {
-                color: #adb5bd;
-                padding: 8px 15px;
-            }
+    .main-content-area {
+        padding: 25px;
+        background-color: #f8f9fa;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
 
-                .sidebar .nav-link.active, .sidebar .nav-link:hover {
-                    color: #fff;
-                    background-color: #495057;
-                    border-radius: 0.25rem;
-                }
+    .page-header {
+        font-size: 1.75rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        color: #343a40;
+    }
 
-        .main-content-area {
-            padding: 25px;
-            background-color: #f8f9fa;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
+    .stat-card {
+        background-color: #fff;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+        text-align: center;
+    }
 
-        .page-header {
+        .stat-card .value {
             font-size: 1.75rem;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-            color: #343a40;
+            font-weight: 600;
         }
 
-        .stat-card {
-            background-color: #fff;
-            border-radius: 0.375rem;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
-            text-align: center;
-        }
-
-            .stat-card .value {
-                font-size: 1.75rem;
-                font-weight: 600;
-            }
-
-            .stat-card .label {
-                font-size: 0.9rem;
-                color: #6c757d;
-                margin-top: 0.25rem;
-            }
-
-        .filter-card {
-            background-color: #fff;
-            padding: 1rem 1.5rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
-        }
-
-        
-        .user-info small {
-            display: block;
+        .stat-card .label {
+            font-size: 0.9rem;
             color: #6c757d;
-            font-size: 0.85em;
+            margin-top: 0.25rem;
         }
-    </style>
-</head>
-<body>
-    <div class="d-flex">
-        <div class="sidebar">
-            <h2>Quản Lý XNK</h2> <ul class="nav flex-column">
-                 
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link active"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="QuanLyDSKH" class="nav-link "><i class="fas fa-warehouse me-2"></i> Danh sách Kho hàng</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="QuanLyDSPX" class="nav-link "><i class="fas fa-file-export me-2"></i> Phiếu xuất</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="TonKho" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
-                <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="ThongKe" class="nav-link "><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
 
-                <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
-                <li class="nav-item mt-auto pt-3 border-top border-secondary"><a href="#" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
-            </ul>
-        </div>
+    .filter-card {
+        background-color: #fff;
+        padding: 1rem 1.5rem;
+        border-radius: 0.375rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+    }
 
-        <div class="main-content-area">
-            <div class="page-header">Quản Lý Thu Gom Phụ Phẩm</div>
 
-            <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
-                        <div class="value text-warning">8</div> <div class="label">Yêu cầu mới</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
-                        <div class="value text-info">15</div> <div class="label">Đã lên lịch</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
-                        <div class="value text-primary">5</div> <div class="label">Đang thực hiện</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
-                        <div class="value text-success">250</div> <div class="label">Đã hoàn thành (tuần)</div>
-                    </div>
+    .user-info small {
+        display: block;
+        color: #6c757d;
+        font-size: 0.85em;
+    }
+</style>
+
+
+<div class="d-flex main-container">
+    @* --- SIDEBAR --- *@
+    <div class="sidebar">
+        <h2>Quản Lý XNK</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link active"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
+            @* Thay thế bằng các link đúng của bạn *@
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="KhoHang" asp-action="Index" class="nav-link"><i class="fas fa-warehouse me-2"></i> Danh sách Kho hàng</a></li>
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="TonKho" asp-action="Index" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="ThongKe" asp-action="Index" class="nav-link"><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
+            @* Nút Đăng xuất *@
+            <li class="nav-item mt-auto pt-3 border-top border-secondary">
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                    <button type="submit" class="nav-link text-danger" style="background:none; border:none; width:100%; text-align:left;">
+                        <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    @* --- MAIN CONTENT --- *@
+    <div class="main-content-area">
+        <div class="page-header">@ViewData["Title"]</div>
+
+        @* --- STATS CARDS --- *@
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="value text-warning">@(Model.Statistics?.YeuCauMoi ?? 0)</div> <div class="label">Yêu cầu mới</div>
                 </div>
             </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="value text-info">@(Model.Statistics?.DaLenLich ?? 0)</div> <div class="label">Đã lên lịch</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="value text-primary">@(Model.Statistics?.DangThucHien ?? 0)</div> <div class="label">Đang thực hiện</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="value text-success">@(Model.Statistics?.HoanThanhTrongTuan ?? 0)</div> <div class="label">Đã hoàn thành (tuần)</div>
+                </div>
+            </div>
+        </div>
 
-            <div class="filter-card">
+        @* --- FILTER FORM --- *@
+        <div class="filter-card">
+            <form method="get" asp-action="Index">
                 <div class="row g-3 align-items-center">
                     <div class="col-md-3">
-                        <input type="text" id="search-input" class="form-control form-control-sm" placeholder="Tìm mã YC, tên, SĐT, địa chỉ...">
+                        <input asp-for="SearchTerm" class="form-control form-control-sm" placeholder="Tìm mã YC, tên, SĐT...">
                     </div>
                     <div class="col-md-2">
-                        <input type="date" id="date-filter" class="form-control form-control-sm" title="Lọc theo ngày thu gom">
+                        <input asp-for="DateFilter" type="date" class="form-control form-control-sm" title="Lọc theo ngày thu gom">
                     </div>
                     <div class="col-md-2">
-                        <select id="status-filter-select" class="form-select form-select-sm">
-                            <option value="" selected>Lọc theo trạng thái</option>
-                            <option value="pending">Chờ xử lý</option>
-                            <option value="scheduled">Đã lên lịch</option>
-                            <option value="collecting">Đang thu gom</option>
-                            <option value="completed">Hoàn thành</option>
-                            <option value="cancelled">Đã hủy</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select id="collector-filter-select" class="form-select form-select-sm">
-                            <option value="" selected>Lọc theo người thu gom</option>
-                            <option value="nv01">NV Giao Hàng A</option>
-                            <option value="nv02">NV Giao Hàng B</option>
-                            <option value="unassigned">Chưa gán</option>
-                        </select>
+                        <select asp-for="StatusFilter" asp-items="Model.StatusOptions" class="form-select form-select-sm"></select>
                     </div>
                     <div class="col-md-1">
-                        <button class="btn btn-sm btn-primary w-100" title="Lọc dữ liệu"><i class="fas fa-filter"></i></button>
+                        <button type="submit" class="btn btn-sm btn-primary w-100" title="Lọc dữ liệu"><i class="fas fa-filter"></i></button>
                     </div>
                     <div class="col-md-2 text-end">
-                        <button class="btn btn-sm btn-success"><i class="fas fa-plus me-1"></i> Ghi nhận mới</button>
+                        @* Nút này có thể trỏ đến Action Create của Admin hoặc chức năng khác *@
+                        <a asp-action="CreateManualEntry" class="btn btn-sm btn-success"><i class="fas fa-plus me-1"></i> Ghi nhận mới</a>
                     </div>
                 </div>
+            </form>
+        </div>
+
+        @* --- DATA TABLE --- *@
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Mã YC</th>
+                            <th>Người Yêu Cầu</th>
+                            <th>Địa chỉ</th>
+                            <th>Loại Phụ Phẩm</th>
+                            <th>Số Lượng</th>
+                            <th>Ngày YC/Thu Gom</th>
+                            <th>Trạng Thái</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.DanhSachYeuCau != null && Model.DanhSachYeuCau.Any()) // Thêm kiểm tra null cho Model.DanhSachYeuCau
+                        {
+                            @foreach (var request in Model.DanhSachYeuCau)
+                            {
+                                <tr>
+                                    <td><span class="fw-bold">@request.M_YeuCau</span></td>
+                                    <td class="user-info"> @request.TenKhachHang <small>@request.SdtKhachHang</small> </td>
+                                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@request.DiaChiTomTat">@request.DiaChiTomTat</td>
+                                    <td>@request.TenLoaiSanPham</td>
+                                    <td>@request.SoLuong @request.TenDonViTinh</td>
+                                    <td>
+                                        <small title="Ngày Yêu Cầu">YC: @request.NgayYeuCau.ToString("dd/MM/yy HH:mm")</small><br>
+                                        <small title="Ngày Thu Gom">TG: @(request.NgayThuGom?.ToString("dd/MM/yy HH:mm") ?? "N/A")</small>
+                                    </td>
+                                    <td><span class="badge @GetStatusBadgeClass(request.TrangThai ?? "")">@request.TrangThai</span></td>
+                                    <td class="actions text-center">
+                                        @* Các nút hành động sẽ thay đổi tùy theo trạng thái *@
+                                        <a asp-action="Details" asp-route-id="@request.M_YeuCau" class="btn btn-sm btn-outline-info" title="Xem Chi tiết"><i class="fas fa-eye"></i></a>
+
+                                        @if (request.TrangThai == "Chờ xử lý")
+                                        {
+                                            <a asp-action="Schedule" asp-route-id="@request.M_YeuCau" class="btn btn-sm btn-outline-primary" title="Lên lịch"><i class="fas fa-calendar-alt"></i></a>
+                                            <form asp-action="AdminCancel" asp-route-id="@request.M_YeuCau" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy yêu cầu này không?');">
+                                                @* Quan trọng: Đảm bảo có method="post" *@
+
+                                                @* Thêm AntiForgeryToken nếu Action trong Controller có [ValidateAntiForgeryToken] *@
+                                                @* @Html.AntiForgeryToken() *@
+
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Hủy YC">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else if (request.TrangThai == "Đã lên lịch")
+                                        {
+                                            <form asp-action="StartCollection" asp-route-id="@request.M_YeuCau" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn bắt đầu thu gom yêu cầu này?');">
+                                                @* Thêm AntiForgeryToken nếu Action trong Controller có [ValidateAntiForgeryToken] *@
+                                                @* @Html.AntiForgeryToken()  *@
+                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Bắt đầu">
+                                                    <i class="fas fa-truck-loading"></i>
+                                                </button>
+                                            </form>                                           
+                                            <a asp-action="EditSchedule" asp-route-id="@request.M_YeuCau" class="btn btn-sm btn-outline-secondary" title="Sửa lịch"><i class="fas fa-edit"></i></a>
+                                        }
+                                        else if (request.TrangThai == "Đang thu gom")
+                                        {
+                                            @* *** SỬA LẠI THÀNH NÚT NÀY - KHÔNG CÓ FORM BAO QUANH *** *@
+                                            <button type="button" class="btn btn-sm btn-success btn-mark-complete"
+                                                    data-bs-toggle="modal" data-bs-target="#completeConfirmationModal"
+                                                    data-request-id="@request.M_YeuCau"
+                                                    title="Đánh dấu Hoàn thành">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>
+
+                                            @* Giữ lại form cho nút Thất bại *@
+                                            <form asp-action="MarkFailed" asp-route-id="@request.M_YeuCau" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn đánh dấu yêu cầu này là THẤT BẠI không?');">
+                                                @Html.AntiForgeryToken() @* <-- THÊM TOKEN *@
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Thất bại">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        @* Các trạng thái khác có thể có nút khác *@
+                                    </td>
+                                </tr>
+                            }
+                            <div class="modal fade" id="completeConfirmationModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="completeModalLabel">Xác nhận Hoàn thành Yêu cầu</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Bạn có chắc muốn đánh dấu yêu cầu <strong id="modal-request-id-display">[Mã YC]</strong> là HOÀN THÀNH?</p>
+                                            <hr />
+                                            <p class="fw-bold">Vui lòng chọn kho đích để nhập hàng:</p>
+                                            <div class="mb-3">
+                                                <label for="targetKhoSelect" class="form-label">Kho Đích <span class="text-danger">*</span></label>
+                                                <select id="targetKhoSelect" class="form-select form-select-sm" required>
+                                                    <option value="" selected disabled>-- Chọn kho hàng --</option>
+                                                    @* Vòng lặp qua danh sách kho từ ViewModel *@
+                                                    @if (Model?.ActiveKhoHangOptions != null)
+                                                    {
+                                                        @foreach (var khoOption in Model.ActiveKhoHangOptions)
+                                                        {
+                                                            <option value="@khoOption.Value">@khoOption.Text</option>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="" disabled>Không tải được danh sách kho</option>
+                                                    }
+                                                </select>
+                                                <div id="khoSelectError" class="text-danger mt-1" style="display: none;">Vui lòng chọn kho đích.</div>
+                                            </div>
+                                            @* Input ẩn để lưu M_YeuCau *@
+                                            <input type="hidden" id="modal-request-id-hidden" />
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                <i class="fas fa-times me-1"></i> Hủy
+                                            </button>
+                                            <button type="button" class="btn btn-success" id="confirmCompleteBtn">
+                                                <i class="fas fa-check me-1"></i> Xác nhận Hoàn thành
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <tr><td colspan="9" class="text-center text-muted py-3">Không có yêu cầu nào phù hợp với bộ lọc hiện tại hoặc chưa có yêu cầu nào.</td></tr>
+                            // Sửa thông báo
+                        }
+                    </tbody>
+                </table>
             </div>
 
-            <div class="table-container">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover table-sm align-middle">
-                        <thead>
-                            <tr>
-                                <th>Mã YC</th>
-                                <th>Người Yêu Cầu</th>
-                                <th>Địa chỉ</th>
-                                <th>Loại Phụ Phẩm</th>
-                                <th>Số Lượng</th>
-                                <th>Ngày YC/Thu Gom</th>
-                                <th>Trạng Thái</th>
-                                <th>Người Thu Gom</th>
-                                <th class="text-center">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>YC#001</td>
-                                <td class="user-info"> Nguyễn Văn An <small>0901112233</small> </td>
-                                <td>123 ABC, P.XYZ, Q.1</td>
-                                <td>Rơm Rạ Khô</td>
-                                <td>~500 kg</td>
-                                <td>04/04/2025</td>
-                                <td><span class="badge bg-secondary">Chờ xử lý</span></td>
-                                <td>Chưa gán</td>
-                                <td class="actions text-center">
-                                    <button class="btn btn-sm btn-outline-info" title="Xem Chi tiết"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-outline-primary" title="Lên lịch/Gán việc"><i class="fas fa-calendar-alt"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger" title="Hủy yêu cầu"><i class="fas fa-times-circle"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>YC#002</td>
-                                <td class="user-info"> Trần Thị Bích <small>0987654321</small> </td>
-                                <td>456 DEF, P.LKA, Q.3</td>
-                                <td>Vỏ Trấu</td>
-                                <td>~2 tấn</td>
-                                <td>05/04/2025 (Dự kiến)</td>
-                                <td><span class="badge bg-info text-dark">Đã lên lịch</span></td>
-                                <td>NV Giao Hàng A</td>
-                                <td class="actions text-center">
-                                    <button class="btn btn-sm btn-outline-info" title="Xem Chi tiết"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-outline-warning" title="Bắt đầu thu gom"><i class="fas fa-truck-loading"></i></button>
-                                    <button class="btn btn-sm btn-outline-secondary" title="Sửa lịch"><i class="fas fa-edit"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            @* --- PAGINATION --- *@
+            @if (Model.TotalPages > 1)
+            {
                 <nav aria-label="Collection navigation" class="mt-3 d-flex justify-content-center">
                     <ul class="pagination pagination-sm">
-                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a></li>
-                        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Sau</a></li>
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.PageIndex - 1)"
+                               asp-route-searchTerm="@Model.SearchTerm"
+                               asp-route-statusFilter="@Model.StatusFilter"
+                               asp-route-dateFilter="@Model.DateFilter?.ToString("yyyy-MM-dd")" @*Định dạng lại DateFilter*@
+                               asp-route-collectorFilter="@Model.CollectorFilter"
+                               aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@i"
+                                   asp-route-searchTerm="@Model.SearchTerm"
+                                   asp-route-statusFilter="@Model.StatusFilter"
+                                   asp-route-dateFilter="@Model.DateFilter?.ToString("yyyy-MM-dd")" @*Định dạng lại DateFilter*@
+                                   asp-route-collectorFilter="@Model.CollectorFilter">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.PageIndex + 1)"
+                               asp-route-searchTerm="@Model.SearchTerm"
+                               asp-route-statusFilter="@Model.StatusFilter"
+                               asp-route-dateFilter="@Model.DateFilter?.ToString("yyyy-MM-dd")" @*Định dạng lại DateFilter*@
+                               asp-route-collectorFilter="@Model.CollectorFilter"
+                               aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            }
+        </div> @* End Table Container *@
+
+    </div> @* End Main Content Area *@
+</div> @* End Main Container *@
+
+@* Sao chép hàm GetStatusBadgeClass nếu Layout chưa có *@
+@functions {
+    string GetStatusBadgeClass(string status)
+    {
+        status = status?.Trim().ToLower() ?? "";
+        switch (status)
+        {
+            case "chờ xử lý": return "bg-secondary";
+            case "đã tiếp nhận": return "bg-info-subtle text-info-emphasis"; // Giả sử có trạng thái này
+            case "đã lên lịch": return "bg-info text-dark"; // Có thể đổi màu nếu muốn
+            case "đang thu gom": return "bg-primary";
+            case "hoàn thành": case "thu gom thành công": return "bg-success";
+            case "đã hủy": return "bg-danger";
+            case "thu gom thất bại": return "bg-warning text-dark";
+            default: return "bg-light text-dark border"; // Trạng thái không xác định
+        }
+    }
+}
+
+@section Scripts {
+        @* Thêm link Bootstrap JS nếu Layout chưa có hoặc cần bản mới hơn *@
+        @*<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>*@
     <script>
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl) })
+        // Kích hoạt Tooltip (nếu dùng)
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')) // Sử dụng data-bs-toggle
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Thêm JS cho datepicker hoặc các filter khác nếu cần
+        // Ví dụ: Gắn datepicker cho input DateFilter
+        // flatpickr("#DateFilter", { // Cần thư viện flatpickr
+        //     dateFormat: "Y-m-d",
+        // });
+
+        // Thêm confirm dialog cho nút Hủy YC
+        document.querySelectorAll('a[asp-action="AdminCancel"]').forEach(button => {
+            button.addEventListener('click', function (event) {
+                if (!confirm('Bạn có chắc chắn muốn hủy yêu cầu này không?')) {
+                    event.preventDefault(); // Ngăn chặn hành động mặc định (chuyển hướng)
+                } else {
+                     // Nếu người dùng đồng ý, cần submit form POST thay vì GET qua link <a>
+                     event.preventDefault(); // Ngăn link <a>
+                     const form = document.createElement('form');
+                     form.method = 'post';
+                     form.action = this.href; // Lấy URL từ link
+
+                     // Thêm token chống CSRF nếu cần (quan trọng!)
+                     // Cách lấy token có thể khác nhau tùy phiên bản .NET Core
+                     // Ví dụ đơn giản (cần thẻ input chứa token trong trang):
+                     // const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                     // if (tokenInput) {
+                     //    const token = document.createElement('input');
+                     //    token.type = 'hidden';
+                     //    token.name = '__RequestVerificationToken';
+                     //    token.value = tokenInput.value;
+                     //    form.appendChild(token);
+                     // }
+
+                     document.body.appendChild(form);
+                     form.submit();
+                }
+            });
+        });
+         // Thêm confirm dialog cho nút Thất bại (tương tự Hủy YC)
+          document.querySelectorAll('a[asp-action="MarkFailed"]').forEach(button => {
+            button.addEventListener('click', function (event) {
+                if (!confirm('Bạn có chắc chắn muốn đánh dấu yêu cầu này là thất bại không?')) {
+                    event.preventDefault();
+                } else {
+                     // Tương tự nút Hủy, nên dùng form POST
+                     event.preventDefault();
+                     const form = document.createElement('form');
+                     form.method = 'post';
+                     form.action = this.href;
+                     // Thêm input cho lý do thất bại nếu cần
+                     // const reason = prompt("Nhập lý do thất bại (không bắt buộc):");
+                     // if (reason !== null) { // Nếu người dùng không bấm Cancel trên prompt
+                     //      const reasonInput = document.createElement('input');
+                     //      reasonInput.type = 'hidden';
+                     //      reasonInput.name = 'failureReason'; // Phải khớp với tham số Action
+                     //      reasonInput.value = reason;
+                     //      form.appendChild(reasonInput);
+                     // }
+                     // Thêm token chống CSRF
+                     document.body.appendChild(form);
+                     form.submit();
+                }
+            });
+        });
+
+         // Các confirm dialog khác nếu cần (StartCollection, MarkComplete...)
+         // Nếu các action đó là POST, cách làm tương tự như Hủy/Thất bại
+         // Nếu là GET thì chỉ cần confirm đơn giản
+
+         document.querySelectorAll('a[asp-action="StartCollection"], a[asp-action="MarkComplete"]').forEach(button => {
+             button.addEventListener('click', function(event) {
+                 // Chỉ cần confirm đơn giản nếu action là GET
+                 // Nếu là POST, làm như Hủy/Thất bại
+                 const action = this.getAttribute('asp-action');
+                 let message = `Bạn có chắc muốn ${action === 'StartCollection' ? 'Bắt đầu' : 'Hoàn thành'} yêu cầu này?`;
+                 if (!confirm(message)) {
+                     event.preventDefault();
+                 } else {
+                    // NẾU LÀ POST, THÊM CODE TẠO FORM VÀ SUBMIT Ở ĐÂY
+                     event.preventDefault();
+                     const form = document.createElement('form');
+                     form.method = 'post';
+                     form.action = this.href;
+                     // Thêm token chống CSRF
+                     document.body.appendChild(form);
+                     form.submit();
+                 }
+             });
+         });
+
+
     </script>
-</body>
-</html>
+
+    {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} // Giữ lại nếu có validation khác
+
+    @* Đảm bảo jQuery đã được load trước script này (thường trong _Layout.cshtml) *@
+    <script>
+        // Sử dụng jQuery cho ngắn gọn, đảm bảo jQuery đã được load trước
+        $(document).ready(function () {
+            var completeModalElement = document.getElementById('completeConfirmationModal');
+            // Kiểm tra xem modal element có tồn tại không trước khi tạo đối tượng Bootstrap Modal
+            if (completeModalElement) {
+                var completeModal = new bootstrap.Modal(completeModalElement);
+                var requestIdToComplete = null; // Biến lưu ID yêu cầu đang xử lý
+
+                // 1. Xử lý khi bấm nút Hoàn thành (dấu check xanh) trong bảng
+                // Dùng class 'btn-mark-complete' mà bạn đã thêm vào nút button
+                $(document).on('click', '.btn-mark-complete', function () {
+                    requestIdToComplete = $(this).data('request-id'); // Lấy ID từ data-request-id
+
+                    // Cập nhật ID hiển thị trong modal và input ẩn
+                    $('#modal-request-id-display').text(requestIdToComplete);
+                    $('#modal-request-id-hidden').val(requestIdToComplete);
+
+                    // Reset dropdown chọn kho và thông báo lỗi
+                    $('#targetKhoSelect').val('');
+                    $('#khoSelectError').hide();
+
+                    // Mở modal (Bootstrap 5 tự xử lý qua data-bs-toggle/target,
+                    // nhưng gọi .show() đảm bảo nó mở bằng JS nếu cần)
+                     completeModal.show();
+                });
+
+                // 2. Xử lý khi bấm nút "Xác nhận Hoàn thành" TRONG MODAL
+                $('#confirmCompleteBtn').on('click', function () {
+                    console.log("Confirm button clicked!"); // * Log để debug *
+
+                    var selectedKho = $('#targetKhoSelect').val();
+                    var requestId = $('#modal-request-id-hidden').val();
+                    console.log("Request ID:", requestId); // * Log để debug *
+                    console.log("Selected Kho:", selectedKho); // * Log để debug *
+
+
+                    // Kiểm tra xem đã chọn kho chưa
+                    if (!selectedKho) {
+                        console.log("Validation failed: Kho not selected."); // * Log để debug *
+                        $('#khoSelectError').show(); // Hiển thị lỗi
+                        return; // Dừng lại
+                    } else {
+                        $('#khoSelectError').hide(); // Ẩn lỗi
+                    }
+
+                    // Tạo URL cho action POST
+                    var postUrl = '@Url.Action("MarkComplete", "QuanLyXNK", new { Area = "QuanLyXNK" })'
+                                + '/' + requestId
+                                + '?targetMaKho=' + encodeURIComponent(selectedKho);
+                    console.log("Generated POST URL:", postUrl); // * Log để debug *
+
+
+                    // Lấy form ẩn và cập nhật action
+                    var hiddenForm = $('#hiddenCompleteForm');
+                    console.log("Hidden form found:", hiddenForm.length); // * Log để debug * (Phải là 1)
+
+                    if(hiddenForm.length === 0) {
+                        console.error("Hidden form #hiddenCompleteForm not found!");
+                        alert("Lỗi: Không tìm thấy form ẩn để gửi yêu cầu.");
+                        return;
+                    }
+                    hiddenForm.attr('action', postUrl);
+                    console.log("Form action set to:", hiddenForm.attr('action')); // * Log để debug *
+
+
+                    // Submit form ẩn
+                    console.log("Submitting hidden form..."); // * Log để debug *
+                    try {
+                         hiddenForm.submit();
+                         console.log("Form submitted."); // * Log để debug * (Có thể không thấy log này nếu trang redirect nhanh)
+                    } catch (e) {
+                         console.error("Error submitting form:", e); // * Log lỗi submit *
+                    }
+
+
+                    // Đóng modal
+                    // completeModal.hide(); // Có thể tạm comment dòng này để xem log dễ hơn
+                });
+
+                 // (Tùy chọn) Reset khi modal đóng
+                $(completeModalElement).on('hidden.bs.modal', function () {
+                    requestIdToComplete = null;
+                    $('#modal-request-id-hidden').val('');
+                    $('#modal-request-id-display').text('[Mã YC]');
+                     $('#targetKhoSelect').val('');
+                     $('#khoSelectError').hide();
+                });
+
+            } else {
+                 console.error("Modal element #completeConfirmationModal not found!");
+            }
+
+            // Kích hoạt Tooltip (giữ lại nếu muốn)
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+        }); // End document ready
+    </script>
+}
+}

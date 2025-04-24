@@ -17,10 +17,6 @@ namespace DACS.Models
         [StringLength(10)]
         public string M_DonViTinh { get; set; } // FK
 
-        [Required]
-        [StringLength(10)]
-        public string M_KhoLuuTru { get; set; } // FK
-
         [Required(ErrorMessage = "Tên sản phẩm là bắt buộc.")]
         [StringLength(100)]
         public string TenSanPham { get; set; }
@@ -56,8 +52,6 @@ namespace DACS.Models
         [ForeignKey("M_DonViTinh")]
         public virtual DonViTinh? DonViTinh { get; set; }
 
-        [ForeignKey("M_KhoLuuTru")]
-        public virtual KhoLuuTru? KhoLuuTru { get; set; }
 
         public virtual ICollection<ChiTietDatHang> ChiTietDatHangs { get; set; } = new List<ChiTietDatHang>();
         public virtual ICollection<ChiTietDanhGia> ChiTietDanhGias { get; set; } = new List<ChiTietDanhGia>();

@@ -13,6 +13,7 @@ namespace DACS.Models.ViewModels
 
         // Danh sách các đơn hàng gần đây
         public List<OrderSummaryViewModel>? RecentOrders { get; set; }
+        public List<YeuCauThuGom> RecentCollectionRequests { get; internal set; }
 
         public KhachHangDashboardViewModel()
         {

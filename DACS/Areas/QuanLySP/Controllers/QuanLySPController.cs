@@ -57,7 +57,6 @@ namespace DACS.Areas.QuanLySP.Controllers
         {
             ViewData["M_LoaiSP"] = new SelectList(_context.LoaiSanPhams, "M_LoaiSP", "TenLoai");
             ViewData["M_DonViTinh"] = new SelectList(_context.DonViTinhs, "M_DonViTinh", "TenLoaiTinh");
-            ViewData["M_KhoLuuTru"] = new SelectList(_context.KhoLuuTrus, "M_KhoLuuTru", "M_KhoLuuTru");
             return View();
         }
         // --- Hết phần giữ nguyên ---
@@ -230,7 +229,6 @@ namespace DACS.Areas.QuanLySP.Controllers
             if (await TryUpdateModelAsync<SanPham>(
                 sanPhamToUpdate,
                 "", // Prefix
-                 s => s.M_LoaiSP, s => s.M_DonViTinh, s => s.M_KhoLuuTru,
                  s => s.TenSanPham, s => s.Gia, s => s.MoTa, s => s.TrangThai, s => s.SoLuong, s => s.HanSuDung
             // Không cập nhật M_SanPham, NgayTao, AnhSanPham ở đây
             ))
@@ -365,7 +363,6 @@ namespace DACS.Areas.QuanLySP.Controllers
         {
             ViewData["M_LoaiSP"] = new SelectList(await _context.LoaiSanPhams.OrderBy(l => l.TenLoai).ToListAsync(), "M_LoaiSP", "TenLoai", sanPham?.M_LoaiSP);
             ViewData["M_DonViTinh"] = new SelectList(await _context.DonViTinhs.OrderBy(d => d.TenLoaiTinh).ToListAsync(), "M_DonViTinh", "TenLoaiTinh", sanPham?.M_DonViTinh);
-            ViewData["M_KhoLuuTru"] = new SelectList(await _context.KhoLuuTrus.OrderBy(k => k.M_KhoLuuTru).ToListAsync(), "M_KhoLuuTru", "M_KhoLuuTru", sanPham?.M_KhoLuuTru); // Hiển thị mã kho, có thể đổi thành tên kho nếu có
         }
 
 
