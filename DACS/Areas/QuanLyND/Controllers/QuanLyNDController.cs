@@ -6,7 +6,7 @@ namespace DACS.Areas.QuanLyND.Controllers
 {
     [Area("QuanLyND")]
     [Authorize(Roles ="QuanLyND, Owner")]
-    public class QuanLyDHController : Controller
+    public class QuanLyNDController : Controller
     {
         public IActionResult Index()
         {

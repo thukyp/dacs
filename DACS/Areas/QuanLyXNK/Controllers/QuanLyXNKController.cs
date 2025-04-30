@@ -261,9 +261,6 @@ namespace DACS.Areas.QuanLyXNK.Controllers
                 .FirstOrDefaultAsync(m => m.M_YeuCau == id);
 
             if (yeuCau == null) return NotFound();
-
-            // TODO: Tạo ViewModel chi tiết và View "Details.cshtml"
-            // return View(detailViewModel);
             return View(yeuCau); // Tạm thời trả về Model gốc
         }
 
@@ -355,9 +352,6 @@ namespace DACS.Areas.QuanLyXNK.Controllers
         private string? FormatAddress(Models.KhachHang? khachHang)
         {
             if (khachHang == null) return "N/A";
-            // This needs access to related address entities if they weren't included above
-            // Ensure KhachHang includes XaPhuong, QuanHuyen, TinhThanhPho if needed here
-            // OR adjust the include in the main query
             var parts = new List<string?>();
             if (!string.IsNullOrWhiteSpace(khachHang.DiaChi_DuongApThon)) parts.Add(khachHang.DiaChi_DuongApThon);
             // Assuming navigation properties are loaded or accessible:

@@ -539,4 +539,27 @@
 
         }); // End document ready
     </script>
+
+
+    @* tìm kiếm *@
+ <script>
+        function filterRequests() {
+       const keyword = document.getElementById("search-input").value.toLowerCase().trim();
+
+       const rows = document.querySelectorAll("#requestTable tbody tr");
+
+       rows.forEach(row => {
+         const cells = row.getElementsByTagName("td");
+         const textContent = row.innerText.toLowerCase();
+
+         const matchesKeyword = textContent.includes(keyword);
+
+         row.style.display = (matchesKeyword ) ? "" : "none";
+       });
+     }
+
+     // Gắn sự kiện lọc
+     document.getElementById("search-input").addEventListener("keyup", filterRequests);
+
+ </script>
 }

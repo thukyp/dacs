@@ -115,11 +115,6 @@ namespace DACS.Areas.QuanLyXNK.Controllers
                 {
                     return "Sắp hết"; // Badge màu vàng (warning)
                 }
-                // Có thể thêm logic "Dư tồn" nếu có định mức tối đa
-                // else if (maxThreshold.HasValue && currentQuantity > maxThreshold.Value)
-                // {
-                //     return "Dư tồn"; // Badge màu xanh dương (info)
-                // }
                 else
                 {
                     return "Đủ hàng"; // Badge màu xanh lá (success)
@@ -130,12 +125,5 @@ namespace DACS.Areas.QuanLyXNK.Controllers
                 return "Còn hàng"; // Badge màu xám (secondary) hoặc xanh lá (success)
             }
         }
-
-        // --- Các Action khác (nếu cần) ---
-        // Ví dụ: Chi tiết, Chỉnh sửa số lượng (cẩn thận), Xóa (cẩn thận)...
-        // public async Task<IActionResult> Details(int id) { ... }
-        // public async Task<IActionResult> Edit(int id) { ... }
-        // [HttpPost]
-        // public async Task<IActionResult> Edit(TonKhoViewModel model) { ... }
     }
 }

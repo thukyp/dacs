@@ -35,7 +35,7 @@ namespace DACS.Areas.KhachHang.Controllers
       ISanPhamRepository sanPhamRepo,
       IThuGomRepository thuGomRepository
       )
-       {
+        {
             _context = context; // <<< Gán lại context
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
@@ -44,8 +44,6 @@ namespace DACS.Areas.KhachHang.Controllers
             _sanPhamRepo = sanPhamRepo;
             _thuGomRepository = thuGomRepository;
         }
-
-
 
         public async Task<IActionResult> Index()
 
@@ -116,7 +114,7 @@ namespace DACS.Areas.KhachHang.Controllers
             }
             else
             {
-                var user = await _userManager.GetUserAsync(User);
+                var user = await _userManager.GetUserAsync(User);
                 if (user != null)
 
                 {
@@ -132,8 +130,6 @@ namespace DACS.Areas.KhachHang.Controllers
                 }
 
             }
-
-
 
             // 2. Lấy danh sách đơn hàng gần đây
 
@@ -176,26 +172,18 @@ namespace DACS.Areas.KhachHang.Controllers
                     .ToListAsync();
             }
 
-
-
             // Assign data to the ViewModel
 
             dashboardViewModel.RecentOrders = recentOrdersData;
 
             dashboardViewModel.RecentCollectionRequests = recentCollectionRequestsData.ToList();
 
-
-
             // 4. Truyền ViewModel tới View Index.cshtml
-
             return View(dashboardViewModel);
 
         }
 
-
-
         // GET: /KhachHang/KhachHang/HoSoCaNhan
-
         public async Task<IActionResult> HoSoCaNhan()
         {
             var userId = _userManager.GetUserId(User);
@@ -309,78 +297,38 @@ namespace DACS.Areas.KhachHang.Controllers
             return View("HoSoCaNhan", viewModel); // Truyền viewModel đã được chuẩn bị đầy đủ
         }
 
-
-
         // GET: /KhachHang/KhachHang/Edit
-
         public async Task<IActionResult> Edit()
-
         {
-
             var userId = _userManager.GetUserId(User);
-
             if (userId == null) { return Challenge(); }
-
-
-
             var nguoiMuaProfile = await _nguoiMuaRepo.GetByUserIdAsync(userId);
 
-
-
             // Nếu không tìm thấy, chuyển hướng về HoSoCaNhan
-
             // HoSoCaNhan sẽ xử lý việc hiển thị lỗi hoặc tự động tạo hồ sơ
-
             if (nguoiMuaProfile == null)
-
             {
-
                 TempData["InfoMessage"] = "Không tìm thấy hồ sơ, đang kiểm tra..."; // Thông báo nhẹ nhàng
-
-                return RedirectToAction(nameof(HoSoCaNhan));
-
+               return RedirectToAction(nameof(HoSoCaNhan));
             }
 
-
-
             // Map sang ViewModel để hiển thị form Edit
-
             var viewModel = new EditNguoiMuaProfile
-
             {
-
                 // Gán các thuộc tính từ nguoiMuaProfile sang viewModel
-
                 Ten_NguoiMua = nguoiMuaProfile.Ten_KhachHang,
-
                 Email_NguoiMua = nguoiMuaProfile.Email_KhachHang,
-
                 SDT_NguoiMua = nguoiMuaProfile.SDT_KhachHang,
-
                 Edit_DiaChi_TinhTP = nguoiMuaProfile.MaTinh,
-
                 Edit_DiaChi_QuanHuyen = nguoiMuaProfile.MaQuan,
-
                 Edit_DiaChi_XaPhuong = nguoiMuaProfile.MaXa,
-
                 Edit_DiaChi_DuongApThon = nguoiMuaProfile.DiaChi_DuongApThon,
-
                 Gender = nguoiMuaProfile.Gender,
-
                 AvatarUrl = nguoiMuaProfile.AvatarUrl
-
-                // Gán M_NguoiMua nếu bạn cần nó trong form (ví dụ: hidden field)
-
-                // viewModel.M_NguoiMua = nguoiMuaProfile.M_NguoiMua;
-
             };
-
-
-
             var provinces = await _context.TinhThanhPhos.OrderBy(p => p.TenTinh).ToListAsync();
             // Truyền MaTinh hiện tại của người dùng làm selected value
             ViewBag.ProvinceOptions = new SelectList(provinces, "MaTinh", "TenTinh", viewModel.Edit_DiaChi_TinhTP);
-
             // 2. Tải Quận/Huyện DỰA VÀO Tỉnh/TP hiện tại (nếu có)
             if (!string.IsNullOrEmpty(viewModel.Edit_DiaChi_TinhTP))
             {
@@ -416,348 +364,158 @@ namespace DACS.Areas.KhachHang.Controllers
 
         }
 
-
-
-
-
-        // POST: /KhachHang/KhachHang/Edit
-
-        // Action POST Edit của bạn về cơ bản đã ổn với việc dùng Repository.
-
-        // Giữ nguyên logic đó vì nó phù hợp với cấu trúc NguoiMua riêng biệt.
-
         [HttpPost]
-
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Edit(EditNguoiMuaProfile model) // Giả sử ViewModel tên là EditNguoiMuaProfile
-
         {
-
             if (!ModelState.IsValid)
-
             {
-
                 // Load lại AvatarUrl nếu validation fail (logic này có vẻ ổn)
-
                 var userIdForUrl = _userManager.GetUserId(User);
-
                 var profileForUrl = await _nguoiMuaRepo.GetByUserIdAsync(userIdForUrl);
-
                 if (profileForUrl != null) { model.AvatarUrl = profileForUrl.AvatarUrl; }
-
                 return View("Edit", model);
-
             }
-
-
-
             var userId = _userManager.GetUserId(User);
-
             var nguoiMuaProfile = await _nguoiMuaRepo.GetByUserIdAsync(userId); // Lấy entity từ Repo
-
-
-
             if (nguoiMuaProfile == null)
-
             {
-
                 TempData["ErrorMessage"] = "Lỗi: Không tìm thấy hồ sơ để cập nhật.";
-
                 return RedirectToAction(nameof(HoSoCaNhan)); // Hoặc trang lỗi
-
             }
 
-
-
             // --- Cập nhật entity NguoiMua ---
-
             bool hasChanges = false; // Biến kiểm tra xem có thay đổi thực sự không
-
-
-
             if (nguoiMuaProfile.Ten_KhachHang != model.Ten_NguoiMua) { nguoiMuaProfile.Ten_KhachHang = model.Ten_NguoiMua; hasChanges = true; }
-
             if (nguoiMuaProfile.Email_KhachHang != model.Email_NguoiMua) { nguoiMuaProfile.Email_KhachHang = model.Email_NguoiMua; hasChanges = true; }
-
             if (nguoiMuaProfile.SDT_KhachHang != model.SDT_NguoiMua) { nguoiMuaProfile.SDT_KhachHang = model.SDT_NguoiMua; hasChanges = true; }
-
             if (nguoiMuaProfile.MaTinh != model.Edit_DiaChi_TinhTP) { nguoiMuaProfile.MaTinh = model.Edit_DiaChi_TinhTP; hasChanges = true; }
-
             if (nguoiMuaProfile.MaQuan != model.Edit_DiaChi_QuanHuyen) { nguoiMuaProfile.MaQuan = model.Edit_DiaChi_QuanHuyen; hasChanges = true; }
-
             if (nguoiMuaProfile.MaXa != model.Edit_DiaChi_XaPhuong) { nguoiMuaProfile.MaXa = model.Edit_DiaChi_XaPhuong; hasChanges = true; }
-
             if (nguoiMuaProfile.DiaChi_DuongApThon != model.Edit_DiaChi_DuongApThon) { nguoiMuaProfile.DiaChi_DuongApThon = model.Edit_DiaChi_DuongApThon; hasChanges = true; }
-
             if (nguoiMuaProfile.Gender != model.Gender) { nguoiMuaProfile.Gender = model.Gender; hasChanges = true; }
 
-
-
-
-
             // --- Xử lý upload ảnh ---
-
             string? oldImagePath = nguoiMuaProfile.AvatarUrl; // Lưu đường dẫn cũ
-
             if (model.ProfileImageFile != null && model.ProfileImageFile.Length > 0)
-
             {
-
                 // Thêm kiểm tra kiểu file và kích thước nếu cần
-
                 if (model.ProfileImageFile.Length > 2 * 1024 * 1024) // Ví dụ giới hạn 2MB
-
                 {
-
                     ModelState.AddModelError("ProfileImageFile", "Kích thước ảnh không được vượt quá 2MB.");
-
                     // Không gán lại AvatarUrl vì cần giữ ảnh cũ khi có lỗi
-
                     return View("Edit", model);
-
                 }
-
                 // Kiểm tra kiểu file MIME Type nếu cần
-
-
-
                 try
-
                 {
-
                     var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "avatars");
-
-                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfileImageFile.FileName); // Thêm phần mở rộng file
-
+                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfileImageFile.FileName); // Thêm phần mở rộng fil
                     var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
                     Directory.CreateDirectory(uploadsFolder); // Tạo thư mục nếu chưa có
-
-
-
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
-
-                    {
-
+                   {
                         await model.ProfileImageFile.CopyToAsync(fileStream);
-
                     }
-
                     var newAvatarUrl = "/images/avatars/" + uniqueFileName; // Đường dẫn lưu trong DB
-
-
-
                     if (nguoiMuaProfile.AvatarUrl != newAvatarUrl)
-
                     {
-
                         nguoiMuaProfile.AvatarUrl = newAvatarUrl;
-
                         hasChanges = true;
-
-
-
                         // Xóa ảnh cũ sau khi đã chắc chắn lưu ảnh mới thành công (hoặc sau khi SaveChanges)
-
                         if (!string.IsNullOrEmpty(oldImagePath))
-
                         {
-
                             string oldPhysicalPath = Path.Combine(_webHostEnvironment.WebRootPath, oldImagePath.TrimStart('/'));
-
                             if (System.IO.File.Exists(oldPhysicalPath))
-
                             {
-
                                 try { System.IO.File.Delete(oldPhysicalPath); } catch (Exception ex) { _logger.LogError(ex, $"Error deleting old avatar: {oldPhysicalPath}"); } // Ghi log nếu xóa lỗi
-
                             }
-
                         }
-
                     }
-
                 }
-
                 catch (Exception ex)
-
                 {
-
                     _logger.LogError(ex, "Error uploading profile image."); // Ghi log
-
                     ModelState.AddModelError("ProfileImageFile", "Lỗi xảy ra khi tải ảnh lên.");
-
                     model.AvatarUrl = oldImagePath; // Giữ lại ảnh cũ khi có lỗi upload
-
                     return View("Edit", model);
-
                 }
-
             }
-
-
-
             // Chỉ lưu nếu thực sự có thay đổi
-
             if (hasChanges)
-
             {
-
                 try
-
                 {
-
                     _nguoiMuaRepo.Update(nguoiMuaProfile); // Đánh dấu Update
-
                     await _nguoiMuaRepo.SaveChangesAsync(); // Lưu thay đổi vào DB
-
                     TempData["SuccessMessage"] = "Cập nhật hồ sơ thành công!";
-
                 }
-
                 catch (DbUpdateConcurrencyException)
-
                 {
-
                     TempData["ErrorMessage"] = "Lỗi: Dữ liệu đã bị thay đổi bởi người khác. Vui lòng tải lại trang và thử lại.";
-
                     model.AvatarUrl = oldImagePath; // Giữ ảnh cũ
-
                     return View("Edit", model);
-
                 }
-
                 catch (Exception ex) // Bắt lỗi chung hoặc DbUpdateException
-
                 {
-
                     TempData["ErrorMessage"] = "Có lỗi xảy ra khi cập nhật hồ sơ.";
-
                     _logger.LogError(ex, "Error updating NguoiMua profile."); // Ghi log lỗi
-
                     model.AvatarUrl = oldImagePath; // Giữ ảnh cũ
-
                     return View("Edit", model);
-
                 }
-
             }
-
             else
-
             {
-
                 TempData["InfoMessage"] = "Không có thông tin nào được thay đổi.";
-
             }
-
-
-
-
-
             return RedirectToAction(nameof(HoSoCaNhan)); // Chuyển về trang hiển thị
-
         }
 
         public async Task<IActionResult> LichSuDonHang(string statusFilter, string timeFilter, int page = 1)
-
         {
-
             var userId = _userManager.GetUserId(User);
-
             if (userId == null)
-
             {
-
-                return Challenge(); // Chưa đăng nhập
-
+               return Challenge(); // Chưa đăng nhập
             }
-
-
-
             // --- Xử lý logic lọc và truy vấn ---
-
             var query = _context.ChiTietDatHangs // Hoặc _orderRepo.GetOrdersQuery()
-
                               .Where(dh => dh.KhachHang.UserId == userId); // Lọc theo User ID
-
-
-
             // 1. Lọc theo trạng thái
-
             if (!string.IsNullOrEmpty(statusFilter) && statusFilter != "Tất cả trạng thái") // Giả sử giá trị mặc định là "Tất cả trạng thái"
-
             {
-
-                // Ánh xạ giá trị từ dropdown (pending, shipping, completed, cancelled) sang giá trị thực tế trong DB
-
-                // Ví dụ:
-
                 string dbStatus = statusFilter switch
-
                 {
-
                     "pending" => "Đang xử lý", // Thay bằng giá trị thực trong DB của bạn
-
                     "shipping" => "Đang giao hàng", // Thay bằng giá trị thực
-
                     "completed" => "Đã giao", // Thay bằng giá trị thực
-
                     "cancelled" => "Đã hủy", // Thay bằng giá trị thực
-
                     _ => null
-
                 };
-
-                if (dbStatus != null)
-
+               if (dbStatus != null)
                 {
-
-                    query = query.Where(dh => dh.TrangThaiDonHang == dbStatus);
-
+                   query = query.Where(dh => dh.TrangThaiDonHang == dbStatus);
                 }
-
             }
-
-
-
             // 2. Lọc theo thời gian
-
             DateTime? startDate = null;
-
             switch (timeFilter)
-
-            {
-
+           {
                 case "3m":
-
                     startDate = DateTime.Now.AddMonths(-3);
-
                     break;
-
                 case "6m":
-
                     startDate = DateTime.Now.AddMonths(-6);
-
                     break;
-
                 case "1y":
-
                     startDate = DateTime.Now.AddYears(-1);
-
                     break;
-
                     // Thêm các trường hợp khác nếu cần
-
             }
 
             if (startDate.HasValue)
-
             {
-
                 query = query.Where(dh => dh.NgayTao >= startDate.Value);
-
             }
 
 
@@ -1837,7 +1595,7 @@ namespace DACS.Areas.KhachHang.Controllers
 
                 chiTietGoc.M_DonViTinh = model.ByproductUnit;
 
-                chiTietGoc.SoLuong =(int) model.ByproductQuantity.Value;
+                chiTietGoc.SoLuong = (int)model.ByproductQuantity.Value;
 
                 chiTietGoc.MoTa = model.ByproductDescription;
 
