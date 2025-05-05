@@ -31,7 +31,7 @@ namespace DACS.Models.ViewModels
 
         [Display(Name = "Ngày tham gia")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}")]
-        public DateTimeOffset CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; } // Nên lấy từ cột ngày tạo thực tế của User
 
         public bool IsLocked { get; set; }
         public bool EmailConfirmed { get; set; } // Cần để xác định trạng thái "Chờ xác minh"
@@ -66,8 +66,14 @@ namespace DACS.Models.ViewModels
         public List<SelectListItem> StatusOptions { get; set; } = new List<SelectListItem>();
 
         // Dùng cho Pagination
+        // Dùng cho Pagination
         public int PageIndex { get; set; }
         public int TotalPages { get; set; }
+        public int PageSize { get; set; } // Thêm PageSize nếu bạn muốn hiển thị nó hoặc dùng ở View
+
+        // *** THÊM THUỘC TÍNH NÀY ***
+        public int TotalItems { get; set; } // Tổng số lượng kết quả khớp với bộ lọc
+
         public bool HasPreviousPage => PageIndex > 1;
         public bool HasNextPage => PageIndex < TotalPages;
     }
@@ -77,7 +83,7 @@ namespace DACS.Models.ViewModels
     {
         [Required(ErrorMessage = "Vui lòng nhập Họ tên.")]
         [Display(Name = "Họ và Tên")]
-        public string FullName { get; set; } = string.Empty;
+        public string? FullName { get; set; } // Cho phép null nếu ApplicationUser không có
 
         [Required(ErrorMessage = "Vui lòng nhập Tên đăng nhập.")]
         [Display(Name = "Tên đăng nhập")]
@@ -110,5 +116,4 @@ namespace DACS.Models.ViewModels
         // Dùng để hiển thị dropdown vai trò trên form
         public List<SelectListItem>? RoleOptions { get; set; }
     }
-
 }
