@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Danh sách Phụ phẩm"; // Tiêu đề trang
+    ViewData["Title"] = "Danh sách Phụ phẩm thô"; // Tiêu đề trang
     int numOfQuantity = 1;                                                   // Layout = "_YourLayoutName"; // Đảm bảo dùng đúng Layout
 }
 @model IEnumerable<DACS.Models.SanPham>
@@ -45,7 +45,7 @@
 
             <div class="col-lg-3 mb-4 mb-lg-0">
                 <h4><i class="fas fa-filter me-2"></i>Lọc sản phẩm theo</h4>
-
+                
                 <div class="mb-3">
                     <h5>Giá</h5>
                     <<label for="customRange1" class="form-label">Khoảng giá (kéo để chọn)</label>
@@ -93,18 +93,21 @@
                                 <option selected>Sắp xếp: Tên A-Z</option>
                                 <option value="1">Sắp xếp: Giá thấp-cao</option>
                                 <option value="2">Sắp xếp: Giá cao-thấp</option>
-
+                                
                             </select>
                         </div>
                         <div>
+                            
                         </div>
                     </div>
                 </div><h1>@ViewData["Title"]</h1>
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="product-list">
                     @foreach (var item in Model) @* Duyệt qua danh sách sản phẩm từ Controller *@
                     {
-                        
-                            <div class="col product-item" data-category="Đã qua xử lý" data-price="@item.Gia">
+                        @* ---- ĐẶT LẠI ĐIỀU KIỆN IF Ở ĐÂY ---- *@
+                        if (item.LoaiSanPham != null && item.LoaiSanPham.TenLoai == "Phụ phẩm thô")
+                        {
+                            <div class="col product-item" data-category="Phụ phẩm thô" data-price="@item.Gia">
                                 @* Có thể thêm data-category nếu cần *@
                                 <div class="card h-100 shadow-sm">
                                     <img src="@item.AnhSanPham" class="card-img-top p-2" alt="@item.TenSanPham" style="object-fit: contain; height:180px;">
@@ -119,62 +122,62 @@
                                             <!-- Thêm nút "Thêm vào giỏ hàng" vào giữa -->
                                             <a asp-controller="ShoppingCart" asp-action="AddToCart"
                                                asp-route-productId="@item.M_SanPham" asp-route-quantity="@numOfQuantity">
-                                                <button class="btn btn-primary btn-sm w-100 mb-2">Thêm vào giỏ hàng</button>
+												<button class="btn btn-primary btn-sm w-100 mb-2" >Thêm vào giỏ hàng</button>
                                             </a>
-
+                                            
                                         </div>
                                         <a href="/DS_SP/CT_SP/@item.M_SanPham" class="btn btn-outline-secondary btn-sm w-100">Xem chi tiết</a>
-                                    </div>
+                                    </div> 
                                 </div>
                             </div>
-                         @* ---- Kết thúc điều kiện IF ---- *@
+                        } @* ---- Kết thúc điều kiện IF ---- *@
                     }
                 </div>
             </div> <nav aria-label="Page navigation">
                 <ul id="pagination" class="pagination justify-content-center mt-4"></ul>
             </nav>
-        </div>
-    </div>
-    <!-- Modal -->
-    <div class="modal fade" id="muaNgayModal" tabindex="-1" aria-labelledby="muaNgayModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="muaNgayModalLabel">Mua sản phẩm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                </div>
-
-                <div class="modal-body">
-                    <form id="formMuaNgay">
-                        <div class="mb-3">
-                            <label class="form-label">Tên sản phẩm:</label>
-                            <input type="text" class="form-control" id="tenSanPham" readonly>
-                        </div><div class="mb-3">
-                            <label class="form-label">Giá sản phẩm:</label>
-                            <input type="text" class="form-control" id="giaSanPham" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tổng giá:</label>
-                            <div id="tongGia" style="font-weight: bold; color: green;">0 VNĐ</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Số lượng (Kg):</label>
-                            <input type="number" class="form-control" id="soLuong" min="0.1" step="0.1" required>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="xacNhanMua()" id="btnXacNhanMua">Xác nhận mua</button>
-                </div>
-
             </div>
         </div>
-    </div>
+        <!-- Modal -->
+        <div class="modal fade" id="muaNgayModal" tabindex="-1" aria-labelledby="muaNgayModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
 
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="muaNgayModalLabel">Mua sản phẩm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="formMuaNgay">
+                            <div class="mb-3">
+                                <label class="form-label">Tên sản phẩm:</label>
+                                <input type="text" class="form-control" id="tenSanPham" readonly>
+                            </div><div class="mb-3">
+                                <label class="form-label">Giá sản phẩm:</label>
+                                <input type="text" class="form-control" id="giaSanPham" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tổng giá:</label>
+                                <div id="tongGia" style="font-weight: bold; color: green;">0 VNĐ</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Số lượng (Kg):</label>
+                                <input type="number" class="form-control" id="soLuong" min="0.1" step="0.1" required>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary" onclick="xacNhanMua()" id="btnXacNhanMua">Xác nhận mua</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+       
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
@@ -227,45 +230,45 @@
     </script>
     @* sap xep *@
     <script>
-        // Khi thay đổi combobox Sort
-        document.getElementById('sortBy').addEventListener('change', function () {
-            var sortValue = this.value;
-            sortProducts(sortValue);
+    // Khi thay đổi combobox Sort
+    document.getElementById('sortBy').addEventListener('change', function () {
+        var sortValue = this.value;
+        sortProducts(sortValue);
+    });
+
+    function sortProducts(sortValue) {
+        var productList = document.getElementById('product-list');
+        var products = Array.from(productList.getElementsByClassName('product-item'));
+
+        products.sort(function (a, b) {
+            var nameA = a.querySelector('.card-title').innerText.trim().toLowerCase();
+            var nameB = b.querySelector('.card-title').innerText.trim().toLowerCase();
+            var priceA = parseFloat(a.querySelector('.text-danger strong').innerText.replace(/\D/g, ''));
+            var priceB = parseFloat(b.querySelector('.text-danger strong').innerText.replace(/\D/g, ''));
+           
+
+            switch (sortValue) {
+                case "1": // Giá thấp - cao
+                    return priceA - priceB;
+                case "2": // Giá cao - thấp
+                    return priceB - priceA;
+               
+                default: // Tên A-Z
+                    return nameA.localeCompare(nameB);
+            }
         });
 
-        function sortProducts(sortValue) {
-            var productList = document.getElementById('product-list');
-            var products = Array.from(productList.getElementsByClassName('product-item'));
+        // Xóa cũ
+        productList.innerHTML = "";
 
-            products.sort(function (a, b) {
-                var nameA = a.querySelector('.card-title').innerText.trim().toLowerCase();
-                var nameB = b.querySelector('.card-title').innerText.trim().toLowerCase();
-                var priceA = parseFloat(a.querySelector('.text-danger strong').innerText.replace(/\D/g, ''));
-                var priceB = parseFloat(b.querySelector('.text-danger strong').innerText.replace(/\D/g, ''));
+        // Render lại đã sắp xếp
+        products.forEach(function (product) {
+            productList.appendChild(product);
+        });
+    }
+</script>
 
-
-                switch (sortValue) {
-                    case "1": // Giá thấp - cao
-                        return priceA - priceB;
-                    case "2": // Giá cao - thấp
-                        return priceB - priceA;
-
-                    default: // Tên A-Z
-                        return nameA.localeCompare(nameB);
-                }
-            });
-
-            // Xóa cũ
-            productList.innerHTML = "";
-
-            // Render lại đã sắp xếp
-            products.forEach(function (product) {
-                productList.appendChild(product);
-            });
-        }
-    </script>
-
-    <script>
+<script>
             // Lọc và Range
         const minPriceInput = document.getElementById('minPrice');
         const maxPriceInput = document.getElementById('maxPrice');
@@ -295,7 +298,7 @@
           filterProducts();
         });
 
-    </script>
+</script>
 
     <script type="text/javascript" src="js/script.js"></script>
 </body>

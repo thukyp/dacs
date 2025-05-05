@@ -1,4 +1,5 @@
-﻿using DACS.Models;
+﻿using DACS.Extention;
+using DACS.Models;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
@@ -69,6 +70,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<XaPhuong> XaPhuongs { get; set; }
     public DbSet<ChiTietPhieuXuat> ChiTietPhieuXuats { get; set; }
     public DbSet<PhieuXuat> PhieuXuats { get; set; }
+
 
 
 

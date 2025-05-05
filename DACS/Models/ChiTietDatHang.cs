@@ -7,11 +7,11 @@ namespace DACS.Models
     {
         [Key]
         public string M_CTDatHang { get; set; }
-        [Required]
+        
         [StringLength(10)]
         public string? M_SanPham { get; set; } // PFK
 
-        [Required]
+        
         [StringLength(10)]
         public string? M_DonHang { get; set; } // PFK
 
@@ -24,9 +24,9 @@ namespace DACS.Models
         public long TongTien { get; set; }
 
         [Required]
-        public int SoLuong { get; set; }
+        public float Khoiluong { get; set; }
 
-        [Required]
+        
         [StringLength(10)]
         // CẢNH BÁO: Cột này có vẻ thừa, nên bỏ đi.
         public string? M_KhachHang { get; set; } // FK?
@@ -43,5 +43,7 @@ namespace DACS.Models
         public DateTime NgayTao { get; set; }
 
         public string TrangThaiDonHang { get; set; }
+        public string ProductId { get; set; }
+        public int Quantity { get; set; }
     }
 }

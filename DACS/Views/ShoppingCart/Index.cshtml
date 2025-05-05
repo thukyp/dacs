@@ -1,0 +1,103 @@
+﻿@using DACS.Extention
+@model ShoppingCart
+<div class="container my-5">
+	<h2 class="mb-4">Sản phẩm của tao</h2>
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table align-middle text-center">
+				<thead class="table-light">
+					<tr>
+						<th>Sản phẩm</th>
+						<th>Số lượng</th>
+						<th>Giá</th>
+						<th>Tổng giá</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model.Items)
+					{
+						var quantity = item.Quantity > 0 ? item.Quantity : 0.1M;
+						var lineTotal = item.Price * quantity;
+
+						<tr>
+							<td class="text-start">
+								<div class="d-flex align-items-center">
+									@item.Name
+								</div>
+							</td>
+							<td >
+								<div class="input-group input-group-sm justify-content-center">
+									<input type="number" class="form-control text-center soLuongInput"
+										   style="max-width: 60px;"
+										   min="0.1" step="0.1"
+										   value="@quantity"
+										   data-price="@item.Price"
+										   data-target="total-@item.ProductId"
+										   data-id="@item.ProductId">
+								</div>
+							</td>
+							<td>@item.Price.ToString("N0") ₫</td>
+							<td id="total-@item.ProductId">@lineTotal.ToString("N0") ₫</td>
+							<td>
+								<a asp-action="RemoveFromCart" asp-route-productId="@item.ProductId" class="btn btn-outline-danger btn-sm">🗑</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+
+			<div class="d-flex justify-content-end">
+				<h4 class="text-danger">Tổng tiền: <span id="grandTotal">0 ₫</span></h4>
+			</div>
+
+			<div class="d-flex justify-content-between mt-4">
+				<a href="/DS_SP/Index" class="btn btn-light">← Tiếp tục mua sắm</a>
+				<a asp-action="Checkout" class="btn btn-success">Tới trang thanh toán</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const inputs = document.querySelectorAll('.soLuongInput');
+
+		function updateLineTotal(input) {
+			const price = parseFloat(input.dataset.price);
+			const quantity = parseFloat(input.value) || 0;
+			const total = price * quantity;
+			const targetId = input.dataset.target;
+			const totalElement = document.getElementById(targetId);
+			if (totalElement) {
+				totalElement.textContent = total.toLocaleString('vi-VN') + " ₫";
+			}
+			return total;
+		}
+
+		function updateGrandTotal() {
+			let grandTotal = 0;
+			const seen = new Set();
+
+			inputs.forEach(input => {
+				const id = input.dataset.id;
+				if (!seen.has(id)) {
+					grandTotal += updateLineTotal(input);
+					seen.add(id);
+				}
+			});
+
+			const grandTotalElement = document.getElementById('grandTotal');
+			if (grandTotalElement) {
+				grandTotalElement.textContent = grandTotal.toLocaleString('vi-VN') + " ₫";
+			}
+		}
+
+		// Cập nhật ban đầu và sau khi thay đổi input
+		updateGrandTotal();
+		inputs.forEach(input => {
+			input.addEventListener('input', updateGrandTotal);
+		});
+	});
+	
+</script>

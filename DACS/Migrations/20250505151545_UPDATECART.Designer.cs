@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DACS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505151545_UPDATECART")]
+    partial class UPDATECART
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,18 +146,12 @@ namespace DACS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("M_KhachHang")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime>("NgayTao")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
 
                     b.Property<long>("TongTien")
                         .HasColumnType("bigint");
@@ -347,8 +344,15 @@ namespace DACS.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("M_KhachHang")
+                    b.Property<string>("ChuThich")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DiaChiShip")
+                        .IsRequired()
                         .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("M_KhachHang")
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("M_PhuongThuc")
@@ -367,15 +371,7 @@ namespace DACS.Migrations
                     b.Property<DateTime?>("NgayGiao")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShippingAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("TotalPrice")
+                    b.Property<float>("TongTien")
                         .HasColumnType("real");
 
                     b.Property<string>("TrangThai")
@@ -1106,7 +1102,9 @@ namespace DACS.Migrations
 
                     b.HasOne("DACS.Models.KhachHang", "KhachHang")
                         .WithMany("ChiTietDatHangs")
-                        .HasForeignKey("M_KhachHang");
+                        .HasForeignKey("M_KhachHang")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DACS.Models.SanPham", "SanPham")
                         .WithMany("ChiTietDatHangs")

@@ -1,29 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace DACS.Models
 {
     public class DonHang // Order
     {
+     
         [Key]
         [StringLength(10)]
-        public string M_DonHang { get; set; }
+        public string? M_DonHang { get; set; }
 
-        [Required]
+        
         public DateTime NgayDat { get; set; } = DateTime.UtcNow;
 
         // Nên cho phép NULL ban đầu
         public DateTime? NgayGiao { get; set; } // DateTime?
 
-        [Required]
+        
         [StringLength(50)] // Tăng độ dài trạng thái
         public string TrangThai { get; set; }
 
-        [Required]
+        
         [StringLength(10)]
         public string M_VanDon { get; set; } // FK
 
-        [Required]
+        
         [StringLength(10)]
         public string M_PhuongThuc { get; set; } // FK
 
@@ -39,13 +41,16 @@ namespace DACS.Models
         public virtual ICollection<QuanLy> QuanLyNhaps { get; set; } = new List<QuanLy>();
         public virtual ICollection<ChiTietThuGom> ChiTietThuGoms { get; set; } = new List<ChiTietThuGom>();
         public virtual ICollection<YeuCauThuGom> YeuCauThuGoms { get; set; } = new List<YeuCauThuGom>();
-
-        [Required]
+        public string ShippingAddress { get; set; }
+        
         [StringLength(10)]
-
+        
         public string? M_KhachHang { get; set; }
         [ForeignKey("M_KhachHang")]
         public virtual KhachHang KhachHang { get; set; } // FK
-
+        public float TotalPrice { get; internal set; }
+         // Giữ lại nếu cột DB là NOT NULL, bỏ đi nếu cột DB cho phép NULL
+        public string Notes { get; set; } // Thêm thuộc tính Notes khớp với cột DB
+        // ---> KẾT THÚC THÊM <---
     }
 }

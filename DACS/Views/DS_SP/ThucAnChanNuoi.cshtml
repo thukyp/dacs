@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Danh sách Phụ phẩm"; // Tiêu đề trang
+    ViewData["Title"] = "Danh sách Phụ phẩm làm thức ăn chăn nuôi"; // Tiêu đề trang
     int numOfQuantity = 1;                                                   // Layout = "_YourLayoutName"; // Đảm bảo dùng đúng Layout
 }
 @model IEnumerable<DACS.Models.SanPham>
@@ -103,7 +103,9 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="product-list">
                     @foreach (var item in Model) @* Duyệt qua danh sách sản phẩm từ Controller *@
                     {
-                        
+                        @* ---- ĐẶT LẠI ĐIỀU KIỆN IF Ở ĐÂY ---- *@
+                        if (item.LoaiSanPham != null && item.LoaiSanPham.TenLoai == "Thức ăn chăn nuôi")
+                        {
                             <div class="col product-item" data-category="Đã qua xử lý" data-price="@item.Gia">
                                 @* Có thể thêm data-category nếu cần *@
                                 <div class="card h-100 shadow-sm">
@@ -127,7 +129,7 @@
                                     </div>
                                 </div>
                             </div>
-                         @* ---- Kết thúc điều kiện IF ---- *@
+                        } @* ---- Kết thúc điều kiện IF ---- *@
                     }
                 </div>
             </div> <nav aria-label="Page navigation">

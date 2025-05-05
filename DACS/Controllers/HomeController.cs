@@ -275,12 +275,6 @@ namespace DACS.Controllers
 
         {
 
-            // Ví dụ: YC + NămThángNgày + 4 chữ số ngẫu nhiên
-
-            // Cần đảm bảo mã là duy nhất trong bảng YeuCauThuGom
-
-            // Cách tốt hơn là dùng sequence trong DB hoặc GUID
-
             string prefix = "YC";
 
             string timestamp = DateTime.UtcNow.ToString("yyMMddHHmm"); // Dùng UTC

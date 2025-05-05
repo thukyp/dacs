@@ -34,6 +34,7 @@ namespace DACS.Models
 
         [Required]
         public bool IsActive { get; set; }
+       
 
         [Column(TypeName = "decimal(18, 2)")] 
         public decimal? GiaTriDonHangToiThieu { get; set; }
