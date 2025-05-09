@@ -181,15 +181,15 @@
                             <a href="cart.html" class="dropdown-toggle d-inline-flex align-items-center" data-bs-toggle="dropdown" role="button" aria-expanded="false">
                                 <svg class="cart">
                                     <use xlink:href="#cart"></use>
-                                </svg><span class="cartCount fs-6 fw-light" id="iddrop">(00)</span>
+                                </svg>
                             </a>
                             <div class="dropdown-menu animate slide dropdown-menu-start dropdown-menu-lg-end p-3">
                                 <h4 class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="text-primary">Xe hàng của mày</span>
-                                    <span class="badge bg-primary rounded-pill" id="dropid">0</span>
+                                    <span class="text-primary">Xe hàng</span>
+                                    
                                 </h4>
                                 <ul class="list-group mb-3" id="cart-items">
-									@if (cart?.Items != null && cart.Items.Any())
+                                    @if (cart?.Items != null && cart.Items.Any() && User.IsInRole("KhachHang") || User.IsInRole("Owner") || User.IsInRole("QuanLyXNK") || User.IsInRole("QuanLyND") || User.IsInRole("QuanLySP") || User.IsInRole("QuanLyDH"))
 									{
                                         decimal total = 0;
                                         int itemCount = 0;
@@ -236,7 +236,7 @@
 
                                 <div class="d-flex flex-wrap justify-content-center">
                                     <a href="/ShoppingCart/Index" class="w-100 btn btn-dark mb-1" type="submit">Xem giỏ hàng</a>
-                                    <a asp-action="Checkout" class="w-100 btn btn-primary" type="submit">Thanh toán</a>
+                                    
                                 </div>
                             </div>
                         </li>

@@ -1,220 +1,268 @@
-﻿<!DOCTYPE html>
+﻿@model DACS.Models.ViewModels.OwnerDashboardViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+	// Layout được đặt là null vì file này tự quản lý toàn bộ cấu trúc HTML.
+	// Nếu bạn có một _Layout.cshtml riêng cho Area Owner và muốn dùng nó,
+	// thì file này chỉ nên chứa phần nội dung <div class="main-content-area">...</div>
+	// và bỏ đi các phần <html>, <head>, <style>, sidebar, và các script tags ở cuối.
+	// Tuy nhiên, theo yêu cầu "Ko dc doi thiet ke cua toi" và bạn cung cấp full HTML,
+	// tôi sẽ giữ nguyên cấu trúc này thành một trang hoàn chỉnh.
+	Layout = null;
+}
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="/css/AdminLayout.css" />
-    <style>
-        /* Copy CSS cơ bản từ các trang Admin trước */
-        body, html {
-            height: 100%;
-        }
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - Owner Dashboard</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	<link rel="stylesheet" href="~/css/AdminLayout.css" />
+	<style>
+		/* CSS cơ bản từ file của bạn. Các style này nên được ưu tiên đặt trong AdminLayout.css */
+		body, html {
+			height: 100%;
+		}
+		/* .container class này có vẻ không được sử dụng cho layout chính,
+						   vì layout chính dùng d-flex. Nếu không dùng, có thể bỏ đi. */
 
-        .container {
-            display: grid;
-            max-width: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            flex-direction: row;
-        }
-        .sidebar {
-            background-color: #212529;
-            color: #fff;
-            padding: 15px;
-            width: 250px;
-            flex-shrink: 0;
-            min-height: 100vh;
-        }
+		.container {
+			display: grid;
+			max-width: 100%;
+			width: 100%;
+			margin: 0;
+			padding: 0;
+			flex-direction: row;
+		}
 
-            .sidebar h2 {
-                border-bottom: 1px solid #495057;
-                padding-bottom: 10px;
-                font-size: 1.5rem;
-            }
+		.sidebar {
+			background-color: #212529;
+			color: #fff;
+			padding: 15px;
+			width: 250px;
+			flex-shrink: 0;
+			min-height: 100vh;
+		}
 
-            .sidebar .nav-link {
-                color: #adb5bd;
-                padding: 8px 15px;
-            }
+			.sidebar h2 {
+				border-bottom: 1px solid #495057;
+				padding-bottom: 10px;
+				font-size: 1.5rem;
+			}
 
-                .sidebar .nav-link.active, .sidebar .nav-link:hover {
-                    color: #fff;
-                    background-color: #495057;
-                    border-radius: 0.25rem;
-                }
+			.sidebar .nav-link {
+				color: #adb5bd;
+				padding: 8px 15px;
+			}
 
-        .main-content-area {
-            padding: 25px;
-            background-color: #f8f9fa;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
+				.sidebar .nav-link.active, .sidebar .nav-link:hover {
+					color: #fff;
+					background-color: #495057;
+					border-radius: 0.25rem;
+				}
 
-        .page-header {
-            font-size: 1.75rem;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-            color: #343a40;
-        }
+		.main-content-area {
+			padding: 25px;
+			background-color: #f8f9fa;
+			flex-grow: 1;
+			overflow-y: auto;
+		}
 
-        .stat-card {
-            background-color: #fff;
-            border-radius: 0.375rem;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
-            text-align: center;
-        }
+		.page-header {
+			font-size: 1.75rem;
+			font-weight: 500;
+			margin-bottom: 1.5rem;
+			color: #343a40;
+		}
 
-            .stat-card .value {
-                font-size: 1.75rem;
-                font-weight: 600;
-            }
+		.stat-card {
+			background-color: #fff;
+			border-radius: 0.375rem;
+			padding: 1rem;
+			margin-bottom: 1.5rem;
+			box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+			text-align: center;
+		}
 
-            .stat-card .label {
-                font-size: 0.9rem;
-                color: #6c757d;
-                margin-top: 0.25rem;
-            }
+			.stat-card .value {
+				font-size: 1.75rem;
+				font-weight: 600;
+			}
 
-        .quick-link-card .card-body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+			.stat-card .label {
+				font-size: 0.9rem;
+				color: #6c757d;
+				margin-top: 0.25rem;
+			}
 
-        .quick-link-card i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
+		.quick-link-card .card-body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
 
-        .quick-link-card a {
-            text-decoration: none;
-            color: inherit;
-        }
+		.quick-link-card i {
+			font-size: 2rem; /* Hoặc dùng class fa-2x của FontAwesome */
+			margin-bottom: 0.5rem; /* Hoặc dùng class mb-2 của Bootstrap */
+		}
 
-        .quick-link-card:hover {
-            background-color: #e9ecef;
-        }
-    </style>
+		.quick-link-card a {
+			text-decoration: none;
+			color: inherit;
+		}
+
+		.quick-link-card:hover {
+			background-color: #e9ecef;
+		}
+	</style>
 </head>
 <body>
-    <div class="d-flex">
-        <div class="sidebar">
-            <h2>OWNER</h2>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="Index" class="nav-link active"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
-                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="DoanhThu"  class="nav-link"><i class="fas fa-chart-line me-2"></i> Doanh thu</a></li>
-                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="QuanLyTaiKhoan"  class="nav-link"><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
-                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="Quanlysanpham"  class="nav-link"><i class="fas fa-box-open me-2"></i> Quản lý Sản phẩm</a></li>
-                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="ThuGom" class="nav-link"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
-                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="QuanLyDonHang"  class="nav-link"><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
-                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="QuanLyGiaoDichThanhToan"  class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh toán</a></li>
-                <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
-                <li class="nav-item mt-auto pt-3 border-top border-secondary"><a href="#" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
-            </ul>
-        </div>
+	<div class="d-flex">
+		<div class="sidebar">
+			<h2>OWNER</h2>
+			<ul class="nav flex-column">
+				@* Điều chỉnh các asp-controller và asp-action cho phù hợp với cấu trúc của bạn *@
+				<li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="Index" class="nav-link"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+				<li class="nav-item"><a asp-area="Owner" asp-controller="DoanhThu" asp-action="Index" class="nav-link"><i class="fas fa-chart-line me-2"></i> Doanh thu</a></li>
+				<li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyND" asp-action="Index" class="nav-link"><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
+				<li class="nav-item"><a asp-area="Owner" asp-controller="QuanLySP" asp-action="Index" class="nav-link"><i class="fas fa-box-open me-2"></i> Quản lý Sản phẩm</a></li>
+				<li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
+				<li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyDonHang" asp-action="Index" class="nav-link active"><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
+				<li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
+				<form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm_sidebar_index" class="mt-3">
+					@* Moved mt-3 to form *@
+					<button type="submit" class="list-group-item list-group-item-action text-danger border-0 bg-transparent p-0 w-100 text-start">
+						@* Adjusted button style to better match list items *@
+						<span class="list-group-item list-group-item-action border-0 text-danger"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Đăng xuất</span>
+					</button>
+				</form>
+			</ul>
+		</div>
 
-        <div class="main-content-area">
-            <div class="page-header">Dashboard Tổng Quan</div>
+		<div class="main-content-area">
+			<div class="page-header">Dashboard Tổng Quan - Chào @Model.OwnerName!</div>
 
-            <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
-                        <div class="value text-success">15.8M đ</div>
-                        <div class="label">Doanh thu (Tháng)</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
-                        <div class="value text-info">120</div>
-                        <div class="label">Đơn hàng mới (Tuần)</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
-                        <div class="value text-primary">55</div>
-                        <div class="label">Người dùng mới (Tháng)</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stat-card">
-                        <div class="value text-warning">8</div>
-                        <div class="label">YC Thu gom chờ xử lý</div>
-                    </div>
-                </div>
-            </div>
+			<div class="row">
+				<div class="col-lg-3 col-md-6">
+					<div class="stat-card">
+						<div class="value text-success">@Model.MonthlyRevenue.ToString("N0") đ</div>
+						<div class="label">Doanh thu (Tháng)</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="stat-card">
+						<div class="value text-info">@Model.NewOrdersThisWeek</div>
+						<div class="label">Đơn hàng mới (Tuần)</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="stat-card">
+						<div class="value text-primary">@Model.NewUsersThisMonth</div>
+						<div class="label">Người dùng mới (Tháng) <small class="text-muted">(Tổng hoạt động)</small></div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="stat-card">
+						<div class="value text-warning">@Model.PendingCollectionRequests</div>
+						<div class="label">YC Thu gom chờ xử lý</div>
+					</div>
+				</div>
+			</div>
 
-            <div class="row mt-3">
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm quick-link-card h-100">
-                        <a href="#" class="card-body text-center">
-                            <i class="fas fa-users text-primary"></i>
-                            <h6 class="card-title mt-2">Quản lý Người Dùng</h6>
-                            <p class="card-text small text-muted">Xem, sửa, khóa tài khoản...</p>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm quick-link-card h-100">
-                        <a href="#" class="card-body text-center">
-                            <i class="fas fa-box-open text-success"></i>
-                            <h6 class="card-title mt-2">Quản lý Sản Phẩm</h6>
-                            <p class="card-text small text-muted">Thêm, sửa, xóa phụ phẩm...</p>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm quick-link-card h-100">
-                        <a href="#" class="card-body text-center">
-                            <i class="fas fa-receipt text-info"></i>
-                            <h6 class="card-title mt-2">Quản lý Đơn Hàng</h6>
-                            <p class="card-text small text-muted">Xác nhận, hủy, theo dõi đơn...</p>
-                        </a>
-                    </div>
-                </div>
-            </div>
+			<div class="row mt-3">
+				<div class="col-md-4 mb-3">
+					<div class="card shadow-sm quick-link-card h-100">
+						<a asp-area="Owner" asp-controller="QuanLyND" asp-action="Index" class="card-body text-center">
+							<i class="fas fa-users text-primary fa-2x mb-2"></i>
+							<h6 class="card-title mt-2">Quản lý Tài khoản</h6> <p class="card-text small text-muted">Xem, sửa, khóa tài khoản...</p>
+						</a>
+					</div>
+				</div>
+				<div class="col-md-4 mb-3">
+					<div class="card shadow-sm quick-link-card h-100">
+						<a asp-area="Owner" asp-controller="QuanLySP" asp-action="Index" class="card-body text-center">
+							<i class="fas fa-box-open text-success fa-2x mb-2"></i>
+							<h6 class="card-title mt-2">Quản lý Sản Phẩm</h6>
+							<p class="card-text small text-muted">Thêm, sửa, xóa sản phẩm...</p>
+						</a>
+					</div>
+				</div>
+				<div class="col-md-4 mb-3">
+					<div class="card shadow-sm quick-link-card h-100">
+						<a asp-area="Owner" asp-controller="QuanLyDonHang" asp-action="Index" class="card-body text-center">
+							<i class="fas fa-receipt text-info fa-2x mb-2"></i>
+							<h6 class="card-title mt-2">Quản lý Đơn Hàng</h6>
+							<p class="card-text small text-muted">Xác nhận, hủy, theo dõi đơn...</p>
+						</a>
+					</div>
+				</div>
+			</div>
 
-            <div class="row mt-3">
-                <div class="col-12">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">Biểu đồ Doanh thu (Ví dụ)</h5>
-                            <canvas id="dashboardRevenueChart" height="100"></canvas>
-                            <p class="text-center text-muted mt-2"><small>(Cần tích hợp thư viện biểu đồ)</small></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+			<div class="row mt-3">
+				<div class="col-12">
+					<div class="card shadow-sm">
+						<div class="card-body">
+							<h5 class="card-title">Biểu đồ Doanh thu (7 ngày gần nhất - Triệu VND)</h5>
+							<canvas id="dashboardRevenueChart" height="100"></canvas>
+							@if (Model.RevenueChartData == null || !Model.RevenueChartData.Any() || Model.RevenueChartLabels == null || !Model.RevenueChartLabels.Any())
+							{
+								<p class="text-center text-muted mt-2"><small>(Không có dữ liệu doanh thu để hiển thị biểu đồ)</small></p>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
 
-        </div>
-    </div>
+		</div>
+	</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Example Chart.js initialization (replace with real data)
-        const ctx = document.getElementById('dashboardRevenueChart');
-        if(ctx) {
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
-                    datasets: [{
-                        label: 'Doanh thu tuần (Triệu VND)',
-                        data: [1.5, 1.8, 2.1, 1.9, 2.5, 2.8, 3.5],
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                    }]
-                },
-                options: { scales: { y: { beginAtZero: true } } }
-            });
-        }
-    </script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const ctx = document.getElementById('dashboardRevenueChart');
+			// Đảm bảo Model và các thuộc tính của nó không null trước khi serialize
+			const revenueLabels = @Html.Raw(Model?.RevenueChartLabels != null ? Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueChartLabels) : "[]");
+			const revenueData = @Html.Raw(Model?.RevenueChartData != null ? Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueChartData) : "[]");
+
+			if (ctx && revenueLabels.length > 0 && revenueData.length > 0) {
+				new Chart(ctx, {
+					type: 'line',
+					data: {
+						labels: revenueLabels,
+						datasets: [{
+							label: 'Doanh thu (Triệu VND)',
+							data: revenueData,
+							borderColor: 'rgb(75, 192, 192)',
+							backgroundColor: 'rgba(75, 192, 192, 0.2)',
+							tension: 0.1,
+							fill: true
+						}]
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: true,
+						scales: {
+							y: {
+								beginAtZero: true,
+								ticks: {
+									callback: function(value, index, values) {
+										return value + ' Tr';
+									}
+								}
+							}
+						}
+					}
+				});
+			} else if (ctx && !(revenueLabels.length > 0 && revenueData.length > 0)) {
+				 // Nếu canvas tồn tại nhưng không có dữ liệu, bạn có thể vẽ thông báo trực tiếp lên canvas
+				const context = ctx.getContext('2d');
+				context.textAlign = 'center';
+				context.font = '16px Arial';
+				context.fillText('Không có dữ liệu biểu đồ.', ctx.width / 2, ctx.height / 2);
+			}
+		});
+	</script>
 </body>
 </html>
