@@ -206,10 +206,10 @@ namespace DACS.Areas.KhachHang.Controllers
                     Email_KhachHang = user.Email ?? "Chưa có email",
                     SDT_KhachHang = user.PhoneNumber ?? "Chưa có SĐT",
                     // Để null nếu DB cho phép và người dùng sẽ cập nhật sau
-                    MaTinh = null,
-                    MaQuan = null,
-                    MaXa = null,
-                    DiaChi_DuongApThon = null
+                    MaTinh = "T01",
+                    MaQuan = "Q0101",
+                    MaXa = "X010101",
+                    DiaChi_DuongApThon = "chua cap nhat"
                 };
 
                 try
@@ -470,6 +470,8 @@ namespace DACS.Areas.KhachHang.Controllers
             }
             return RedirectToAction(nameof(HoSoCaNhan)); // Chuyển về trang hiển thị
         }
+
+
 
         public async Task<IActionResult> LichSuDonHang(string statusFilter, string timeFilter, int page = 1)
         {

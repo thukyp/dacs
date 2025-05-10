@@ -544,7 +544,5 @@ namespace DACS.Controllers
                 return Json(new List<object>()); // Trả về rỗng khi lỗi
             }
         }
-
     }
-
 }

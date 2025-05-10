@@ -48,7 +48,7 @@ namespace DACS.Models
         public string? M_KhachHang { get; set; }
         [ForeignKey("M_KhachHang")]
         public virtual KhachHang KhachHang { get; set; } // FK
-        public float TotalPrice { get; internal set; }
+        public float TotalPrice { get; set; }
          // Giữ lại nếu cột DB là NOT NULL, bỏ đi nếu cột DB cho phép NULL
         public string Notes { get; set; } // Thêm thuộc tính Notes khớp với cột DB
         // ---> KẾT THÚC THÊM <---

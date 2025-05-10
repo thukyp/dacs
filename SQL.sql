@@ -7,7 +7,11 @@
 --         INSERT DATA FOR TinhThanhPho
 -- =============================================
 
+Select *from KhachHangs
+
+
 INSERT INTO TinhThanhPhos (MaTinh, TenTinh) VALUES
+('T00', N'Chưa cập nhật')
 ('T01', N'Thành phố Hà Nội'),
 ('T02', N'Thành phố Hồ Chí Minh'),
 ('T03', N'Thành phố Đà Nẵng'),
@@ -21,6 +25,7 @@ GO
 
 -- Quận/Huyện cho Hà Nội (T01)
 INSERT INTO QuanHuyens (MaQuan, TenQuan, MaTinh) VALUES
+('Q0100', N'Chưa cập nhật','T00')
 ('Q0101', N'Quận Hoàn Kiếm', 'T01'),
 ('Q0102', N'Quận Ba Đình', 'T01'),
 ('Q0103', N'Quận Đống Đa', 'T01'),
@@ -70,6 +75,7 @@ GO
 
 -- Xã/Phường cho Quận Hoàn Kiếm (Q0101), Hà Nội
 INSERT INTO XaPhuongs (MaXa, TenXa, MaQuan) VALUES
+('X010100', N'Chưa cập nhật', 'Q0100'),
 ('X010101', N'Phường Hàng Trống', 'Q0101'),
 ('X010102', N'Phường Lý Thái Tổ', 'Q0101'),
 ('X010103', N'Phường Trần Hưng Đạo', 'Q0101'),

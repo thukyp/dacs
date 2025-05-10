@@ -37,17 +37,17 @@ namespace DACS.Models
         [Required(ErrorMessage = "Vui lòng chọn Tỉnh/Thành phố.")]
         [StringLength(10)] // Hoặc int
         [Display(Name = "Tỉnh/Thành phố")]
-        public string MaTinh { get; set; } // <<< Khóa ngoại đến TinhThanhPho
+        public string? MaTinh { get; set; } // <<< Khóa ngoại đến TinhThanhPho
 
         [Required(ErrorMessage = "Vui lòng chọn Quận/Huyện.")]
         [StringLength(10)] // Hoặc int
         [Display(Name = "Quận/Huyện")]
-        public string MaQuan { get; set; } // <<< Khóa ngoại đến QuanHuyen
+        public string? MaQuan { get; set; } // <<< Khóa ngoại đến QuanHuyen
 
         [Required(ErrorMessage = "Vui lòng chọn Xã/Phường.")]
         [StringLength(10)] // Hoặc int
         [Display(Name = "Xã/Phường")]
-        public string MaXa { get; set; } // <<< Khóa ngoại đến XaPhuong
+        public string? MaXa { get; set; } // <<< Khóa ngoại đến XaPhuong
         // -------------------------------------------
 
         // --- Giữ lại trường địa chỉ chi tiết ---
