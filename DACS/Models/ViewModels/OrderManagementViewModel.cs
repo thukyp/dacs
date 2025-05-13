@@ -20,6 +20,7 @@ namespace DACS.Areas.Owner.Models
         // Cho cột "Trạng Thái ĐH"
         public string OrderStatusText { get; set; } // Sẽ là DonHang.TrangThai
         public string OrderStatusBadgeClass { get; set; } // Tính toán bởi helper của controller
+        public string PaymentMethod { get; set; }
     }
 
     public class OrderManagementViewModel // Model cho toàn bộ trang

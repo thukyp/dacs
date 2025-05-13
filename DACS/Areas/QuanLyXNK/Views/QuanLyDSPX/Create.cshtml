@@ -1,0 +1,174 @@
+﻿@model DACS.Models.ViewModels.PhieuXuatCreateViewModel
+
+@{
+    ViewData["Title"] = "Tạo Phiếu Xuất Kho";
+    // Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Tùy chỉnh layout nếu cần
+}
+
+@* Bạn có thể copy phần CSS và Sidebar từ các view khác nếu muốn giao diện đồng nhất *@
+<style>
+    .item-row {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+</style>
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="MaKho" class="form-label"></label>
+                <select asp-for="MaKho" asp-items="Model.KhoHangOptions" class="form-select">
+                    <option value="">-- Chọn kho xuất --</option>
+                </select>
+                <span asp-validation-for="MaKho" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="NgayXuat" class="form-label"></label>
+                <input asp-for="NgayXuat" type="datetime-local" class="form-control" />
+                <span asp-validation-for="NgayXuat" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="LyDoXuat" class="form-label"></label>
+                <input asp-for="LyDoXuat" class="form-control" />
+                <span asp-validation-for="LyDoXuat" class="text-danger"></span>
+            </div>
+        </div>
+
+        <h4 class="mt-4">Chi Tiết Sản Phẩm Xuất</h4>
+        @if (ViewData.ModelState.ContainsKey("ChiTietItems"))
+        {
+            <div class="text-danger">@ViewData.ModelState["ChiTietItems"].Errors.First().ErrorMessage</div>
+        }
+
+        <div id="chiTietItemsContainer">
+            @for (int i = 0; i < Model.ChiTietItems.Count; i++)
+            {
+                <div class="row item-row align-items-end">
+                    <div class="col-md-4">
+                        <label asp-for="ChiTietItems[i].M_LoaiSP" class="form-label"></label>
+                        <select asp-for="ChiTietItems[i].M_LoaiSP" asp-items="Model.LoaiSanPhamOptions" class="form-select chi-tiet-san-pham">
+                            <option value="">-- Chọn sản phẩm --</option>
+                        </select>
+                        <span asp-validation-for="ChiTietItems[i].M_LoaiSP" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ChiTietItems[i].M_DonViTinh" class="form-label"></label>
+                        <select asp-for="ChiTietItems[i].M_DonViTinh" asp-items="Model.DonViTinhOptions" class="form-select chi-tiet-donvitinh">
+                            <option value="">-- Chọn ĐVT --</option>
+                        </select>
+                        <span asp-validation-for="ChiTietItems[i].M_DonViTinh" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="ChiTietItems[i].SoLuong" class="form-label"></label>
+                        <input asp-for="ChiTietItems[i].SoLuong" type="number" class="form-control chi-tiet-soluong" min="1" />
+                        <span asp-validation-for="ChiTietItems[i].SoLuong" class="text-danger"></span>
+                    </div>
+                    @* Nút xóa dòng (cần JavaScript) - ví dụ *@
+                    @if (i > 0) @* Không cho xóa dòng đầu tiên nếu chỉ có 1 dòng *@
+                    {
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-sm btn-danger removeItemBtn">Xóa</button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        @* Nút thêm dòng mới (cần JavaScript) *@
+        <button type="button" id="addItemBtn" class="btn btn-sm btn-outline-success mt-2 mb-3">Thêm Sản Phẩm</button>
+
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">Tạo Phiếu Xuất</button>
+            <a asp-action="Index" asp-controller="TonKho" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- JavaScript để thêm/xóa dòng chi tiết ---
+            // Đây là ví dụ rất cơ bản, bạn có thể cần hoàn thiện thêm
+            const container = document.getElementById('chiTietItemsContainer');
+            const addItemBtn = document.getElementById('addItemBtn');
+            let itemIndex = @Model.ChiTietItems.Count; // Bắt đầu từ số lượng item hiện có
+
+            if (addItemBtn) {
+                addItemBtn.addEventListener('click', function () {
+                    const newItemRow = `
+                        <div class="row item-row align-items-end">
+                            <div class="col-md-4">
+                                <label for="ChiTietItems_${itemIndex}__M_LoaiSP" class="form-label">Sản phẩm</label>
+                                <select name="ChiTietItems[${itemIndex}].M_LoaiSP" id="ChiTietItems_${itemIndex}__M_LoaiSP" class="form-select chi-tiet-san-pham">
+                                    <option value="">-- Chọn sản phẩm --</option>
+        @foreach (var option in Model.LoaiSanPhamOptions ?? Enumerable.Empty<SelectListItem>())
+        {
+                                            <option value="@option.Value">@option.Text</option>
+        }
+                                </select>
+                                <span data-valmsg-for="ChiTietItems[${itemIndex}].M_LoaiSP" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="ChiTietItems_${itemIndex}__M_DonViTinh" class="form-label">ĐVT</label>
+                                <select name="ChiTietItems[${itemIndex}].M_DonViTinh" id="ChiTietItems_${itemIndex}__M_DonViTinh" class="form-select chi-tiet-donvitinh">
+                                    <option value="">-- Chọn ĐVT --</option>
+        @foreach (var option in Model.DonViTinhOptions ?? Enumerable.Empty<SelectListItem>())
+        {
+                                            <option value="@option.Value">@option.Text</option>
+        }
+                                </select>
+                                <span data-valmsg-for="ChiTietItems[${itemIndex}].M_DonViTinh" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="ChiTietItems_${itemIndex}__SoLuong" class="form-label">Số lượng xuất</label>
+                                <input type="number" name="ChiTietItems[${itemIndex}].SoLuong" id="ChiTietItems_${itemIndex}__SoLuong" class="form-control chi-tiet-soluong" min="1" />
+                                <span data-valmsg-for="ChiTietItems[${itemIndex}].SoLuong" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-sm btn-danger removeItemBtn">Xóa</button>
+                            </div>
+                        </div>`;
+                    container.insertAdjacentHTML('beforeend', newItemRow);
+                    itemIndex++;
+                    // Gắn lại sự kiện xóa cho các nút mới
+                    attachRemoveListeners();
+                    // Bạn có thể cần re-parse validator của jQuery nếu dùng Unobtrusive validation cho các trường mới
+                    // var form = $("form"); // Hoặc ID của form
+                    // form.removeData("validator");
+                    // form.removeData("unobtrusiveValidation");
+                    // $.validator.unobtrusive.parse(form);
+                });
+            }
+
+            function attachRemoveListeners() {
+                const removeBtns = container.querySelectorAll('.removeItemBtn');
+                removeBtns.forEach(btn => {
+                    // Xóa listener cũ để tránh gắn nhiều lần
+                    btn.replaceWith(btn.cloneNode(true));
+                });
+                // Gắn listener mới
+                container.querySelectorAll('.removeItemBtn').forEach(btn => {
+                     btn.addEventListener('click', function(e) {
+                        e.target.closest('.item-row').remove();
+                        // Cập nhật lại itemIndex nếu cần thiết (phức tạp hơn, có thể bỏ qua nếu không quá quan trọng)
+                    });
+                });
+            }
+            attachRemoveListeners(); // Gắn lần đầu cho các item có sẵn
+        });
+    </script>
+}

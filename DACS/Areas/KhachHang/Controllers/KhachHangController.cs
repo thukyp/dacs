@@ -207,10 +207,10 @@ namespace DACS.Areas.KhachHang.Controllers
                     Email_KhachHang = user.Email ?? "Chưa có email",
                     SDT_KhachHang = user.PhoneNumber ?? "Chưa có SĐT",
                     // Để null nếu DB cho phép và người dùng sẽ cập nhật sau
-                    MaTinh = null,
-                    MaQuan = null,
-                    MaXa = null,
-                    DiaChi_DuongApThon = null
+                    MaTinh = "T00",
+                    MaQuan = "Q0100",
+                    MaXa = "X010100",
+                    DiaChi_DuongApThon = "chua cap nhat"
                 };
 
                 try
@@ -364,6 +364,8 @@ namespace DACS.Areas.KhachHang.Controllers
             return View("Edit", viewModel); // Truyền ViewModel tới View Edit.cshtml
 
         }
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1603,6 +1605,38 @@ namespace DACS.Areas.KhachHang.Controllers
 
             }
 
+        }
+
+        public async Task<IActionResult> ChiTietDonHang(string id) // id ở đây là M_DonHang (Mã Đơn Hàng chính)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound("Mã đơn hàng không hợp lệ.");
+            }
+
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Challenge(); // Chưa đăng nhập
+            }
+
+            var donHang = await _context.DonHangs // Truy vấn từ bảng DonHangs (Đơn hàng chính)
+                .Include(dh => dh.KhachHang) // Thông tin khách hàng của đơn hàng
+                .Include(dh => dh.PhuongThucThanhToan) // Phương thức thanh toán của đơn hàng
+                .Include(dh => dh.VanChuyen) // Thông tin vận chuyển của đơn hàng
+                .Include(dh => dh.ChiTietDatHangs) // Lấy danh sách tất cả các ChiTietDatHang thuộc đơn hàng này
+                    .ThenInclude(ctdh => ctdh.SanPham) // Với mỗi ChiTietDatHang, lấy thông tin SanPham của nó
+                        .ThenInclude(sp => sp.LoaiSanPham) // Nếu cần, lấy thêm LoaiSP của SanPham
+                .FirstOrDefaultAsync(dh => dh.M_DonHang == id && dh.KhachHang.UserId == userId); // Lọc theo M_DonHang và UserId của khách hàng
+
+            if (donHang == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy đơn hàng hoặc bạn không có quyền xem đơn hàng này.";
+                return RedirectToAction(nameof(LichSuDonHang));
+            }
+
+            ViewData["Title"] = $"Chi tiết Đơn hàng #{donHang.M_DonHang}";
+            return View(donHang); // Truyền đối tượng DonHang (đơn hàng chính) cho View
         }
         // Thêm hàm này vào KhachHangController.cs
         private async Task LoadThuGomDropdownsAsync(ThuGomViewModel model)

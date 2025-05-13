@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DACS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250512183342_add-phieuxuat")]
+    partial class addphieuxuat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,9 +350,6 @@ namespace DACS.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("LyDoHoanTra")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("M_KhachHang")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -370,9 +370,6 @@ namespace DACS.Migrations
                     b.Property<DateTime?>("NgayGiao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("NgayHoanTra")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -388,13 +385,6 @@ namespace DACS.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("TrangThaiHoanTra")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TrangThaiThanhToan")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("M_DonHang");
 

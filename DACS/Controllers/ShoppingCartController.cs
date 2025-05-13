@@ -46,11 +46,6 @@ namespace DACS.Controllers
             var nguoiMuaProfile = await _context.KhachHangs
                 .FirstOrDefaultAsync(kh => kh.UserId == user.Id);
 
-
-
-
-
-
             // Kiểm tra hoặc tạo M_VanDon
             string vanDonId = "VD" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
 
@@ -90,9 +85,11 @@ namespace DACS.Controllers
             // Đảm bảo gán giá trị cho TrangThai
             order.TrangThai = order.TrangThai ?? "Chưa xử lý";  // Gán giá trị mặc định nếu TrangThai là null
 
-            order.M_KhachHang = nguoiMuaProfile.M_KhachHang;
+            order.M_KhachHang  = nguoiMuaProfile.M_KhachHang;
             order.NgayDat = DateTime.UtcNow;
             order.TotalPrice = cart.Items.Sum(i => i.Price * i.Khoiluong);
+            order.TrangThaiThanhToan = "Chưa thanh toán"; // Gán giá trị mặc định cho trạng thái thanh toán
+
 
             // Tiến hành thêm đơn hàng vào cơ sở dữ liệu
             _context.DonHangs.Add(order);
@@ -111,6 +108,7 @@ namespace DACS.Controllers
                 NgayTao = DateTime.UtcNow,
                 Quantity = i.Quantity,
                 TrangThaiDonHang = "Chưa xử lý"
+                
             }).ToList();
 
             _context.ChiTietDatHangs.AddRange(order.ChiTietDatHangs); // Thêm chi tiết đơn hàng vào bảng ChiTietDatHangs

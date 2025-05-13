@@ -173,24 +173,22 @@ namespace DACS.Areas.Identity.Pages.Account
                             var nguoiMuaProfile = new Models.KhachHang
                             {
                                 M_KhachHang = Guid.NewGuid().ToString("N").Substring(0, 10), // <<< DÒNG BẠN ĐÃ THÊM
-                                UserId = user.Id // << Liên kết User ID
+                                UserId = user.Id, // << Liên kết User ID
+                                // Các trường khác của KhachHang
+                                Ten_KhachHang = Input.FullName,
+                                Email_KhachHang = Input.Email,
+                                SDT_KhachHang = "Chua cap nhat",
+                                DiaChi_DuongApThon = "Chưa cập nhật",
+                                MaTinh = "T00",
+                                MaQuan = "Q0100",
+                                MaXa = "X010100",
+
                             };
                             // DÙNG DbContext TRỰC TIẾP
                             _context.KhachHangs.Add(nguoiMuaProfile);
                             await _context.SaveChangesAsync(); // Lưu trực tiếp qua DbContext
                             _logger.LogInformation($"NguoiMua profile created for User ID: {user.Id}");
                         }
-                        //else if (roleToAssign == SD.Role_PhuTa || roleToAssign == SD.Role_BacSi)
-                        //{
-
-                        //    var newNhanVien = new NhanVien
-                        //    {
-                        //        UserId = user.Id
-                        //    };
-                        //    _context.NhanViens.Add(newNhanVien);
-                        //    await _context.SaveChangesAsync(); // Lưu NhanVien
-                        //    _logger.LogInformation($"NhanVien record created for User ID: {user.Id}");
-                        //}
                     }
                     catch (Exception ex)
                     {
