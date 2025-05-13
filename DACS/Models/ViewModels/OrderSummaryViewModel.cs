@@ -11,6 +11,7 @@ namespace DACS.Models.ViewModels // Đảm bảo đúng namespace
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
         public string Status { get; set; }
+        public int KhoiLuong { get;  set; }
         // Thêm các trường khác nếu cần hiển thị (ví dụ: tên sản phẩm đầu tiên...)
     }
 

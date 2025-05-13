@@ -18,20 +18,37 @@
 <div class="container account-section">
     <div class="row">
         @* Cột Menu bên trái *@
-        <div class="col-lg-3">
+        <div class="col-lg-3 mb-4 mb-lg-0">
+            @* Added bottom margin for mobile *@
             <div class="account-menu list-group">
-                @* Cập nhật asp-controller="KhachHang" và asp-action tương ứng *@
-                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="Index" class="list-group-item list-group-item-action "><i class="fas fa-tachometer-alt fa-fw me-2"></i> Tổng quan</a>
-                @* Đặt class active cho link này *@
-                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="HoSoCaNhan" class="list-group-item list-group-item-action active"><i class="fas fa-user-circle fa-fw me-2"></i> Hồ sơ cá nhân</a>
-                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuDonHang" class="list-group-item list-group-item-action"><i class="fas fa-receipt fa-fw me-2"></i> Lịch sử Đơn hàng</a>
-                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="list-group-item list-group-item-action"><i class="fas fa-lock fa-fw me-2"></i> Đổi mật khẩu</a>
-                @* <a asp-area="KhachHang" asp-controller="Address" asp-action="Index" class="list-group-item list-group-item-action"><i class="fas fa-map-marker-alt fa-fw me-2"></i> Sổ địa chỉ</a> *@
-                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm_sidebar_hscn">
-                    <button type="submit" class="list-group-item list-group-item-action text-danger mt-3 border-0 bg-transparent"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Đăng xuất</button>
+                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="Index" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-tachometer-alt fa-fw me-2"></i> Tổng quan
+                </a>
+                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="HoSoCaNhan" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user-circle fa-fw me-2"></i> Hồ sơ cá nhân
+                </a>
+                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuDonHang" class="list-group-item list-group-item-action">
+                    <i class="fas fa-receipt fa-fw me-2"></i> Lịch sử Đơn hàng
+                </a>
+                <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuYeuCauThuGom" class="list-group-item list-group-item-action">
+                    @* Added link to Collection History here for consistency *@
+                    <i class="fas fa-recycle fa-fw me-2"></i> Lịch sử Thu gom
+                </a>
+                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="list-group-item list-group-item-action">
+                    <i class="fas fa-lock fa-fw me-2"></i> Đổi mật khẩu
+                </a>
+                @* <a asp-area="KhachHang" asp-controller="Address" asp-action="Index" class="list-group-item list-group-item-action">
+                    <i class="fas fa-map-marker-alt fa-fw me-2"></i> Sổ địa chỉ
+                   </a> *@
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm_sidebar_index" class="mt-3">
+                    @* Moved mt-3 to form *@
+                    <button type="submit" class="list-group-item list-group-item-action text-danger border-0 bg-transparent p-0 w-100 text-start">
+                        @* Adjusted button style to better match list items *@
+                        <span class="list-group-item list-group-item-action border-0 text-danger"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Đăng xuất</span>
+                    </button>
                 </form>
             </div>
-        </div>
+            </div>
 
         @* Cột Nội dung chính bên phải *@
         <div class="col-lg-9">

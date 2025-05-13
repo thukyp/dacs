@@ -35,7 +35,8 @@ else
                                 <td>@item.Name</td>
                                 <td>@item.Khoiluong.ToString("0.##") kg</td>
                                 <td>@item.Price.ToString("N0") ₫</td>
-                                <td>@(item.Price * item.Khoiluong).ToString("N0") ₫</td>
+                                <td>@(item.Price * item.Khoiluong) ₫</td>
+                                
                             </tr>
                         }
                     </tbody>
@@ -65,11 +66,12 @@ else
 
                 <div class="form-group">
                     <label for="M_PhuongThuc">Phương thức thanh toán</label>
-                    <select name="M_PhuongThuc" class="form-control" required>
+                    <select asp-for="M_PhuongThuc" class="form-control" required>
                         <option value="">-- Chọn phương thức --</option>
-                        <option value="COD">Thanh toán khi nhận hàng (COD)</option>
-                        <option value="VNPAY">VNPAY</option>
-                        <option value="BANK">Chuyển khoản ngân hàng</option>
+                        <option value="PT001">Thanh toán khi nhận hàng (COD)</option>
+                        <option value="PT002">Chuyển khoản ngân hàng</option>
+                        <option value="PT003">Ví điện tử MoMo</option>
+                        <option value="PT004">Ví điện tử ZaloPay</option>
                         <!-- Thêm các phương thức khác nếu có -->
                     </select>
                 </div>

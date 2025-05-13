@@ -24,14 +24,17 @@
                 <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuDonHang" class="list-group-item list-group-item-action">
                     <i class="fas fa-receipt fa-fw me-2"></i> Lịch sử Đơn hàng
                 </a>
-                @* Đánh dấu active cho link này nếu người dùng thường đến từ đây *@
+                @* Đánh dấu active cho link này *@
                 <a asp-area="KhachHang" asp-controller="KhachHang" asp-action="LichSuYeuCauThuGom" class="list-group-item list-group-item-action active">
                     <i class="fas fa-recycle fa-fw me-2"></i> Lịch sử Thu gom
                 </a>
                 <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="list-group-item list-group-item-action">
                     <i class="fas fa-lock fa-fw me-2"></i> Đổi mật khẩu
                 </a>
-                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm_sidebar_yctgd" class="mt-3">
+                @* <a asp-area="KhachHang" asp-controller="Address" asp-action="Index" class="list-group-item list-group-item-action">
+                    <i class="fas fa-map-marker-alt fa-fw me-2"></i> Sổ địa chỉ
+                   </a> *@
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm_sidebar_lstg" class="mt-3">
                     <button type="submit" class="list-group-item list-group-item-action text-danger border-0 bg-transparent p-0 w-100 text-start">
                         <span class="list-group-item list-group-item-action border-0 text-danger"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Đăng xuất</span>
                     </button>
