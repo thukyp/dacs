@@ -69,7 +69,7 @@
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             <div>
                                                 @* Consider adding controller/area if OrderDetails isn't in KhachHang controller *@
-                                                <a asp-action="OrderDetails" asp-controller="Order" asp-route-id="@order.OrderId" class="order-id-link fw-bold">#@order.OrderId</a>
+                                                <a asp-action="ChiTietDonHang" asp-controller="KhachHang" asp-route-id="@order.OrderId" class="order-id-link fw-bold">#@order.OrderId</a>
                                                 <small class="d-block text-muted">@order.OrderDate.ToString("dd/MM/yyyy")</small>
                                             </div>
                                             <span class="badge @GetStatusBadgeClass(order.Status) order-status">@order.Status</span>

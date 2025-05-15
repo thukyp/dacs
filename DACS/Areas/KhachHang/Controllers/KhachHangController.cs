@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Security.Claims;
 using DACS.Models;
@@ -206,9 +207,9 @@ namespace DACS.Areas.KhachHang.Controllers
                     Email_KhachHang = user.Email ?? "Chưa có email",
                     SDT_KhachHang = user.PhoneNumber ?? "Chưa có SĐT",
                     // Để null nếu DB cho phép và người dùng sẽ cập nhật sau
-                    MaTinh = "T01",
-                    MaQuan = "Q0101",
-                    MaXa = "X010101",
+                    MaTinh = "T00",
+                    MaQuan = "Q0100",
+                    MaXa = "X010100",
                     DiaChi_DuongApThon = "chua cap nhat"
                 };
 
@@ -364,6 +365,8 @@ namespace DACS.Areas.KhachHang.Controllers
 
         }
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditNguoiMuaProfile model) // Giả sử ViewModel tên là EditNguoiMuaProfile
@@ -478,115 +481,66 @@ namespace DACS.Areas.KhachHang.Controllers
             var userId = _userManager.GetUserId(User);
             if (userId == null)
             {
-               return Challenge(); // Chưa đăng nhập
-            }
-            // --- Xử lý logic lọc và truy vấn ---
-            var query = _context.ChiTietDatHangs // Hoặc _orderRepo.GetOrdersQuery()
-                              .Where(dh => dh.KhachHang.UserId == userId); // Lọc theo User ID
-            // 1. Lọc theo trạng thái
-            if (!string.IsNullOrEmpty(statusFilter) && statusFilter != "Tất cả trạng thái") // Giả sử giá trị mặc định là "Tất cả trạng thái"
-            {
-                string dbStatus = statusFilter switch
+                return Challenge(); // Chưa đăng nhập
+            }
+
+            var query = _context.ChiTietDatHangs
+                                .Where(dh => dh.KhachHang.UserId == userId); // Lọc theo User ID
+
+            // 1. Lọc theo trạng thái (giữ nguyên logic của bạn)
+            if (!string.IsNullOrEmpty(statusFilter) && statusFilter != "Tất cả trạng thái")
+            {
+                string dbStatus = statusFilter switch
                 {
-                    "pending" => "Đang xử lý", // Thay bằng giá trị thực trong DB của bạn
-                    "shipping" => "Đang giao hàng", // Thay bằng giá trị thực
-                    "completed" => "Đã giao", // Thay bằng giá trị thực
-                    "cancelled" => "Đã hủy", // Thay bằng giá trị thực
-                    _ => null
+                    "pending" => "Đang xử lý",
+                    "shipping" => "Đang giao hàng",
+                    "completed" => "Đã giao",
+                    "cancelled" => "Đã hủy",
+                    _ => null
                 };
-               if (dbStatus != null)
+                if (dbStatus != null)
                 {
-                   query = query.Where(dh => dh.TrangThaiDonHang == dbStatus);
+                    query = query.Where(dh => dh.TrangThaiDonHang == dbStatus);
                 }
             }
-            // 2. Lọc theo thời gian
-            DateTime? startDate = null;
-            switch (timeFilter)
-           {
-                case "3m":
-                    startDate = DateTime.Now.AddMonths(-3);
-                    break;
-                case "6m":
-                    startDate = DateTime.Now.AddMonths(-6);
-                    break;
-                case "1y":
-                    startDate = DateTime.Now.AddYears(-1);
-                    break;
-                    // Thêm các trường hợp khác nếu cần
-            }
 
+            // 2. Lọc theo thời gian (giữ nguyên logic của bạn)
+            DateTime? startDate = null;
+            switch (timeFilter)
+            {
+                case "3m": startDate = DateTime.Now.AddMonths(-3); break;
+                case "6m": startDate = DateTime.Now.AddMonths(-6); break;
+                case "1y": startDate = DateTime.Now.AddYears(-1); break;
+            }
             if (startDate.HasValue)
             {
                 query = query.Where(dh => dh.NgayTao >= startDate.Value);
             }
 
+            // 3. Sắp xếp (Mới nhất lên đầu)
+            query = query.OrderByDescending(dh => dh.NgayTao);
 
+            var ordersData = await query
+                .Select(dh => new OrderSummaryViewModel
+                {
+                    OrderId = dh.M_DonHang,      // Mã chi tiết đặt hàng (hoặc mã đơn hàng chính nếu có)
+                    OrderDate = dh.NgayTao,        // << THÊM HOẶC SỬA: Lấy ngày tạo/ngày đặt
+                    TotalAmount = (Decimal)dh.TongTien,     // Tổng tiền của chi tiết này
+                    Status = dh.TrangThaiDonHang,
+                    KhoiLuong = (int)(float)dh.Khoiluong
+                })
+                .ToListAsync();
 
-            // 3. Sắp xếp (Mới nhất lên đầu)
-
-            query = query.OrderByDescending(dh => dh.NgayTao);
-
-
-
-            // 4. Phân trang
-
-            int pageSize = 10; // Số lượng đơn hàng trên mỗi trang
-
-            int totalItems = await query.CountAsync();
-
-            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-            page = Math.Max(1, Math.Min(page, totalPages)); // Đảm bảo page hợp lệ
-
-
-
-            var ordersData = await query
-
-                  .Skip((page - 1) * pageSize)
-
-                  .Take(pageSize)
-
-                  .Select(dh => new OrderSummaryViewModel // Map sang ViewModel
-
-                  {
-
-                      OrderId = dh.M_CTDatHang, // Hoặc mã đơn hàng chính nếu có
-
-                      TotalAmount = dh.TongTien, // Đảm bảo kiểu dữ liệu phù hợp
-
-                      Status = dh.TrangThaiDonHang
-
-                  })
-
-                  .ToListAsync();
-
-
-
-            // 5. Tạo ViewModel cho View
-
-            var viewModel = new OrderHistoryViewModel
-
+            // 5. Tạo ViewModel cho View
+            var viewModel = new OrderHistoryViewModel
             {
-
                 Orders = ordersData,
-
-                PageIndex = page,
-
-                TotalPages = totalPages,
-
-                CurrentStatusFilter = statusFilter, // Giữ lại giá trị lọc để hiển thị trên form
-
-                CurrentTimeFilter = timeFilter
-
+                CurrentStatusFilter = statusFilter,
+                CurrentTimeFilter = timeFilter
             };
 
-
-
-            return View(viewModel); // Trả về View LichSuDonHang.cshtml với ViewModel
-
-        }
-
-
+            return View(viewModel);
+        }
 
         public async Task<IActionResult> Details(string id)
 
@@ -1651,6 +1605,38 @@ namespace DACS.Areas.KhachHang.Controllers
 
             }
 
+        }
+
+        public async Task<IActionResult> ChiTietDonHang(string id) // id ở đây là M_DonHang (Mã Đơn Hàng chính)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound("Mã đơn hàng không hợp lệ.");
+            }
+
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Challenge(); // Chưa đăng nhập
+            }
+
+            var donHang = await _context.DonHangs // Truy vấn từ bảng DonHangs (Đơn hàng chính)
+                .Include(dh => dh.KhachHang) // Thông tin khách hàng của đơn hàng
+                .Include(dh => dh.PhuongThucThanhToan) // Phương thức thanh toán của đơn hàng
+                .Include(dh => dh.VanChuyen) // Thông tin vận chuyển của đơn hàng
+                .Include(dh => dh.ChiTietDatHangs) // Lấy danh sách tất cả các ChiTietDatHang thuộc đơn hàng này
+                    .ThenInclude(ctdh => ctdh.SanPham) // Với mỗi ChiTietDatHang, lấy thông tin SanPham của nó
+                        .ThenInclude(sp => sp.LoaiSanPham) // Nếu cần, lấy thêm LoaiSP của SanPham
+                .FirstOrDefaultAsync(dh => dh.M_DonHang == id && dh.KhachHang.UserId == userId); // Lọc theo M_DonHang và UserId của khách hàng
+
+            if (donHang == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy đơn hàng hoặc bạn không có quyền xem đơn hàng này.";
+                return RedirectToAction(nameof(LichSuDonHang));
+            }
+
+            ViewData["Title"] = $"Chi tiết Đơn hàng #{donHang.M_DonHang}";
+            return View(donHang); // Truyền đối tượng DonHang (đơn hàng chính) cho View
         }
         // Thêm hàm này vào KhachHangController.cs
         private async Task LoadThuGomDropdownsAsync(ThuGomViewModel model)

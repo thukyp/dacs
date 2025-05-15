@@ -21,7 +21,12 @@ namespace DACS.Models
         [StringLength(50)] // Tăng độ dài trạng thái
         public string TrangThai { get; set; }
 
-        
+        public string TrangThaiThanhToan { get; set; }
+        public string? LyDoHoanTra { get; set; } // Lý do khách hàng hoàn trả
+        public DateTime? NgayHoanTra { get; set; }
+        public string? TrangThaiHoanTra { get; set; }
+
+
         [StringLength(10)]
         public string M_VanDon { get; set; } // FK
 

@@ -347,6 +347,9 @@ namespace DACS.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<string>("LyDoHoanTra")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("M_KhachHang")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -367,6 +370,9 @@ namespace DACS.Migrations
                     b.Property<DateTime?>("NgayGiao")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("NgayHoanTra")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -382,6 +388,13 @@ namespace DACS.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TrangThaiHoanTra")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TrangThaiThanhToan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("M_DonHang");
 
@@ -630,7 +643,8 @@ namespace DACS.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuXuat"));
 
                     b.Property<string>("LyDoXuat")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("MaKho")
                         .IsRequired()
@@ -639,6 +653,14 @@ namespace DACS.Migrations
 
                     b.Property<DateTime>("NgayXuat")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("NguoiNhan")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("TrangThai")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("MaPhieuXuat");
 

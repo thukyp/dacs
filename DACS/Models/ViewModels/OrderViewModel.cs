@@ -36,6 +36,7 @@ namespace DACS.Models.ViewModels
         // List<SelectListItem> dùng để tạo <select> trong HTML với các <option>
         public List<SelectListItem> OrderStatusOptions { get; set; }
 
+
         // Danh sách đơn hàng và thông tin phân trang
         public List<OrderSummaryItemViewModel> Orders { get; set; }
         public int PageNumber { get; set; }

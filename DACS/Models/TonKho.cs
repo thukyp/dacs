@@ -39,8 +39,10 @@ namespace DACS.Models
         public string? SoLo { get; set; }
 
         // Có thể thêm Đơn vị tính nếu cần (FK đến DonViTinh)
-        public string M_DonViTinh { get; set; }
-        [ForeignKey("MaDonViTinh")]
+
+        public string M_DonViTinh { get; set; } 
+
+        [ForeignKey("MaDonViTinh")] 
         public virtual DonViTinh DonViTinh { get; set; }
     }
 }
