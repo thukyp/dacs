@@ -72,7 +72,7 @@
             <h2>OWNER</h2>
             <ul class="nav flex-column">
                 <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="Index" class="nav-link"><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
-                <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="QuanLyThanhToan" class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh Toán</a></li>
+                <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyThanhToan" asp-action="Index" class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh Toán</a></li>
             </ul>
         </div>
 
@@ -80,7 +80,7 @@
             <div class="page-header">@ViewData["Title"]</div>
 
             <div class="card-custom">
-                <form asp-action="UpdatePaymentStatus" asp-controller="QuanLyDH" asp-area="QuanLyDH" method="post">
+                <form asp-action="UpdatePaymentStatus" asp-controller="QuanLyThanhToan" asp-area="QuanLyDH" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     <input type="hidden" name="id" value="@ViewBag.M_DonHang" />
 
