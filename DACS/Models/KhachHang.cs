@@ -26,14 +26,6 @@ namespace DACS.Models
         [Phone]
         public string SDT_KhachHang { get; set; }
 
-        // --- XÓA CÁC TRƯỜNG TÊN ĐỊA CHỈ CŨ ---
-        // public string? DiaChi_TinhTP { get; set; }
-        // public string? DiaChi_QuanHuyen { get; set; }
-        // public string? DiaChi_XaPhuong { get; set; }
-        // -----------------------------------
-
-        // --- THÊM CÁC TRƯỜNG KHÓA NGOẠI MÃ ĐỊA CHỈ ---
-        // Kiểu dữ liệu (string/int) và độ dài phải khớp với Khóa chính của bảng ĐVHC
         [Required(ErrorMessage = "Vui lòng chọn Tỉnh/Thành phố.")]
         [StringLength(10)] // Hoặc int
         [Display(Name = "Tỉnh/Thành phố")]

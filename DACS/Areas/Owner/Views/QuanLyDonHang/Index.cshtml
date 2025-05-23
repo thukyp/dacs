@@ -246,7 +246,7 @@
             </div>
 
             <div class="filter-card">
-                <form method="get" asp-action="Index" asp-controller="QuanLyDH" asp-area="QuanLyDH">
+                <form method="get" asp-action="Index" asp-controller="QuanLyDonHang" asp-area="QuanLyDonHang">
                     @*Đảm bảo asp-controller và asp-area đúng*@
                     <div class="row g-3 align-items-center">
                         <div class="col-md-3">
@@ -293,7 +293,7 @@
                                 foreach (var order in Model.Orders)
                                 {
                                     <tr>
-                                        <td><a asp-action="Details" asp-controller="QuanLyDH" asp-area="QuanLyDH" asp-route-id="@order.M_DonHang">@order.M_DonHang</a></td>
+                                        <td><a asp-action="Details" asp-controller="QuanLyDonHang" asp-area="QuanLyDonHang" asp-route-id="@order.M_DonHang">@order.M_DonHang</a></td>
                                         <td>
                                             @order.CustomerName
                                             <small class="d-block text-muted">@order.CustomerPhoneNumber</small>
@@ -304,13 +304,13 @@
                                         <td><span class="badge @order.OrderStatusBadgeClass">@order.OrderStatusText</span></td>
                                         <td class="actions text-center action-group">
                                             @* Nút Xem chi tiết (luôn hiển thị) *@
-                                            <a asp-action="Details" asp-controller="QuanLyDH" asp-area="QuanLyDH" asp-route-id="@order.M_DonHang" class="btn btn-sm btn-outline-info" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
+                                            <a asp-action="Details" asp-controller="QuanLyDonHang" asp-area="QuanLyDonHang" asp-route-id="@order.M_DonHang" class="btn btn-sm btn-outline-info" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
 
                                             @* --- TRẠNG THÁI: "Chưa xử lý" hoặc "Chờ xác nhận" --- *@
                                             @if (order.OrderStatusText == "Chưa xử lý" || order.OrderStatusText == "Chờ xác nhận")
                                             {
                                                 @* Sửa đơn *@
-                                                <a asp-action="EditOrder" asp-controller="QuanLyDH" asp-area="QuanLyDH" asp-route-id="@order.M_DonHang" class="btn btn-sm btn-outline-warning" title="Sửa đơn hàng"><i class="fas fa-edit"></i></a>
+                                                <a asp-action="EditOrder" asp-controller="QuanLyDonHang" asp-area="QuanLyDonHang"s asp-route-id="@order.M_DonHang" class="btn btn-sm btn-outline-warning" title="Sửa đơn hàng"><i class="fas fa-edit"></i></a>
 
                                                 @* Xác nhận đơn *@
                                                 <form asp-action="UpdateStatus" asp-controller="QuanLyDH" asp-area="QuanLyDH" method="post" style="display:inline;">

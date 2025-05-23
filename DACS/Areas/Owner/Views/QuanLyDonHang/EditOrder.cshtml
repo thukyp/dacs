@@ -208,7 +208,7 @@
             }
 
             <div class="card-custom">
-                <form asp-action="EditOrder" asp-controller="QuanLyDH" asp-area="QuanLyDH" asp-route-id="@Model.M_DonHang" method="post">
+                <form asp-action="EditOrder" asp-controller="QuanLyDonHang" asp-area="QuanLyDonHang" asp-route-id="@Model.M_DonHang" method="post">
                     @* Hiển thị tất cả lỗi validation ở đầu form *@
                     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
@@ -278,8 +278,8 @@
 
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i> Lưu Thay Đổi</button>
-                        <a asp-action="Details" asp-controller="QuanLyDH" asp-area="QuanLyDH" asp-route-id="@Model.M_DonHang" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i> Quay Lại Chi Tiết</a>
-                        <a asp-action="Index" asp-controller="QuanLyDH" asp-area="QuanLyDH" class="btn btn-outline-secondary"><i class="fas fa-list me-2"></i> Danh sách Đơn Hàng</a>
+                        <a asp-action="Details" asp-controller="QuanLyDonHang" asp-area="QuanLyDonHang" asp-route-id="@Model.M_DonHang" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i> Quay Lại Chi Tiết</a>
+                        <a asp-action="Index" asp-controller="QuanLyDonHang" asp-area="QuanLyDonHang" class="btn btn-outline-secondary"><i class="fas fa-list me-2"></i> Danh sách Đơn Hàng</a>
                     </div>
                 </form>
             </div>

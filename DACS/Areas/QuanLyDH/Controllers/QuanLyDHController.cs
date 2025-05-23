@@ -293,8 +293,8 @@ namespace DACS.Areas.QuanLyDH.Controllers
                 {
                     // TODO: Cập nhật các thuộc tính được phép của donHangToUpdate từ editedDonHang
                     // Ví dụ:
-                     donHangToUpdate.ShippingAddress = editedDonHang.ShippingAddress;
-                     donHangToUpdate.Notes = editedDonHang.Notes;
+                    donHangToUpdate.ShippingAddress = editedDonHang.ShippingAddress;
+                    donHangToUpdate.Notes = editedDonHang.Notes;
                     donHangToUpdate.KhachHang.Ten_KhachHang = editedDonHang.KhachHang.Ten_KhachHang;
                     donHangToUpdate.KhachHang.SDT_KhachHang = editedDonHang.KhachHang.SDT_KhachHang;
                     // ... các trường khác bạn cho phép sửa ...
@@ -481,7 +481,7 @@ namespace DACS.Areas.QuanLyDH.Controllers
         }
 
         // POST: QuanLyDH/QuanLyDH/HandleReturn/DH00001
-        
+
 
 
         // --- CÁC HÀM HELPER (giữ nguyên và bổ sung nếu cần) ---

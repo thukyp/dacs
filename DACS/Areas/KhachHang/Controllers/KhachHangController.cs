@@ -206,7 +206,6 @@ namespace DACS.Areas.KhachHang.Controllers
                     Ten_KhachHang = user.FullName ?? user.UserName ?? "Chưa đặt tên",
                     Email_KhachHang = user.Email ?? "Chưa có email",
                     SDT_KhachHang = user.PhoneNumber ?? "Chưa có SĐT",
-                    // Để null nếu DB cho phép và người dùng sẽ cập nhật sau
                     MaTinh = "T00",
                     MaQuan = "Q0100",
                     MaXa = "X010100",

@@ -165,6 +165,8 @@ namespace DACS.Areas.Identity.Pages.Account
 
                     var roleToAssign = string.IsNullOrEmpty(Input.Role) ? SD.Role_KhachHang : Input.Role;
                     await _userManager.AddToRoleAsync(user, roleToAssign);
+                    var createdUser = await _userManager.FindByEmailAsync(Input.Email);
+
 
                     try
                     {
@@ -172,17 +174,16 @@ namespace DACS.Areas.Identity.Pages.Account
                         {
                             var nguoiMuaProfile = new Models.KhachHang
                             {
-                                M_KhachHang = Guid.NewGuid().ToString("N").Substring(0, 10), // <<< DÒNG BẠN ĐÃ THÊM
-                                UserId = user.Id, // << Liên kết User ID
-                                // Các trường khác của KhachHang
-                                Ten_KhachHang = Input.FullName,
-                                Email_KhachHang = Input.Email,
-                                SDT_KhachHang = "Chua cap nhat",
-                                DiaChi_DuongApThon = "Chưa cập nhật",
+                                M_KhachHang = Guid.NewGuid().ToString("N").Substring(0, 10),
+                                UserId = user.Id,
+                                Ten_KhachHang = user.FullName ?? user.UserName ?? "Chưa đặt tên",
+                                Email_KhachHang = user.Email ?? "Chưa có email",
+                                SDT_KhachHang = user.PhoneNumber ?? "Chưa có SĐT",
+                                // Để null nếu DB cho phép và người dùng sẽ cập nhật sau
                                 MaTinh = "T00",
                                 MaQuan = "Q0100",
                                 MaXa = "X010100",
-
+                                DiaChi_DuongApThon = "chua cap nhat"
                             };
                             // DÙNG DbContext TRỰC TIẾP
                             _context.KhachHangs.Add(nguoiMuaProfile);

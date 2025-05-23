@@ -91,6 +91,7 @@ namespace DACS.Controllers
             order.TrangThaiThanhToan = "Chưa thanh toán"; // Gán giá trị mặc định cho trạng thái thanh toán
 
 
+
             // Tiến hành thêm đơn hàng vào cơ sở dữ liệu
             _context.DonHangs.Add(order);
             await _context.SaveChangesAsync();
