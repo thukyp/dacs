@@ -17,9 +17,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="~/css/AdminLayout.css" /> @* Giả sử bạn có file này *@
     <style>
-        .container-fluid.d-flex {
-            min-height: 100vh;
-            padding: 0;
+        /* Basic CSS - move to external files if possible */
+        body, html {
+            height: 100%;
         }
 
         .container {
@@ -30,30 +30,62 @@
             padding: 0;
             flex-direction: row;
         }
-        /* Sửa height thành min-height */
+
         .sidebar {
             background-color: #212529;
             color: #fff;
             padding: 15px;
             width: 250px;
             flex-shrink: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-            .sidebar h2 {
+            .sidebar h4 {
                 border-bottom: 1px solid #495057;
                 padding-bottom: 10px;
-                font-size: 1.5rem;
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+                font-weight: 600;
+            }
+
+            .sidebar .nav {
+                flex-grow: 1;
             }
 
             .sidebar .nav-link {
                 color: #adb5bd;
                 padding: 8px 15px;
+                border-radius: 0.25rem;
+                margin-bottom: 5px;
+                font-size: 0.9rem;
             }
 
                 .sidebar .nav-link.active, .sidebar .nav-link:hover {
                     color: #fff;
                     background-color: #495057;
-                    border-radius: 0.25rem;
+                }
+
+            .sidebar .nav-item.mt-auto {
+                margin-top: auto;
+                border-top: 1px solid #495057;
+                padding-top: 15px;
+            }
+
+            .sidebar .logout-form button {
+                padding: 8px 15px;
+                color: #dc3545;
+                background: none;
+                border: none;
+                width: 100%;
+                text-align: left;
+                font-size: 0.9rem;
+            }
+
+                .sidebar .logout-form button:hover {
+                    background-color: rgba(220, 53, 69, 0.1);
+                    color: #bd2130;
                 }
 
         .main-content-area {
@@ -63,42 +95,106 @@
             overflow-y: auto;
         }
 
-        .page-header {
+        .header {
             font-size: 1.75rem;
             font-weight: 500;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             color: #343a40;
         }
 
-        .card-custom {
+        .stat-card {
             background-color: #fff;
-            padding: 1.5rem;
             border-radius: 0.375rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            padding: 15px;
+            margin-bottom: 1rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            text-align: center;
+        }
+
+            .stat-card .value {
+                font-size: 1.5rem;
+                font-weight: 600;
+            }
+
+            .stat-card .label {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+
+        .filter-section {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 0.375rem;
             margin-bottom: 1.5rem;
-        }
-
-        .info-label {
-            font-weight: 500;
-            color: #495057;
-        }
-
-        .info-value {
-            color: #212529;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
 
         .table th {
-            background-color: #e9ecef;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
 
-        .action-buttons .btn, .action-buttons form {
-            margin-right: 5px;
-            margin-bottom: 5px;
+        .table td {
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+
+        .table .actions form, .table .actions a, .table .actions button {
+            margin-right: 3px;
+            display: inline-block;
+        }
+        /* Adjust spacing */
+        .table .actions .btn-sm {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.75rem;
+        }
+        /* Smaller buttons */
+        .table .badge {
+            font-size: 0.75rem;
+            padding: 0.3em 0.5em;
+        }
+
+        .user-display span {
+            display: block;
+        }
+
+        .user-display small {
+            color: #6c757d;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-    
+
+
+    @* --- Main Layout Container --- *@
+    <div class="d-flex">
+        @* --- Sidebar --- *@
+        <div class="sidebar">
+            <h2>OWNER</h2>
+            <ul class="nav flex-column">
+                @* Điều chỉnh các asp-controller và asp-action cho phù hợp với cấu trúc của bạn *@
+                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="Index" class="nav-link"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="DoanhThu" asp-action="Index" class="nav-link "><i class="fas fa-chart-line me-2"></i> Doanh thu</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyND" asp-action="Index" class="nav-link"><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLySP" asp-action="Index" class="nav-link"><i class="fas fa-box-open me-2"></i> Quản lý Sản phẩm</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyDonHang" asp-action="Index" class="nav-link "><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyThanhToan" asp-action="Index" class="nav-link active"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh toán</a></li>
+                
+            </ul>
+            <div class="nav-item mt-auto ">
+                <button type="submit" class="text-danger border-0 bg-transparent p-0 w-100 text-start mt-1">
+                    @* Adjusted button style to better match list items *@
+                    <a href="/home/index" class="border-0 text-danger" style="text-decoration: none;"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Về trang chủ</a>
+                </button>
+            </div>
+        </div>
+        <div class="main-content-area">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="page-header">@ViewData["Title"]</div>
+                <a asp-action="Index" asp-controller="QuanLyDH" asp-area="QuanLyDH" class="btn btn-outline-secondary mb-3"><i class="fas fa-arrow-left me-2"></i> Quay Lại Danh Sách</a>
+            </div>
 
             @if (TempData["SuccessMessage"] != null)
             {
@@ -165,11 +261,7 @@
                         <button type="submit" class="btn btn-warning"><i class="fas fa-hand-holding-usd me-1"></i> Hoàn Tiền (Sau Hủy)</button>
                     </form>
                 }
-                <a asp-action="UpdatePaymentStatus" asp-controller="QuanLyDH" asp-area="QuanLyDH" asp-route-id="@Model.M_DonHang" class="btn btn-info"><i class="far fa-credit-card me-1"></i> Cập nhật TT Thanh Toán</a>
-        <a asp-controller="QuanLyDH" asp-action="index">
-            <i class="fas fa-arrow-left me-1"></i> Quay lại
-        </a>
-
+                <a asp-action="UpdatePaymentStatus" asp-controller="QuanLyThanhToan" asp-area="QuanLyDH" asp-route-id="@Model.M_DonHang" class="btn btn-info"><i class="far fa-credit-card me-1"></i> Cập nhật TT Thanh Toán</a>
             </div>
 
 
@@ -271,7 +363,7 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">Sản Phẩm</th>
-                                        <th scope="col" class="text-center">KL</th>
+                                        <th scope="col" class="text-center">SL</th>
                                         <th scope="col" class="text-end">Đơn Giá</th>
                                         <th scope="col" class="text-end">Thành Tiền</th>
                                     </tr>
@@ -287,20 +379,20 @@
                                                     <img src="~/@item.SanPham.AnhSanPham" alt="@item.SanPham.TenSanPham" style="width: 30px; height: 30px; object-fit: cover; margin-left: 5px;" />
                                                 }
                                             </td>
-                                            <td class="text-center">@item.Khoiluong</td>
+                                            <td class="text-center">@item.Quantity</td>
                                             <td class="text-end">@item.GiaDatHang.ToString("N0") đ</td>
-                                            <td class="text-end">@((item.Khoiluong * item.GiaDatHang).ToString("N0")) đ</td>
+                                            <td class="text-end">@((item.Quantity * item.GiaDatHang).ToString("N0")) đ</td>
                                         </tr>
                                     }
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="3" class="text-end fw-bold">Tổng cộng sản phẩm:</td>
-                                        <td class="text-end fw-bold">@Model.ChiTietDatHangs.Sum(c => c.Khoiluong  * c.GiaDatHang).ToString("N0") đ</td>
+                                        <td class="text-end fw-bold">@Model.ChiTietDatHangs.Sum(c => c.Quantity  * c.GiaDatHang).ToString("N0") đ</td>
                                     </tr>
                                     <tr>
                                         <td colspan="3" class="text-end fw-bold">Phí vận chuyển:</td>
-                                        <td class="text-end fw-bold">0 đ</td>
+                                        <td class="text-end fw-bold">@((Model.TotalPrice - Model.ChiTietDatHangs.Sum(c => c.Quantity * c.GiaDatHang)).ToString("N0")) đ</td>
                                     </tr>
                                     <tr>
                                         <td colspan="3" class="text-end fw-bold h5">Tổng Thanh Toán:</td>

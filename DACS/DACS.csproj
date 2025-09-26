@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,57 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Areas\KhachHang\Data\**" />
-    <Compile Remove="Areas\KhachHang\Models\**" />
-    <Compile Remove="Areas\Owner\Data\**" />
-    <Compile Remove="Areas\Owner\Models\**" />
-    <Compile Remove="Areas\QuanLyDH\Data\**" />
-    <Compile Remove="Areas\QuanLyDH\Models\**" />
-    <Compile Remove="Areas\QuanLyND\Data\**" />
-    <Compile Remove="Areas\QuanLyND\Models\**" />
-    <Compile Remove="Areas\QuanLySP\Data\**" />
-    <Compile Remove="Areas\QuanLySP\Models\**" />
-    <Compile Remove="Areas\QuanLyXNK\Data\**" />
-    <Compile Remove="Areas\QuanLyXNK\Models\**" />
-    <Content Remove="Areas\KhachHang\Data\**" />
-    <Content Remove="Areas\KhachHang\Models\**" />
-    <Content Remove="Areas\Owner\Data\**" />
-    <Content Remove="Areas\Owner\Models\**" />
-    <Content Remove="Areas\QuanLyDH\Data\**" />
-    <Content Remove="Areas\QuanLyDH\Models\**" />
-    <Content Remove="Areas\QuanLyND\Data\**" />
-    <Content Remove="Areas\QuanLyND\Models\**" />
-    <Content Remove="Areas\QuanLySP\Data\**" />
-    <Content Remove="Areas\QuanLySP\Models\**" />
-    <Content Remove="Areas\QuanLyXNK\Data\**" />
-    <Content Remove="Areas\QuanLyXNK\Models\**" />
-    <EmbeddedResource Remove="Areas\KhachHang\Data\**" />
-    <EmbeddedResource Remove="Areas\KhachHang\Models\**" />
-    <EmbeddedResource Remove="Areas\Owner\Data\**" />
-    <EmbeddedResource Remove="Areas\Owner\Models\**" />
-    <EmbeddedResource Remove="Areas\QuanLyDH\Data\**" />
-    <EmbeddedResource Remove="Areas\QuanLyDH\Models\**" />
-    <EmbeddedResource Remove="Areas\QuanLyND\Data\**" />
-    <EmbeddedResource Remove="Areas\QuanLyND\Models\**" />
-    <EmbeddedResource Remove="Areas\QuanLySP\Data\**" />
-    <EmbeddedResource Remove="Areas\QuanLySP\Models\**" />
-    <EmbeddedResource Remove="Areas\QuanLyXNK\Data\**" />
-    <EmbeddedResource Remove="Areas\QuanLyXNK\Models\**" />
-    <None Remove="Areas\KhachHang\Data\**" />
-    <None Remove="Areas\KhachHang\Models\**" />
-    <None Remove="Areas\Owner\Data\**" />
-    <None Remove="Areas\Owner\Models\**" />
-    <None Remove="Areas\QuanLyDH\Data\**" />
-    <None Remove="Areas\QuanLyDH\Models\**" />
-    <None Remove="Areas\QuanLyND\Data\**" />
-    <None Remove="Areas\QuanLyND\Models\**" />
-    <None Remove="Areas\QuanLySP\Data\**" />
-    <None Remove="Areas\QuanLySP\Models\**" />
-    <None Remove="Areas\QuanLyXNK\Data\**" />
-    <None Remove="Areas\QuanLyXNK\Models\**" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.12.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />

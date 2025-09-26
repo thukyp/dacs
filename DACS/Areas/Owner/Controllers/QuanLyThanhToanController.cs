@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
-namespace DACS.Areas.QuanLyDH.Controllers
+namespace DACS.Areas.Owner.Controllers
 {
-    [Area("QuanLyDH")]
+    [Area("Owner")]
     [Authorize(Roles = SD.Role_Owner + "," + SD.Role_QuanLyDH)] // Đảm bảo phân quyền phù hợp
     public class QuanLyThanhToanController : Controller
     {

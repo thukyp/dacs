@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model IEnumerable<DACS.Models.ChiTietLienHe>
+@using DACS.Models
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -22,18 +24,56 @@
             color: #fff;
             padding: 15px;
             width: 250px;
+            flex-shrink: 0;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+            .sidebar h4 {
+                border-bottom: 1px solid #495057;
+                padding-bottom: 10px;
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+                font-weight: 600;
+            }
+
+            .sidebar .nav {
+                flex-grow: 1;
+            }
 
             .sidebar .nav-link {
                 color: #adb5bd;
                 padding: 8px 15px;
+                border-radius: 0.25rem;
+                margin-bottom: 5px;
+                font-size: 0.9rem;
             }
 
                 .sidebar .nav-link.active, .sidebar .nav-link:hover {
                     color: #fff;
                     background-color: #495057;
-                    border-radius: 0.25rem;
+                }
+
+            .sidebar .nav-item.mt-auto {
+                margin-top: auto;
+                border-top: 1px solid #495057;
+                padding-top: 15px;
+            }
+
+            .sidebar .logout-form button {
+                padding: 8px 15px;
+                color: #dc3545;
+                background: none;
+                border: none;
+                width: 100%;
+                text-align: left;
+                font-size: 0.9rem;
+            }
+
+                .sidebar .logout-form button:hover {
+                    background-color: rgba(220, 53, 69, 0.1);
+                    color: #bd2130;
                 }
 
         .main-content {
@@ -55,15 +95,18 @@
         <div class="sidebar">
             <h4>Quản Lý ND</h4>
             <ul class="nav flex-column">
-
-                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyND" asp-action="Index" class="nav-link active"><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
-                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyPhanHoi" asp-action="Index" class="nav-link "><i class="fas fa-comments me-2"></i> Phản hồi & Đánh giá</a></li>
-                @* <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyND" asp-action="QuanLyHanhDong" class="nav-link "><i class="fas fa-history me-2"></i> Lịch sử hoạt động</a></li> *@
-                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanLyHoTro" asp-action="Index" class="nav-link "><i class="fas fa-headset me-2"></i> Hỗ trợ người dùng</a></li>
-                @* <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyND" asp-action="QuanLyBaoCao" class="nav-link "><i class="fas fa-chart-bar me-2"></i> Báo cáo người dùng</a></li> *@
-
-                <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+                @* Set the correct 'active' class based on the current page/controller *@
+                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyND" asp-action="Index" class="nav-link "><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
+                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyPhanHoi" asp-action="Index" class="nav-link"><i class="fas fa-comments me-2"></i> Phản hồi & Đánh giá</a></li>
+                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyHoTro" asp-action="Index" class="nav-link active"><i class="fas fa-headset me-2"></i> Hỗ trợ người dùng</a></li>
+                @* Add other links as needed *@
             </ul>
+            <div class="nav-item mt-auto ">
+                <button type="submit" class="text-danger border-0 bg-transparent p-0 w-100 text-start mt-1">
+                    @* Adjusted button style to better match list items *@
+                    <a href="/home/index" class="border-0 text-danger" style="text-decoration: none;"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Về trang chủ</a>
+                </button>
+            </div>
         </div>
 
         <div class="main-content flex-grow-1">
@@ -98,22 +141,36 @@
                         </tr>
                     </thead>
                     <tbody id="product-table-body">
-                        <tr>
-                            <td>Phạm Thị D</td>
-                            <td>Tôi không đăng nhập được tài khoản, xin hỗ trợ!</td>
-                            <td>09/04/2025 10:30</td>
-                            <td><span class="badge bg-warning text-dark">Chưa xử lý</span></td>
-                            <td class="actions text-center">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Nguyễn Văn T</td>
-                            <td>Lỗi khi đăng bài bán sản phẩm vỏ trấu.</td>
-                            <td>08/04/2025 15:45</td>
-                            <td><span class="badge bg-success">Đã xử lý</span></td>
-                            <td class="actions text-center">
-                            </td>
-                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.HoTen</td>
+                                <td>@item.NoiDung</td>
+                                <td>@item.NgayGui.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (item.TrangThai == "Đã xử lý")
+                                    {
+                                        <span class="badge bg-success">Đã xử lý</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">Chưa xử lý</span>
+                                    }
+                                </td>
+                                <td class="actions text-center">
+                                    @if (item.TrangThai == "Đã xử lý")
+                                    {
+                                        <button class="btn btn-sm btn-outline-info" onclick="viewFeedback(this)"><i class="fas fa-eye"></i> Xem</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewreply(this)">
+                                            <i class="fas fa-reply"></i> Phản hồi
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -143,6 +200,45 @@
             </div>
         </div>
     </div>
+    <!-- phản hồi -->
+    <div class="modal fade" id="reply" tabindex="-1" aria-labelledby="replyLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-sm">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="replyLabel"><i class="fas fa-reply"></i> Gửi phản hồi đến người dùng</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="replyForm">
+
+                        <div class="mb-3">
+                            <label for="reply-content" class="form-label">Nội dung phản hồi:</label>
+                            <textarea class="form-control" id="reply-content" rows="5" placeholder="Nhập nội dung phản hồi..."></textarea>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="sendReply()">Gửi phản hồi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    @* modal phan hoi *@
+    <script>
+         function viewreply(button) {
+
+
+          var myModal = new bootstrap.Modal(document.getElementById('reply'));
+          myModal.show();
+        }
+    </script>
+
     @* tim kiem va loc *@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -177,34 +273,7 @@
             statusSelect.addEventListener("change", filterTable);
         });
     </script>
-    <script>
-                function renderActions() {
-                    const rows = document.querySelectorAll("#userTable tbody tr");
 
-                    rows.forEach(row => {
-                        const status = row.cells[3].textContent.toLowerCase().trim();
-                        const actionsTd = row.querySelector(".actions");
-                        actionsTd.innerHTML = ""; // Reset
-
-                        const commonButtons = `
-                            `;
-
-                        let dynamicButtons = "";
-                        if (status === "đã xử lý") {
-                            dynamicButtons = `
-        <button class="btn btn-sm btn-outline-info" onclick="viewFeedback(this)"><i class="fas fa-eye"></i> Xem</button> `;
-                        } else if (status === "chưa xử lý") {
-                            dynamicButtons = `
-                                <button class="btn btn-sm btn-outline-primary"><i class="fas fa-reply"></i> Phản hồi</button>
-                                     `;
-                        }
-
-                        actionsTd.innerHTML = commonButtons + dynamicButtons;
-                    });
-                }
-
-                renderActions();
-    </script>
     <script>
         function viewFeedback(button) {
           const row = button.closest('tr');

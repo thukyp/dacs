@@ -21,7 +21,7 @@ namespace DACS.Models // <-- Kiểm tra lại namespace
         // public string? LoaiHinh { get; set; }
 
         // --- Khóa ngoại đến QuanHuyen ---
-        [Required(ErrorMessage = "Vui lòng chọn Quận/Huyện.")]
+        
         [StringLength(10)] // Phải khớp kiểu và độ dài với QuanHuyen.MaQuan
         [Display(Name = "Quận/Huyện")]
         public string MaQuan { get; set; } // Foreign Key property

@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using System; // For DateTime
 using System.Linq; // For LINQ methods like .Any()
 using System.Threading.Tasks; // For Task
-using System.Collections.Generic; // For List
+using System.Collections.Generic;
+using DACS.Models.ViewModels; // For List
 
 namespace DACS.Areas.QuanLyDH.Controllers
 {
@@ -44,7 +45,7 @@ namespace DACS.Areas.QuanLyDH.Controllers
             ViewData["Title"] = "Quản Lý Đơn Hàng";
             int pageSize = 5;
 
-            var viewModel = new OrderManagementViewModel
+            var viewModel = new Owner.Models.OrderManagementViewModel
             {
                 SearchInput = searchInput,
                 DateFromFilter = dateFromFilter,
@@ -157,7 +158,7 @@ namespace DACS.Areas.QuanLyDH.Controllers
             var donHang = await _context.DonHangs.FirstOrDefaultAsync(m => m.M_DonHang == id);
             if (donHang == null)
                 return NotFound($"Không tìm thấy đơn hàng {id}.");
-
+            
             string actualNewStatusInDb = "";
             string successMessagePart = "";
             bool canUpdate = false;
@@ -192,14 +193,17 @@ namespace DACS.Areas.QuanLyDH.Controllers
                     }
                     break;
                 case "complete":
+                    
                     if (donHang.TrangThai == StatusShippingDbValue)
                     {
                         actualNewStatusInDb = StatusCompletedDbValue;
                         successMessagePart = "hoàn thành.";
                         canUpdate = true;
+                        
                         // TODO: Logic khi hoàn thành (VD: ghi nhận doanh thu, cập nhật trạng thái thanh toán nếu là COD,...)
                     }
                     break;
+                    
                 case "cancel":
                     // Cho phép hủy từ nhiều trạng thái hơn (tùy theo logic nghiệp vụ)
                     if (donHang.TrangThai == StatusPendingDbValue || donHang.TrangThai == "Chưa xử lý" || donHang.TrangThai == StatusConfirmedDbValue)
@@ -213,6 +217,11 @@ namespace DACS.Areas.QuanLyDH.Controllers
                         {
                             // donHang.TrangThaiThanhToan = "Đã hoàn tiền"; // Cần xem xét kỹ
                         }
+
+                    }
+                    if (donHang.TrangThai == StatusConfirmedDbValue)
+                    {
+                        await CapNhatTonKhoAsync(truKho: false);
                     }
                     break;
             }
@@ -239,7 +248,11 @@ namespace DACS.Areas.QuanLyDH.Controllers
             {
                 TempData["ErrorMessage"] = $"Không thể cập nhật trạng thái cho đơn hàng {donHang.M_DonHang} từ '{donHang.TrangThai}' sang '{newStatusKey}'.";
             }
+
+                await CapNhatTonKhoAsync(truKho: true);
+             
             return RedirectToAction(nameof(Index)); // Hoặc RedirectToAction(nameof(Details), new { id = id });
+            
         }
 
         // --- CÁC ACTION METHOD MỚI ---
@@ -249,71 +262,154 @@ namespace DACS.Areas.QuanLyDH.Controllers
         public async Task<IActionResult> EditOrder(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
+
             var donHang = await _context.DonHangs
-                                .Include(d => d.KhachHang)
-                                // .Include(d => d.ChiTietDatHangs).ThenInclude(ct => ct.SanPham) // Load chi tiết nếu cần sửa sản phẩm
-                                .FirstOrDefaultAsync(m => m.M_DonHang == id);
+                                    .Include(d => d.KhachHang) // Cần để lấy tên và SĐT khách hàng/người nhận ban đầu
+                                    .FirstOrDefaultAsync(m => m.M_DonHang == id);
 
             if (donHang == null) return NotFound();
 
-            // Chỉ cho phép sửa nếu đơn hàng ở trạng thái phù hợp (ví dụ: "Chờ xác nhận")
+            // Chỉ cho phép sửa nếu đơn hàng ở trạng thái phù hợp (ví dụ: "Chờ xác nhận" hoặc "Chưa xử lý")
             if (donHang.TrangThai != StatusPendingDbValue && donHang.TrangThai != "Chưa xử lý")
             {
-                TempData["ErrorMessage"] = "Không thể sửa đơn hàng ở trạng thái này.";
+                TempData["ErrorMessage"] = $"Không thể sửa đơn hàng ở trạng thái '{donHang.TrangThai}'.";
                 return RedirectToAction(nameof(Details), new { id = id });
             }
 
-            // TODO: Tạo một EditOrderViewModel nếu cần, map DonHang sang ViewModel đó
-            // var viewModel = new EditOrderViewModel { /* ... map properties ... */ };
-            ViewData["Title"] = $"Sửa đơn hàng {id}";
-            return View(donHang); // Hoặc View(viewModel);
+            // Map từ DonHang sang EditOrderViewModel
+            var viewModel = new EditOrderViewModel
+            {
+                M_DonHang = donHang.M_DonHang,
+
+                // Thông tin gốc để hiển thị
+                Display_M_KhachHang = donHang.M_KhachHang,
+                Display_Ten_KhachHang = donHang.KhachHang?.Ten_KhachHang ?? "N/A",
+                Display_NgayDat = donHang.NgayDat,
+                Display_TotalPrice = (decimal)donHang.TotalPrice, // Giả sử TotalPrice là decimal
+                Display_TrangThai = donHang.TrangThai,
+                TenNguoiNhan = donHang.KhachHang?.Ten_KhachHang ?? "", // Nếu KhachHang null, để trống
+                SDTNguoiNhan = donHang.KhachHang?.SDT_KhachHang ?? "",   // Nếu KhachHang null, để trống
+                ShippingAddress = donHang.ShippingAddress,
+                Notes = donHang.Notes // Ghi chú của Owner/Quản lý
+            };
+            
+            ViewData["Title"] = $"Sửa Đơn Hàng {viewModel.M_DonHang}";
+            return View(viewModel); // Truyền ViewModel cho View
         }
 
         // POST: QuanLyDH/QuanLyDH/EditOrder/DH00001
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditOrder(string id, [Bind("M_DonHang,ShippingAddress,Notes,KhachHang.Ten_KhachHang,SDTNguoiNhan")] DonHang editedDonHang) // Bind các thuộc tính cho phép sửa
+        public async Task<IActionResult> EditOrder(string id, EditOrderViewModel viewModel) // Nhận EditOrderViewModel
         {
-            if (id != editedDonHang.M_DonHang) return NotFound();
+            if (id != viewModel.M_DonHang) // Kiểm tra id từ route và M_DonHang trong model có khớp không
+            {
+                return NotFound("Lỗi: Mã đơn hàng không khớp.");
+            }
 
-            var donHangToUpdate = await _context.DonHangs.FindAsync(id);
-            if (donHangToUpdate == null) return NotFound();
+            // Trước khi kiểm tra ModelState, nạp lại các thông tin display nếu ModelState không hợp lệ và cần trả về View
+            // Điều này cần thiết vì các trường Display_ không được POST lên.
+            var donHangToUpdate = await _context.DonHangs
+                                                .Include(d => d.KhachHang) // Include KhachHang để có thể cập nhật hoặc tham chiếu
+                                                .FirstOrDefaultAsync(d => d.M_DonHang == viewModel.M_DonHang);
 
-            // Chỉ cho phép sửa nếu đơn hàng ở trạng thái phù hợp
+            if (donHangToUpdate == null)
+            {
+                return NotFound($"Không tìm thấy đơn hàng {viewModel.M_DonHang}.");
+            }
+
+            if (!ModelState.IsValid) // Validate EditOrderViewModel
+            {
+                // Nạp lại thông tin gốc cho ViewModel để hiển thị đúng nếu có lỗi validation
+                viewModel.Display_M_KhachHang = donHangToUpdate.M_KhachHang;
+                viewModel.Display_Ten_KhachHang = donHangToUpdate.KhachHang?.Ten_KhachHang ?? "N/A";
+                viewModel.Display_NgayDat = donHangToUpdate.NgayDat;
+                viewModel.Display_TotalPrice = (decimal)donHangToUpdate.TotalPrice;
+                viewModel.Display_TrangThai = donHangToUpdate.TrangThai;
+
+                ViewData["Title"] = $"Sửa Đơn Hàng {viewModel.M_DonHang}";
+                TempData["ErrorMessage"] = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+                return View(viewModel); // Trả về ViewModel với các lỗi validation
+            }
+
+
+            // Kiểm tra lại trạng thái đơn hàng trước khi cập nhật (quan trọng)
             if (donHangToUpdate.TrangThai != StatusPendingDbValue && donHangToUpdate.TrangThai != "Chưa xử lý")
             {
-                TempData["ErrorMessage"] = "Không thể sửa đơn hàng ở trạng thái này. Trạng thái hiện tại: " + donHangToUpdate.TrangThai;
-                // TODO: Load lại view EditOrder với model và lỗi
-                return View(editedDonHang); // Hoặc tạo ViewModel và trả về
+                TempData["ErrorMessage"] = $"Không thể sửa đơn hàng ở trạng thái '{donHangToUpdate.TrangThai}'. Đơn hàng có thể đã được xử lý.";
+                // Nạp lại thông tin display cho ViewModel
+                viewModel.Display_M_KhachHang = donHangToUpdate.M_KhachHang;
+                viewModel.Display_Ten_KhachHang = donHangToUpdate.KhachHang?.Ten_KhachHang ?? "N/A";
+                viewModel.Display_NgayDat = donHangToUpdate.NgayDat;
+                viewModel.Display_TotalPrice = (decimal)donHangToUpdate.TotalPrice;
+                viewModel.Display_TrangThai = donHangToUpdate.TrangThai;
+                return View(viewModel);
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    // TODO: Cập nhật các thuộc tính được phép của donHangToUpdate từ editedDonHang
-                    // Ví dụ:
-                     donHangToUpdate.ShippingAddress = editedDonHang.ShippingAddress;
-                     donHangToUpdate.Notes = editedDonHang.Notes;
-                    donHangToUpdate.KhachHang.Ten_KhachHang = editedDonHang.KhachHang.Ten_KhachHang;
-                    donHangToUpdate.KhachHang.SDT_KhachHang = editedDonHang.KhachHang.SDT_KhachHang;
-                    // ... các trường khác bạn cho phép sửa ...
-                    // KHÔNG cho phép sửa các trường nhạy cảm như TotalPrice trực tiếp ở đây trừ khi có logic tính toán lại.
+                // Cập nhật các thuộc tính của donHangToUpdate từ viewModel
+                donHangToUpdate.ShippingAddress = viewModel.ShippingAddress;
+                donHangToUpdate.Notes = viewModel.Notes; // Ghi chú của Owner/QL
 
-                    // donHangToUpdate.ThoiGianCapNhat = DateTime.Now;
-                    _context.Update(donHangToUpdate);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = $"Đơn hàng {id} đã được cập nhật.";
-                    return RedirectToAction(nameof(Details), new { id = id });
-                }
-                catch (DbUpdateConcurrencyException)
+                // Cẩn thận khi cập nhật thông tin KhachHang.
+                // Nếu bạn cho phép sửa tên/SĐT của KhachHang gốc liên kết với đơn hàng:
+                if (donHangToUpdate.KhachHang != null)
                 {
-                    if (!DonHangExists(donHangToUpdate.M_DonHang)) return NotFound();
-                    else throw;
+                    donHangToUpdate.KhachHang.Ten_KhachHang = viewModel.TenNguoiNhan;
+                    donHangToUpdate.KhachHang.SDT_KhachHang = viewModel.SDTNguoiNhan;
+                    _context.Update(donHangToUpdate.KhachHang); // Đánh dấu KhachHang là đã thay đổi nếu cần thiết
+                }
+                else
+                {
+                    // Xử lý trường hợp đơn hàng không có KhachHang liên kết (ít xảy ra nếu M_KhachHang là required)
+                    // Có thể bạn muốn log lỗi hoặc hiển thị thông báo khác.
+                    // Nếu không có KhachHang, bạn không thể cập nhật Ten_KhachHang, SDT_KhachHang trực tiếp vào nó.
+                    // Trong trường hợp này, có thể Tên người nhận và SĐT người nhận nên là các trường riêng trên DonHang.
+                    // Dựa theo form của bạn, nó đang cố gắng cập nhật vào DonHang.KhachHang.
+                    TempData["ErrorMessage"] = "Lỗi: Không tìm thấy thông tin khách hàng liên kết với đơn hàng để cập nhật tên/SĐT người nhận.";
+                    viewModel.Display_M_KhachHang = donHangToUpdate.M_KhachHang;
+                    viewModel.Display_Ten_KhachHang = "N/A"; // Vì KhachHang gốc là null
+                    viewModel.Display_NgayDat = donHangToUpdate.NgayDat;
+                    viewModel.Display_TotalPrice = (decimal)donHangToUpdate.TotalPrice;
+                    viewModel.Display_TrangThai = donHangToUpdate.TrangThai;
+                    return View(viewModel);
+                }
+
+                // donHangToUpdate.ThoiGianCapNhat = DateTime.Now; // Nếu có trường này
+                _context.Update(donHangToUpdate); // Đánh dấu DonHang là đã thay đổi
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Đơn hàng {donHangToUpdate.M_DonHang} đã được cập nhật thành công.";
+                return RedirectToAction(nameof(Details), new { id = donHangToUpdate.M_DonHang });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DonHangExists(viewModel.M_DonHang))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    // Xử lý lỗi concurrency: thông báo cho người dùng dữ liệu đã bị thay đổi
+                    TempData["ErrorMessage"] = "Dữ liệu đã bị thay đổi bởi một người khác. Vui lòng tải lại trang và thử lại.";
                 }
             }
-            ViewData["Title"] = $"Sửa đơn hàng {id}";
-            return View(editedDonHang); // Trả về view với model đã nhập nếu có lỗi validation
+            catch (Exception ex)
+            {
+                // Log lỗi và thông báo chung
+                // _logger.LogError(ex, $"Lỗi khi cập nhật đơn hàng {viewModel.M_DonHang}");
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi không mong muốn khi cập nhật đơn hàng.";
+            }
+
+            // Nếu có lỗi không phải validation hoặc concurrency, nạp lại thông tin display và trả về view
+            viewModel.Display_M_KhachHang = donHangToUpdate.M_KhachHang;
+            viewModel.Display_Ten_KhachHang = donHangToUpdate.KhachHang?.Ten_KhachHang ?? "N/A";
+            viewModel.Display_NgayDat = donHangToUpdate.NgayDat;
+            viewModel.Display_TotalPrice = (decimal)donHangToUpdate.TotalPrice;
+            viewModel.Display_TrangThai = donHangToUpdate.TrangThai;
+            ViewData["Title"] = $"Sửa Đơn Hàng {viewModel.M_DonHang}";
+            return View(viewModel);
         }
 
         // GET: QuanLyDH/QuanLyDH/OrderNotes/DH00001
@@ -481,7 +577,7 @@ namespace DACS.Areas.QuanLyDH.Controllers
         }
 
         // POST: QuanLyDH/QuanLyDH/HandleReturn/DH00001
-        
+
 
 
         // --- CÁC HÀM HELPER (giữ nguyên và bổ sung nếu cần) ---
@@ -694,9 +790,6 @@ namespace DACS.Areas.QuanLyDH.Controllers
                 return RedirectToAction(nameof(Details), new { id = id });
             }
 
-            // Nếu ModelState không hợp lệ, load lại view với thông tin đã nhập và lỗi
-            // Cần truyền lại donHang (hoặc ViewModel) để hiển thị form với giá trị cũ
-            donHang.M_VanDon = m_VanDon; // Để hiển thị lại giá trị đã nhập
             if (donHang.VanChuyen != null) donHang.VanChuyen.DonViVanChuyen = donViVanChuyen;
             else donHang.VanChuyen = new VanChuyen { M_VanDon = m_VanDon, DonViVanChuyen = donViVanChuyen };
 
@@ -705,6 +798,24 @@ namespace DACS.Areas.QuanLyDH.Controllers
         }
 
 
+        public async Task CapNhatTonKhoAsync(bool truKho)
+        {
+            var danhSachTonKho = await _context.TonKhos.ToListAsync();
+
+            foreach (var tk in danhSachTonKho)
+            {
+                var khoiLuongDonHang = await _context.ChiTietDatHangs
+                    .Where(ct => ct.ProductId == tk.M_SanPham
+                                 && ct.DonHang.TrangThai == "Đã xác nhận")
+                    .SumAsync(ct => (float?)ct.Khoiluong) ?? 0;
+                if (truKho) { 
+                tk.KhoiLuong = tk.KhoiLuong - khoiLuongDonHang; // hoặc dùng cột riêng như KhoiLuongConLai
+                }else
+                    tk.KhoiLuong = tk.KhoiLuong + khoiLuongDonHang;
+            }
+            
+            await _context.SaveChangesAsync();
+        }
         private bool DonHangExists(string id)
         {
             return _context.DonHangs.Any(e => e.M_DonHang == id);

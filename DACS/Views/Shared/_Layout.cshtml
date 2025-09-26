@@ -49,7 +49,7 @@
     @* nhấn vào search hiện lên khung chat và đề xuất *@
     
     <header id="header" class="site-header">
-        <div class="nav-top navbar-expand-sm navbar-light bg-light">
+        <div class="nav-top navbar-expand-sm navbar-light bg-agriculture-green">
             <div class="container-fluid">
                 <div class="row g-0">
                     <div class="col-lg-5">
@@ -66,7 +66,7 @@
 
 
                                 <a href="https://www.youtube.com/watch?v=i6wU_CQUbIA">
-                                    <i class="fa-brands fa-zalo"><img src="~/images/Zalo.png" width="25" height="25" /> Zalo</i>
+                                    <i class="fa-brands fa-zalo"><img src="~/images/icons8-zalo-50.png" width="25" height="25" /> Zalo</i>
 
                                 </a>
 
@@ -92,7 +92,7 @@
             </a>
         </div>
 
-        <nav id="header-nav" class="navbar-mid navbar-expand-sm navbar-light bg-light">
+        <nav id="header-nav" class="navbar-mid navbar-expand-sm navbar-light bg-agriculture-earth">
             <div class="container">
 
 
@@ -115,17 +115,20 @@
                             <div class="search-popup" id="searchPopup">
                                 <div class="search-popup-container">
                                     <button class="close-btn" id="closeSearch">&times;</button>
-                                    <form action="/tim-kiem" method="get">
-                                        <input type="search" name="s" placeholder="Tìm sản phẩm bạn cần..." autofocus />
+                                    <form action="/DS_SP/TimKiem" method="get">
+                                        <input type="text" id="searchBox" class="form-control" style="width:400px; border-radius:1.5rem;" name="keyword" placeholder="Tìm sản phẩm bạn cần..." autocomplete="off" />
+                                        
+                                        
+                                        <div id="suggestions" class="list-group w-100" style="z-index:1000;"></div>
                                     </form>
 
                                     <ul class="cat-list">
-                                        <li><a href="#">Điện thoại</a></li>
-                                        <li><a href="#">Đồng hồ</a></li>
-                                        <li><a href="#">Tai nghe</a></li>
-                                        <li><a href="#">Phụ kiện</a></li>
-                                        <li><a href="#">Màn hình</a></li>
-                                        <li><a href="#">Loa</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=b%C3%A3+m%C3%ADa">Bã mía</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Trấu+nghiền">Trấu nghiền</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Rơm+mì">Rơm mì</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Xơ+dừa">Xơ dừa</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Viên+nén+trấu">Viên nén trấu</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Phân+compost">Phân compost</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -191,8 +194,8 @@
                                 <ul class="list-group mb-3" id="cart-items">
                                     @if (cart?.Items != null && cart.Items.Any() && User.IsInRole("KhachHang") || User.IsInRole("Owner") || User.IsInRole("QuanLyXNK") || User.IsInRole("QuanLyND") || User.IsInRole("QuanLySP") || User.IsInRole("QuanLyDH"))
 									{
-                                        decimal total = 0;
-                                        int itemCount = 0;
+                                        float total = 0;
+                                        float itemCount = 0;
 
                                         @foreach (var item in cart.Items)
                                         {
@@ -248,7 +251,7 @@
 
         </nav>
 
-        <nav class="navbar-bot navbar-expand-sm navbar-light bg-light">
+        <nav class="navbar-bot navbar-expand-sm navbar-light bg-agriculture-green">
             <div class="row">
                 <div class="col-lg-1 col-3 col-xs-3 ">
                 </div>
@@ -346,81 +349,107 @@
         </main>
     </div>
 
-    <footer class="end-footer">
+    <footer class="end-footer ">
         <div class="container">
-            <div class="row">
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul>
-                        <li>
-                            <a href="#">about us</a>
-                        </li>
-                        <li>
-                            <a href="#">our service</a>
-                        </li>
-                        <li>
-                            <a href="#">privacy policy</a>
-                        </li>
-                        <li>
-                            <a href="#">affiliate program</a>
-                        </li>
+            <div class="row ">
+                <!-- Giới thiệu công ty -->
+                <div class="footer-col mt-2">
+                    <h4>Về chúng tôi</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-light">Giới thiệu nền tảng</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Sứ mệnh & Tầm nhìn</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Chính sách bảo mật</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Hợp tác cùng chúng tôi</a></li>
                     </ul>
                 </div>
-                <div class="footer-col">
-                    <h4>Get help</h4>
-                    <ul>
-                        <li>
-                            <a href="#">FAQ</a>
-                        </li>
-                        <li>
-                            <a href="#">shipping</a>
-                        </li>
-                        <li>
-                            <a href="#">return</a>
-                        </li>
-                        <li>
-                            <a href="#">order status</a>
-                        </li>
-                        <li>
-                            <a href="#">payment opinions</a>
-                        </li>
+
+                <!-- Hỗ trợ khách hàng -->
+                <div class="footer-col mt-2">
+                    <h4>Hỗ trợ</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-light">Câu hỏi thường gặp</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Chính sách vận chuyển</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Chính sách đổi trả</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Tra cứu đơn hàng</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Phương thức thanh toán</a></li>
                     </ul>
                 </div>
-                <div class="footer-col">
-                    <h4>Service</h4>
-                    <ul>
-                        <li>
-                            <a href="#">dfdfsdsv</a>
-                        </li>
-                        <li>
-                            <a href="#">dvsdsvdsv</a>
-                        </li>
-                        <li>
-                            <a href="#">dsvdvsdvs</a>
-                        </li>
-                        <li>
-                            <a href="#">dsvdvsvds</a>
-                        </li>
-                        <li>
-                            <a href="#">vdsdsvdvs</a>
-                        </li>
-                        <li>
-                            <a href="#">dvsdvs</a>
-                        </li>
+
+                <!-- Dịch vụ chính -->
+                <div class="footer-col mt-2">
+                    <h4>Dịch vụ</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-light">Đăng bán phụ phẩm</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Thu mua tận nơi</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Kết nối doanh nghiệp</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Giao nhận & vận chuyển</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Tư vấn tái chế</a></li>
                     </ul>
                 </div>
-                <div class="footer-col">
-                    <h4>Follow us</h4>
+
+                <!-- Mạng xã hội -->
+                <div class="footer-col mt-2">
+                    <h4>Kết nối với chúng tôi</h4>
                     <div class="social-link">
-                        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                        <a href="#"><i class="fa-brands fa-zalo"><img src="~/Img/icons8-zalo-50.png" width="25" height="25" /></i></a>
-                        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="text-light "><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="text-light "><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="text-light "><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" class="text-light ">
+                            <i class="fa-brands fa-zalo">
+                            <img src="~/images/icons8-zalo-50.png" width="25" height="25" alt="Zalo" style="vertical-align: middle;" /></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#searchBox').on('input', function () {
+                const keyword = $(this).val();
+                if (keyword.length === 0) {
+                    $('#suggestions').empty();
+                    return;
+                }
+
+                $.ajax({
+                    url: '/DS_SP/Suggest',
+                    type: 'GET',
+                    data: { keyword: keyword },
+                    success: function (data) {
+                        $('#suggestions').empty();
+                        if (data.length > 0) {
+                            data.forEach(function (item) {
+                                $('#suggestions').append(`
+                                    <a href="#" class="list-group-item list-group-item-action suggestion-item"
+                                       data-name="${item.tenSanPham}" data-id="${item.m_SanPham}">
+                                        ${item.tenSanPham}
+                                    </a>
+                                `);
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Khi người dùng nhấn vào gợi ý
+            $(document).on('click', '.suggestion-item', function (e) {
+                e.preventDefault();
+                const name = $(this).data('name');
+                const id = $(this).data('id');
+
+                $('#searchBox').val(name); // Ghi vào ô input
+
+                
+            });
+
+            
+        });
+    </script>
+
+
     
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -451,7 +480,7 @@
             updateCartStats();
             document.querySelectorAll(".soLuongInput").forEach(input => {
                 input.addEventListener("input", updateCartStats);
-            });
+            });0
         });
     </script>
 
