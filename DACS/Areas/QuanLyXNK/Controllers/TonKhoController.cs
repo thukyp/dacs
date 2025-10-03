@@ -1,4 +1,5 @@
 ﻿// File: Areas/QuanLyXNK/Controllers/TonKhoController.cs
+using DACS.Extention;
 using DACS.Models;
 using DACS.Models.ViewModels;
 using DACS.Repositories; // Namespace của Repository
@@ -6,10 +7,13 @@ using DACS.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using YourNameSpace.Extensions;
 
 namespace DACS.Areas.QuanLyXNK.Controllers
 {
@@ -33,6 +37,7 @@ namespace DACS.Areas.QuanLyXNK.Controllers
         // GET: QuanLyXNK/TonKho
         public async Task<IActionResult> Index(string? searchTerm, string? maKhoFilter, int page = 1)
         {
+            
             int pageSize = 15; // Số lượng mục trên mỗi trang (có thể điều chỉnh)
             _logger.LogInformation("Vào TonKho Index - Page: {PageIndex}, Search: '{SearchTerm}', Kho: '{MaKhoFilter}'", page, searchTerm, maKhoFilter);
 
@@ -87,23 +92,33 @@ namespace DACS.Areas.QuanLyXNK.Controllers
         // --- Hàm Helper để Map TonKho sang TonKhoListItemViewModel ---
         private TonKhoListItemViewModel MapToListItemViewModel(TonKho tk, long? dinhMucToiThieu)
         {
+            var khoiLuongDonHang = _context.ChiTietDatHangs
+    .Where(ct => ct.ProductId == tk.M_SanPham
+                 && ct.DonHang.TrangThai == "Đã xác nhận")
+    .Sum(ct => ct.Khoiluong);
+
+            var khoiLuongConLai = tk.KhoiLuong - khoiLuongDonHang;
+            
+
             return new TonKhoListItemViewModel
             {
                 Id = tk.Id,
-                TenKho = tk.KhoHang?.TenKho ?? tk.MaKho, // Hiển thị tên kho nếu có, không thì mã kho
-                TenSanPham = tk.LoaiSanPham?.TenLoai ?? tk.M_LoaiSP,
+                TenKho = tk.KhoHang?.TenKho ?? tk.MaKho,
+                TenSanPham = tk.SanPham?.TenSanPham ?? tk.M_SanPham,
                 TenDonViTinh = tk.DonViTinh?.TenLoaiTinh ?? tk.M_DonViTinh,
-                SoLuong = tk.SoLuong,
-                DinhMucToiThieu = dinhMucToiThieu, // Gán định mức lấy được
-                TrangThai = CalculateStatus(tk.SoLuong, dinhMucToiThieu), // Tính trạng thái
-                NgayNhapKho = tk.NgayNhapKho,
-                HanSuDung = tk.HanSuDung,
-                SoLo = tk.SoLo
+                KhoiLuong = khoiLuongConLai,
+                DinhMucToiThieu = dinhMucToiThieu,
+                TrangThai = CalculateStatus(tk.KhoiLuong, dinhMucToiThieu)
             };
+            
         }
+       
+
+
+
 
         // --- Hàm Helper để tính toán Trạng thái Tồn kho ---
-        private string CalculateStatus(long currentQuantity, long? minThreshold)
+        private string CalculateStatus(float currentQuantity, long? minThreshold)
         {
             if (currentQuantity <= 0)
             {

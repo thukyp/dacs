@@ -1,7 +1,7 @@
-﻿@model DACS.Models.DonHang
+﻿@model DACS.Models.ViewModels.EditOrderViewModel
 @{
     ViewData["Title"] = $"Sửa Đơn Hàng {Model.M_DonHang}";
-    // Layout = "_AdminLayout"; // Đặt Layout của bạn ở đây nếu có
+    // Layout = "_AdminLayout";
 }
 
 <!DOCTYPE html>
@@ -14,10 +14,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="~/css/AdminLayout.css" /> @* Đường dẫn tới CSS layout của bạn *@
     <style>
-        /* CSS cơ bản cho sidebar và main content (tương tự các view khác) */
-        .container-fluid.d-flex {
-            min-height: 100vh;
+        /* ... (CSS của bạn giữ nguyên) ... */
+        .container {
+            display: grid;
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
             padding: 0;
+            flex-direction: row;
         }
 
         .sidebar {
@@ -68,15 +72,7 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid d-flex p-0">
-        <div class="sidebar">
-            <h2>OWNER</h2>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="Index" class="nav-link"><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
-                <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="QuanLyThanhToan" class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh Toán</a></li>
-                @* Thêm các mục menu khác nếu có *@
-            </ul>
-        </div>
+   
 
         <div class="main-content-area">
             <div class="page-header">@ViewData["Title"]</div>
@@ -88,34 +84,47 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
 
             <div class="card-custom">
                 <form asp-action="EditOrder" asp-controller="QuanLyDH" asp-area="QuanLyDH" asp-route-id="@Model.M_DonHang" method="post">
-                    @* Hiển thị tất cả lỗi validation ở đầu form *@
-                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> @* Chỉ hiển thị lỗi model-level *@
 
-                    @* M_DonHang là khóa chính và không được sửa, truyền ẩn đi *@
                     <input type="hidden" asp-for="M_DonHang" />
 
-                    @* Các trường thông tin gốc có thể hiển thị ở dạng readonly nếu cần tham khảo *@
                     <fieldset disabled class="mb-3">
                         <legend class="h6">Thông tin đơn hàng gốc (không sửa)</legend>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Mã Khách Hàng</label>
-                                <input type="text" class="form-control" value="@Model.M_KhachHang" />
+                                <label class="form-label">Mã Đơn Hàng</label>
+                                <input type="text" class="form-control" value="@Model.M_DonHang" />
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Tên Khách Hàng</label>
-                                <input type="text" class="form-control" value="@(Model.KhachHang?.Ten_KhachHang ?? "N/A")" />
+                                <label class="form-label">Trạng Thái Hiện Tại</label>
+                                <input type="text" class="form-control" value="@Model.Display_TrangThai" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Mã Khách Hàng</label>
+                                <input type="text" class="form-control" value="@Model.Display_M_KhachHang" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tên Khách Hàng (Gốc)</label>
+                                <input type="text" class="form-control" value="@Model.Display_Ten_KhachHang" />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Ngày Đặt</label>
-                                <input type="text" class="form-control" value="@Model.NgayDat.ToString("dd/MM/yyyy HH:mm")" />
+                                <input type="text" class="form-control" value="@Model.Display_NgayDat.ToString("dd/MM/yyyy HH:mm")" />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Tổng Tiền</label>
-                                <input type="text" class="form-control" value="@Model.TotalPrice.ToString("N0") đ" />
+                                <input type="text" class="form-control" value="@Model.Display_TotalPrice.ToString("N0") đ" />
                             </div>
                         </div>
                     </fieldset>
@@ -124,39 +133,28 @@
                     <p class="fw-bold">Thông tin có thể chỉnh sửa:</p>
 
                     <div class="mb-3">
-                        <label asp-for="KhachHang.Ten_KhachHang" class="form-label">Tên Người Nhận</label>
-                        <input asp-for="KhachHang.Ten_KhachHang" class="form-control" />
-                        <span asp-validation-for="KhachHang.Ten_KhachHang" class="text-danger"></span>
+                        <label asp-for="TenNguoiNhan" class="form-label"></label>
+                        <input asp-for="TenNguoiNhan" class="form-control" />
+                        <span asp-validation-for="TenNguoiNhan" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="KhachHang.SDT_KhachHang" class="form-label">SĐT Người Nhận</label>
-                        <input asp-for="KhachHang.SDT_KhachHang" class="form-control" />
-                        <span asp-validation-for="KhachHang.SDT_KhachHang" class="text-danger"></span>
+                        <label asp-for="SDTNguoiNhan" class="form-label"></label>
+                        <input asp-for="SDTNguoiNhan" class="form-control" />
+                        <span asp-validation-for="SDTNguoiNhan" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="ShippingAddress" class="form-label">Địa Chỉ Giao Hàng</label>
+                        <label asp-for="ShippingAddress" class="form-label"></label>
                         <textarea asp-for="ShippingAddress" class="form-control" rows="3"></textarea>
                         <span asp-validation-for="ShippingAddress" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Notes" class="form-label">Ghi Chú Đơn Hàng</label>
+                        <label asp-for="Notes" class="form-label"></label>
                         <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
                         <span asp-validation-for="Notes" class="text-danger"></span>
                     </div>
-
-                    @*
-                        LƯU Ý:
-                        - Controller của bạn dùng [Bind("M_DonHang,DiaChiGiaoHang,GhiChu,TenNguoiNhan,SDTNguoiNhan")] DonHang editedDonHang
-                        Điều này có nghĩa là chỉ những trường này mới được cập nhật từ form.
-                        - Nếu bạn muốn giữ nguyên giá trị của các trường khác không có trong [Bind] khi model được POST về,
-                          bạn không cần thêm hidden input cho chúng vì chúng sẽ không bị ghi đè bởi model binding nếu không có trong [Bind].
-                          Tuy nhiên, nếu bạn không dùng [Bind] và POST toàn bộ đối tượng DonHang, thì các trường không có input trên form
-                          sẽ bị null hoặc default, khi đó bạn cần hidden input cho những trường muốn giữ giá trị.
-                          Với cách dùng [Bind] như trên, bạn chỉ cần input cho những trường được phép sửa.
-                    *@
 
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i> Lưu Thay Đổi</button>
@@ -166,10 +164,9 @@
                 </form>
             </div>
         </div>
-    </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    @* Partial view cho các script validation (nếu bạn đã cấu hình) *@
     @await Html.PartialAsync("_ValidationScriptsPartial")
 </body>
 </html>

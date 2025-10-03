@@ -23,10 +23,18 @@
         Hahana
     </title>
     <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #8D6E63;
+            --light-bg: #F9FBE7;
+            --dark-text: #2E2E2E;
+            --card-border: #C8E6C9;
+        }
+
         body {
-            font-family: Arial;
-            background-color: white;
-            background-color: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
         }
 
         .container {
@@ -36,6 +44,54 @@
             margin: 0;
             padding: 0;
             flex-direction: row;
+        }
+
+        h1, h4, h5 {
+            color: var(--primary);
+        }
+
+        .card {
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            transition: transform 0.2s;
+            background-color: white;
+        }
+
+            .card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+            .btn-primary:hover {
+                background-color: #388E3C;
+                border-color: #388E3C;
+            }
+
+        .btn-outline-secondary {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: var(--secondary);
+                color: white;
+            }
+
+        .bg-light {
+            background-color: #F1F8E9 !important;
+        }
+
+        input[type="range"] {
+            accent-color: var(--primary);
+        }
+
+        .form-select {
+            border-color: var(--primary);
         }
     </style>
 </head>
@@ -58,28 +114,7 @@
                 </div>
                 <hr>
 
-                <div class="mb-3">
-                    <h5>Đặc tính</h5>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="feat1" checked>
-                        <label class="form-check-label" for="feat1">
-                            Hữu cơ (Organic)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="feat2">
-                        <label class="form-check-label" for="feat2">
-                            Độ ẩm thấp (&lt;15%)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="feat3">
-                        <label class="form-check-label" for="feat3">
-                            Đã nghiền
-                        </label>
-                    </div>
-                </div>
-
+               
             </div><div class="col-lg-9">
 
                 <div class="d-flex justify-content-between align-items-center mb-3 bg-light p-2 rounded">
@@ -116,7 +151,6 @@
                                         <p class="card-text mt-auto mb-2 fs-5 text-danger">
                                             <strong>Giá: @String.Format("{0:N0}", item.Gia)₫</strong>
                                         </p>
-                                        <button class="btn btn-success btn-sm w-100 mb-2" onclick="moModalMuaNgay('@item.TenSanPham', @item.Gia)">Mua ngay</button>
                                         <div class="mb-3">
                                             <!-- Thêm nút "Thêm vào giỏ hàng" vào giữa -->
                                             <a asp-controller="ShoppingCart" asp-action="AddToCart"
@@ -137,93 +171,13 @@
             </nav>
         </div>
     </div>
-    <!-- Modal -->
-    <div class="modal fade" id="muaNgayModal" tabindex="-1" aria-labelledby="muaNgayModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="muaNgayModalLabel">Mua sản phẩm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                </div>
-
-                <div class="modal-body">
-                    <form id="formMuaNgay">
-                        <div class="mb-3">
-                            <label class="form-label">Tên sản phẩm:</label>
-                            <input type="text" class="form-control" id="tenSanPham" readonly>
-                        </div><div class="mb-3">
-                            <label class="form-label">Giá sản phẩm:</label>
-                            <input type="text" class="form-control" id="giaSanPham" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tổng giá:</label>
-                            <div id="tongGia" style="font-weight: bold; color: green;">0 VNĐ</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Số lượng (Kg):</label>
-                            <input type="number" class="form-control" id="soLuong" min="0.1" step="0.1" required>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="xacNhanMua()" id="btnXacNhanMua">Xác nhận mua</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    @* modal mua ngay  *@
-    <script>
-                 function moModalMuaNgay(tenSanPham, giaSanPham) {
-          document.getElementById('tenSanPham').value = tenSanPham;
-          document.getElementById('giaSanPham').value = giaSanPham;
-          document.getElementById('soLuong').value = 1;
-
-          capNhatTongGia();
-
-          var myModal = new bootstrap.Modal(document.getElementById('muaNgayModal'));
-          myModal.show();
-        }
-
-        document.getElementById('soLuong').addEventListener('input', capNhatTongGia);
-
-        function capNhatTongGia() {
-          var gia = parseFloat(document.getElementById('giaSanPham').value);
-          var soLuong = parseFloat(document.getElementById('soLuong').value);
-          var tongGia = gia * soLuong;
-
-          document.getElementById('tongGia').innerText = tongGia.toLocaleString('vi-VN') + ' VNĐ';
-        }
-
-        document.getElementById('btnXacNhanMua').addEventListener('click', function() {
-          var ten = document.getElementById('tenSanPham').value;
-          var gia = parseFloat(document.getElementById('giaSanPham').value);
-          var soLuong = parseInt(document.getElementById('soLuong').value) || 1;
-          var tongGia = gia * soLuong;
-
-          if (soLuong <= 0) {
-            alert('Vui lòng nhập số lượng hợp lệ!');
-            return;
-          }
-
-          console.log('Đã đặt mua:', ten, gia, soLuong, '=> Tổng:', tongGia);
-
-          alert('Bạn đã đặt mua ' + soLuong + ' kg sản phẩm "' + ten + '" với tổng tiền ' + tongGia.toLocaleString('vi-VN') + ' VNĐ thành công!');
-
-          var modalEl = document.getElementById('muaNgayModal');
-          var modal = bootstrap.Modal.getInstance(modalEl);
-          modal.hide();
-        });
-    </script>
+   
 
     <script src="~/js/PhanTrangDSSP.js">
     </script>

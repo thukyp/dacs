@@ -9,7 +9,7 @@ namespace DACS.Models // <-- Kiểm tra lại namespace
         [StringLength(10)] // Giới hạn độ dài Mã Tỉnh/TP
         public string MaTinh { get; set; }
 
-        [Required(ErrorMessage = "Vui lòng nhập Tên Tỉnh/Thành phố.")]
+        
         [StringLength(100)]
         [Display(Name = "Tên Tỉnh/Thành phố")]
         public string TenTinh { get; set; }

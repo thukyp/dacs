@@ -576,14 +576,14 @@ namespace DACS.Areas.Owner.Controllers
                         // Tìm bản ghi tồn kho hiện có
                         var existingTonKho = await _context.TonKhos
                             .FirstOrDefaultAsync(tk => tk.MaKho == targetMaKho
-                                                    && tk.M_LoaiSP == maSanPham
+                                                    && tk.M_SanPham == maSanPham
                                                     && tk.M_DonViTinh == maDonViTinh);
 
                         if (existingTonKho != null)
                         {
-                            existingTonKho.SoLuong += soLuongCollected;
+                            existingTonKho.KhoiLuong += soLuongCollected;
                             _context.Update(existingTonKho); // Đánh dấu TonKho để được cập nhật
-                            _logger.LogInformation("Chuẩn bị cập nhật TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng +{SoLuong}. Tổng mới: {TongSoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected, existingTonKho.SoLuong);
+                            _logger.LogInformation("Chuẩn bị cập nhật TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng +{SoLuong}. Tổng mới: {TongSoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected, existingTonKho.KhoiLuong);
                         }
                         else
                         {
@@ -594,12 +594,10 @@ namespace DACS.Areas.Owner.Controllers
                                 // The variable 'maLoaiSP' was not defined in the context. It should be replaced with the correct variable name 'maSanPham'.
 
                                 // With this corrected line:
-                                M_LoaiSP = maSanPham,
-                                SoLuong = soLuongCollected,
+                                M_SanPham = maSanPham,
+                                KhoiLuong = soLuongCollected,
                                 M_DonViTinh = maDonViTinh,
-                                NgayNhapKho = DateTime.UtcNow.Date,
-                                HanSuDung = null,
-                                SoLo = null
+                               
                             };
                             _context.Add(newTonKho); // Đánh dấu TonKho mới để được thêm
                             _logger.LogInformation("Chuẩn bị thêm mới TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng: {SoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected);

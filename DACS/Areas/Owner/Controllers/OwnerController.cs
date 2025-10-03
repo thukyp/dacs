@@ -44,7 +44,7 @@ namespace DACS.Areas.Owner.Controllers
                 var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                 var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
                 decimal monthlyRevenue = (decimal)await _context.DonHangs
-                    .Where(dh => dh.NgayDat.Date >= firstDayOfMonth.Date && dh.NgayDat.Date <= lastDayOfMonth.Date && dh.TrangThai == "Đã giao")
+                    .Where(dh => dh.NgayDat.Date >= firstDayOfMonth.Date && dh.NgayDat.Date <= lastDayOfMonth.Date && dh.TrangThai == "Hoàn thành")
                     .SumAsync(dh => dh.TotalPrice);
 
                 // Đơn hàng mới (Tuần hiện tại)
@@ -81,7 +81,7 @@ namespace DACS.Areas.Owner.Controllers
                     var date = DateTime.Today.AddDays(-i);
                     revenueChartLabels.Add(date.ToString("dd/MM"));
                     decimal dailyRevenue = (decimal)await _context.DonHangs
-                        .Where(dh => dh.NgayDat.Date == date.Date && dh.TrangThai == "Đã giao")
+                        .Where(dh => dh.NgayDat.Date == date.Date && dh.TrangThai == "Hoàn thành")
                         // Thêm filter theo Owner/Shop nếu cần
                         .SumAsync(dh => dh.TotalPrice);
                     revenueChartData.Add(dailyRevenue / 1000000); // Ví dụ: Hiển thị theo triệu VND
@@ -101,30 +101,7 @@ namespace DACS.Areas.Owner.Controllers
 
                 return View(viewModel);
             }
-            public IActionResult DoanhThu()
-        {
-            return View();
-        }
-        public IActionResult QuanLyDonHang()
-        {
-            return View();
-        }
-        public IActionResult QuanLyGiaoDichThanhToan()
-        {
-            return View();
-        }
-        public IActionResult QuanLyTaiKhoan()
-        {
-            return View();
-        }
-        public IActionResult Quanlysanpham()
-        {
-            return View();
-        }
-        public IActionResult ThuGom()
-        {
-            return View();
-        }
+
     }
     
 }

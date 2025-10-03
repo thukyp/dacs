@@ -161,12 +161,11 @@
             <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="TonKho" asp-action="Index" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
             <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="ThongKe" asp-action="Index" class="nav-link"><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
         </ul>
-        <div class="mt-auto pt-3 border-top border-secondary logout-form">
-            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
-                <button type="submit" class="nav-link text-danger">
-                    <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+        <div class="nav-item mt-auto ">
+            <button type="submit" class="text-danger border-0 bg-transparent p-0 w-100 text-start mt-1">
+                @* Adjusted button style to better match list items *@
+                <a href="/home/index" class="border-0 text-danger" style="text-decoration: none;"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Về trang chủ</a>
                 </button>
-            </form>
         </div>
     </div>
     @* --- MAIN CONTENT --- *@

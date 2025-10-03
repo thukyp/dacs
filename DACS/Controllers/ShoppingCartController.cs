@@ -41,34 +41,41 @@ namespace DACS.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
+            var nguoiMuaProfile = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.UserId == user.Id);
 
-            // Kiểm tra xem người dùng đã có trong bảng KhachHangs chưa
-            var nguoiMuaProfile = await _context.KhachHangs
-                .FirstOrDefaultAsync(kh => kh.UserId == user.Id);
+            var errorMessages = new List<string>();
+            foreach (var item in cart.Items)
+            {
+                var tonKho = await _context.TonKhos.FirstOrDefaultAsync(t => t.M_SanPham == item.ProductId);
+                if (tonKho == null || item.Khoiluong > tonKho.KhoiLuong)
+                {
+                    var tonKhoHienTai = tonKho?.KhoiLuong ?? 0;
+                    errorMessages.Add($"Sản phẩm '{item.Name}' chỉ còn {tonKhoHienTai:N0}kg, bạn đặt {item.Khoiluong:N0}kg.");
+                }
+            }
 
-            // Kiểm tra hoặc tạo M_VanDon
+            if (errorMessages.Any())
+            {
+                ViewBag.CartErrors = errorMessages;
+                return View("Index", cart); // Trả về trang giỏ hàng kèm lỗi
+            }
+
+            // ======= TẠO MÃ VẬN ĐƠN ========
             string vanDonId = "VD" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
-
-            var vanChuyenExist = await _context.VanChuyens
-                .FirstOrDefaultAsync(vc => vc.M_VanDon == vanDonId);
-
+            var vanChuyenExist = await _context.VanChuyens.FirstOrDefaultAsync(vc => vc.M_VanDon == vanDonId);
             if (vanChuyenExist == null)
             {
-                // Nếu không có, bạn có thể tạo mới và cung cấp giá trị cho DonViVanChuyen
                 vanChuyenExist = new VanChuyen
                 {
                     M_VanDon = vanDonId,
-                    DonViVanChuyen = "DHL" // Cung cấp giá trị cho DonViVanChuyen
+                    DonViVanChuyen = "DHL"
                 };
                 _context.VanChuyens.Add(vanChuyenExist);
                 await _context.SaveChangesAsync();
             }
 
-            // Tạo mã đơn hàng tự động
-            var lastOrder = _context.DonHangs
-                .OrderByDescending(o => o.M_DonHang)
-                .FirstOrDefault();
-
+            // ======= TẠO MÃ ĐƠN HÀNG ========
+            var lastOrder = _context.DonHangs.OrderByDescending(o => o.M_DonHang).FirstOrDefault();
             int nextNumber = 1;
             if (lastOrder != null && lastOrder.M_DonHang.StartsWith("DH"))
             {
@@ -80,21 +87,17 @@ namespace DACS.Controllers
             }
 
             order.M_DonHang = "DH" + nextNumber.ToString("D6");
-            order.M_VanDon = vanChuyenExist.M_VanDon; // Gán M_VanDon đã xác nhận
-
-            // Đảm bảo gán giá trị cho TrangThai
-            order.TrangThai = order.TrangThai ?? "Chưa xử lý";  // Gán giá trị mặc định nếu TrangThai là null
-
-            order.M_KhachHang  = nguoiMuaProfile.M_KhachHang;
+            order.M_VanDon = vanChuyenExist.M_VanDon;
+            order.TrangThai = order.TrangThai ?? "Chưa xử lý";
+            order.M_KhachHang = nguoiMuaProfile.M_KhachHang;
             order.NgayDat = DateTime.UtcNow;
             order.TotalPrice = cart.Items.Sum(i => i.Price * i.Khoiluong);
-            order.TrangThaiThanhToan = "Chưa thanh toán"; // Gán giá trị mặc định cho trạng thái thanh toán
+            order.TrangThaiThanhToan = "Chưa thanh toán";
 
-
-            // Tiến hành thêm đơn hàng vào cơ sở dữ liệu
             _context.DonHangs.Add(order);
             await _context.SaveChangesAsync();
 
+            // ======= CHI TIẾT ĐƠN HÀNG ========
             order.ChiTietDatHangs = cart.Items.Select(i => new ChiTietDatHang
             {
                 M_KhachHang = nguoiMuaProfile.M_KhachHang,
@@ -108,16 +111,16 @@ namespace DACS.Controllers
                 NgayTao = DateTime.UtcNow,
                 Quantity = i.Quantity,
                 TrangThaiDonHang = "Chưa xử lý"
-                
             }).ToList();
 
-            _context.ChiTietDatHangs.AddRange(order.ChiTietDatHangs); // Thêm chi tiết đơn hàng vào bảng ChiTietDatHangs
+            _context.ChiTietDatHangs.AddRange(order.ChiTietDatHangs);
             await _context.SaveChangesAsync();
 
             HttpContext.Session.Remove("Cart");
 
-            return View("OrderCompleted", order.M_DonHang); // Trả về màn hình "Đặt hàng thành công"
+            return View("OrderCompleted", order.M_DonHang);
         }
+
 
 
 

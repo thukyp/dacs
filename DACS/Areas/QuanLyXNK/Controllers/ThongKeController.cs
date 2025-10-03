@@ -119,7 +119,7 @@ namespace DACS.Areas.QuanLyXNK.Controllers
 
                 var stockGrouped = await _context.TonKhos
                     .GroupBy(tk => new { tk.M_LoaiSP, tk.M_DonViTinh })
-                    .Select(g => new { g.Key.M_LoaiSP, g.Key.M_DonViTinh, TonHienTai = g.Sum(tk => tk.SoLuong) })
+                    .Select(g => new { g.Key.M_LoaiSP, g.Key.M_DonViTinh, TonHienTai = g.Sum(tk => tk.KhoiLuong) })
                     .ToListAsync();
                 _logger.LogInformation("Số lượng stockGrouped: {Count}", stockGrouped.Count);
 
