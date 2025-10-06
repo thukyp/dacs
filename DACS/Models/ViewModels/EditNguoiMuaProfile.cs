@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DACS.Models.ViewModels
 {
@@ -17,23 +19,23 @@ namespace DACS.Models.ViewModels
         public string? Email_NguoiMua { get; set; } // Giữ nullable nếu không bắt buộc
 
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
-        [StringLength(20, ErrorMessage = "Số điện thoại không được vượt quá 20 ký tự.")]
+        [StringLength(10, ErrorMessage = "Số điện thoại không được vượt quá 20 ký tự.")]
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]
-        [Display(Name = "Số điện thoại")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Số điện thoại phải gồm đúng 10 chữ số")]
         public string SDT_NguoiMua { get; set; } // Đổi thành string (không nullable)
 
         // --- Địa chỉ chi tiết (Giả sử Mã là string) ---
-        [Required(ErrorMessage = "Vui lòng chọn Tỉnh/Thành phố.")]
+        
         [Display(Name = "Tỉnh/Thành phố")]
         public string Edit_DiaChi_TinhTP { get; set; } // <<< Đổi thành string, thêm Display
 
-        [Required(ErrorMessage = "Vui lòng chọn Quận/Huyện.")]
         [Display(Name = "Quận/Huyện")]
         public string Edit_DiaChi_QuanHuyen { get; set; } // <<< Đổi thành string, thêm Display
 
-        [Required(ErrorMessage = "Vui lòng chọn Xã/Phường.")]
         [Display(Name = "Xã/Phường")]
         public string Edit_DiaChi_XaPhuong { get; set; } // <<< Đổi thành string, thêm Display
+
+       
 
         [StringLength(200)]
         [Display(Name = "Số nhà, Đường/Ấp/Thôn")]
@@ -55,5 +57,7 @@ namespace DACS.Models.ViewModels
 
         [Display(Name = "Địa chỉ đầy đủ")]
         public string? HienThiDiaChiDayDu { get; set; }
+        
+
     }
 }

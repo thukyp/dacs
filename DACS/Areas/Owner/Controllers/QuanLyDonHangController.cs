@@ -10,7 +10,7 @@ using System.Linq; // For LINQ methods like .Any()
 using System.Threading.Tasks; // For Task
 using System.Collections.Generic; // For List
 
-namespace DACS.Areas.QuanLyDH.Controllers
+namespace DACS.Areas.Owner.Controllers
 {
     [Area("Owner")]
     [Authorize(Roles = "Owner")]

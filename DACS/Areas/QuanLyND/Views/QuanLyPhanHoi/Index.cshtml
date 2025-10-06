@@ -24,18 +24,56 @@
             color: #fff;
             padding: 15px;
             width: 250px;
+            flex-shrink: 0;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+            .sidebar h4 {
+                border-bottom: 1px solid #495057;
+                padding-bottom: 10px;
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+                font-weight: 600;
+            }
+
+            .sidebar .nav {
+                flex-grow: 1;
+            }
 
             .sidebar .nav-link {
                 color: #adb5bd;
                 padding: 8px 15px;
+                border-radius: 0.25rem;
+                margin-bottom: 5px;
+                font-size: 0.9rem;
             }
 
                 .sidebar .nav-link.active, .sidebar .nav-link:hover {
                     color: #fff;
                     background-color: #495057;
-                    border-radius: 0.25rem;
+                }
+
+            .sidebar .nav-item.mt-auto {
+                margin-top: auto;
+                border-top: 1px solid #495057;
+                padding-top: 15px;
+            }
+
+            .sidebar .logout-form button {
+                padding: 8px 15px;
+                color: #dc3545;
+                background: none;
+                border: none;
+                width: 100%;
+                text-align: left;
+                font-size: 0.9rem;
+            }
+
+                .sidebar .logout-form button:hover {
+                    background-color: rgba(220, 53, 69, 0.1);
+                    color: #bd2130;
                 }
 
         .main-content {
@@ -81,15 +119,18 @@
         <div class="sidebar">
             <h4>Quản Lý ND</h4>
             <ul class="nav flex-column">
-
-                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyND" asp-action="Index" class="nav-link active"><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
-                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyPhanHoi" asp-action="Index" class="nav-link "><i class="fas fa-comments me-2"></i> Phản hồi & Đánh giá</a></li>
-                @* <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyND" asp-action="QuanLyHanhDong" class="nav-link "><i class="fas fa-history me-2"></i> Lịch sử hoạt động</a></li> *@
-                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanLyHoTro" asp-action="Index" class="nav-link "><i class="fas fa-headset me-2"></i> Hỗ trợ người dùng</a></li>
-                @* <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyND" asp-action="QuanLyBaoCao" class="nav-link "><i class="fas fa-chart-bar me-2"></i> Báo cáo người dùng</a></li> *@
-
-                <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+                @* Set the correct 'active' class based on the current page/controller *@
+                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyND" asp-action="Index" class="nav-link "><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
+				<li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyPhanHoi" asp-action="Index" class="nav-link active"><i class="fas fa-comments me-2"></i> Phản hồi & Đánh giá</a></li>
+                <li class="nav-item"><a asp-area="QuanlyND" asp-controller="QuanlyHoTro" asp-action="Index" class="nav-link"><i class="fas fa-headset me-2"></i> Hỗ trợ người dùng</a></li>
+                @* Add other links as needed *@
             </ul>
+            <div class="nav-item mt-auto ">
+                <button type="submit" class="text-danger border-0 bg-transparent p-0 w-100 text-start mt-1">
+                    @* Adjusted button style to better match list items *@
+                    <a href="/home/index" class="border-0 text-danger" style="text-decoration: none;"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Về trang chủ</a>
+                </button>
+            </div>
         </div>
 
         <div class="main-content flex-grow-1">

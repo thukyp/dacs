@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 
 using System.Security.Claims;
@@ -72,6 +73,39 @@ namespace DACS.Controllers
 
             return View();
 
+        }
+
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
+        // Xử lý form liên hệ (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Contact(ChiTietLienHe model)
+        {
+            // Kiểm tra nếu người dùng chưa đăng nhập
+           
+
+
+            try
+            {
+                model.Id = Guid.NewGuid().ToString("N").Substring(0, 10);
+                model.NgayGui = DateTime.UtcNow;
+                model.TrangThai = "chưa xử lý";
+                _context.ChiTietLienHe.Add(model);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Thông tin liên hệ của bạn đã được gửi thành công.";
+                return RedirectToAction("Contact");
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu cần
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại sau.";
+                return View(model);
+            }
         }
 
         // GET: /Home/ThuGom
@@ -275,17 +309,27 @@ namespace DACS.Controllers
 
         {
 
-            string prefix = "YC";
+            string prefix = "YC" + DateTime.Now.ToString("yyMMdd");
+            var todayCodes = _context.YeuCauThuGoms
+                .Where(y => y.M_YeuCau.StartsWith(prefix))
+                .OrderByDescending(y => y.M_YeuCau)
+                .Select(y => y.M_YeuCau)
+                .FirstOrDefault();
 
-            string timestamp = DateTime.UtcNow.ToString("yyMMddHHmm"); // Dùng UTC
+            int nextNumber = 1;
 
-            string randomPart = new Random().Next(1000, 9999).ToString();
+            if (!string.IsNullOrEmpty(todayCodes))
+            {
+                // Lấy phần số sau prefix
+                string numberPart = todayCodes.Substring(prefix.Length);
+                if (int.TryParse(numberPart, out int parsed))
+                {
+                    nextNumber = parsed + 1;
+                }
+            }
 
-            // Cần kiểm tra tính duy nhất trong DB trước khi trả về mã này trong môi trường thực tế
-
-            return $"{prefix}{timestamp}{randomPart}".Substring(0, 10); // Giới hạn 10 ký tự nếu cần
-
-        }
+            return prefix + nextNumber.ToString("D2");
+        }
 
 
 
@@ -299,13 +343,7 @@ namespace DACS.Controllers
 
         }
 
-        public IActionResult Contact()
-
-        {
-
-            return View();
-
-        }
+        
 
         public IActionResult News()
 

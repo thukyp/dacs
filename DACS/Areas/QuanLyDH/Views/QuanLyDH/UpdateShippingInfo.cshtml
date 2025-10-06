@@ -15,9 +15,17 @@
     <link rel="stylesheet" href="~/css/AdminLayout.css" /> @* Giả sử bạn có file này *@
     <style>
         /* CSS cơ bản cho sidebar và main content (tương tự Index.cshtml) */
-        .container-fluid.d-flex {
-            height: 100vh;
+        body, html {
+            height: 100%;
+        }
+
+        .container {
+            display: grid;
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
             padding: 0;
+            flex-direction: row;
         }
 
         .sidebar {
@@ -68,15 +76,7 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid d-flex p-0">
-        <div class="sidebar">
-            <h2>OWNER</h2>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="Index" class="nav-link"><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
-                <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="QuanLyThanhToan" class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh Toán</a></li>
-                @* Thêm các mục menu khác nếu có *@
-            </ul>
-        </div>
+    
 
         <div class="main-content-area">
             <div class="page-header">@ViewData["Title"]</div>
@@ -105,7 +105,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @* Thêm script cần thiết khác *@

@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8">
@@ -17,10 +21,25 @@
         Liên hệ
     </title>
     <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #8D6E63;
+            --light-bg: #F9FBE7;
+            --dark-text: #2E2E2E;
+            --card-border: #C8E6C9;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            
+            margin-bottom: 30px;
+        }
+
         body {
-            font-family: Arial;
-            background-color: white;
-            background-color: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
         }
 
         .container {
@@ -38,11 +57,7 @@
             padding: 40px 20px;
         }
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
+        
 
         .contact-wrapper {
             display: flex;
@@ -129,10 +144,10 @@
 
             <div class="contact-form">
                 <h2>Gửi tin nhắn</h2>
-                <form action="#" method="post">
-                    <input type="text" name="name" placeholder="Họ và tên" required>
+                <form asp-action="Contact" method="post">
+                    <input type="text" name="HoTen" placeholder="Họ và tên" required>
                     <input type="email" name="email" placeholder="Email của bạn" required>
-                    <textarea name="message" placeholder="Nội dung liên hệ..." required></textarea>
+                    <textarea name="NoiDung" placeholder="Nội dung liên hệ..." required></textarea>
                     <button type="submit">Gửi liên hệ</button>
                 </form>
             </div>

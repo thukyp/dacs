@@ -41,7 +41,7 @@
                 @* ... (Copy phần <div class="mb-3 row align-items-center">... đến hết các input fields) ... *@
                 <div class="mb-3 row align-items-center">
                     <label class="col-sm-3 col-form-label">Ảnh đại diện</label>
-                    <div class="col-sm-9"> <div class="d-flex align-items-center"> <img id="avatarPreviewEdit" src="@avatarPath" alt="Xem trước" class="profile-avatar-display me-3" style="width:80px; height:80px;" onerror="this.src='@defaultAvatar'"> <div> <label for="avatarUploadInput" class="avatar-upload-label"> <i class="fas fa-camera"></i> Chọn ảnh mới... </label> <input asp-for="ProfileImageFile" type="file" id="avatarUploadInput" accept="image/*" class="form-control" style="display: none;" onchange="previewEditImage(event)" /> <span asp-validation-for="ProfileImageFile" class="text-danger d-block"></span> <small class="form-text text-muted d-block">JPG, PNG, GIF. Tối đa 2MB.</small> </div> </div> </div>
+                    <div class="col-sm-9"> <div class="d-flex align-items-center"> <img id="avatarPreviewEdit" alt="Xem trước" class="profile-avatar-display me-3" style="width:80px; height:80px;" onerror="this.src='@defaultAvatar'"> <div> <label for="avatarUploadInput" class="avatar-upload-label"> <i class="fas fa-camera"></i> Chọn ảnh mới... </label> <input asp-for="ProfileImageFile" type="file" id="avatarUploadInput" accept="image/*" class="form-control" style="display: none;" onchange="previewEditImage(event)" /> <span asp-validation-for="ProfileImageFile" class="text-danger d-block"></span> <small class="form-text text-muted d-block">JPG, PNG, GIF. Tối đa 2MB.</small> </div> </div> </div>
                 </div>
                 <div class="mb-3 row"> <label asp-for="Ten_NguoiMua" class="col-sm-3 col-form-label"></label> <div class="col-sm-9"> <input asp-for="Ten_NguoiMua" class="form-control" /> <span asp-validation-for="Ten_NguoiMua" class="text-danger"></span> </div> </div>
                 <div class="mb-3 row"> <label asp-for="Email_NguoiMua" class="col-sm-3 col-form-label"></label> <div class="col-sm-9"> <input asp-for="Email_NguoiMua" class="form-control" /> <span asp-validation-for="Email_NguoiMua" class="text-danger"></span> </div> </div>
@@ -49,7 +49,8 @@
                 <div class="mb-3 row">
                     <label asp-for="Edit_DiaChi_TinhTP" class="col-sm-3 col-form-label"></label>
                     <div class="col-sm-9">
-                        <select asp-for="Edit_DiaChi_TinhTP" asp-items="@ViewBag.ProvinceOptions" class="form-select" id="provinceSelect">
+                        <select asp-for="Edit_DiaChi_TinhTP" asp-items="@ViewBag.ProvinceOptions" class="form-select" id="provinceSelect"
+                                data-districts-url="@Url.Action("GetDistricts", "KhachHang", new { area = "KhachHang" })">
                             <option value="">-- Chọn Tỉnh/Thành phố --</option>
                         </select>
                         <span asp-validation-for="Edit_DiaChi_TinhTP" class="text-danger"></span>
@@ -59,7 +60,8 @@
                 <div class="mb-3 row">
                     <label asp-for="Edit_DiaChi_QuanHuyen" class="col-sm-3 col-form-label"></label>
                     <div class="col-sm-9">
-                        <select asp-for="Edit_DiaChi_QuanHuyen" asp-items="@ViewBag.DistrictOptions" class="form-select" id="districtSelect">
+                        <select asp-for="Edit_DiaChi_QuanHuyen" asp-items="@ViewBag.DistrictOptions" class="form-select" id="districtSelect"
+                                data-wards-url="@Url.Action("GetWards", "KhachHang", new { area = "KhachHang" })">
                             <option value="">-- Chọn Quận/Huyện --</option>
                         </select>
                         <span asp-validation-for="Edit_DiaChi_QuanHuyen" class="text-danger"></span>
@@ -101,12 +103,14 @@ else
 }
 
 
+@* Ở cuối file Edit.cshtml *@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    @* Giữ nguyên phần script preview ảnh *@
+    @* Giữ nguyên phần script preview ảnh của bạn *@
     <script>
+        // ... (script previewEditImage của bạn ở đây) ...
         const avatarPreview = document.getElementById('avatarPreviewEdit');
         const avatarUploadInput = document.getElementById('avatarUploadInput');
         function previewEditImage(event) {
@@ -115,4 +119,77 @@ else
             if (event.target.files && event.target.files[0]) { reader.readAsDataURL(event.target.files[0]); }
         }
     </script>
+
+    <script>
+        $(document).ready(function () {
+            var provinceSelect = $('#provinceSelect');
+            var districtSelect = $('#districtSelect');
+            var wardSelect = $('#wardSelect');
+
+            var districtsUrl = provinceSelect.data('districts-url');
+            var wardsUrl = districtSelect.data('wards-url');
+
+            provinceSelect.on('change', function () {
+                var provinceId = $(this).val();
+                districtSelect.empty().append('<option value="">-- Đang tải Quận/Huyện... --</option>').prop('disabled', true);
+                wardSelect.empty().append('<option value="">-- Chọn Xã/Phường --</option>').prop('disabled', true);
+
+                if (provinceId) {
+                    var url = districtsUrl + '?provinceId=' + provinceId;
+                    console.log("Requesting Districts URL:", url);
+
+                    $.getJSON(url)
+                        .done(function (data) {
+                            districtSelect.empty();
+                            if (data && data.length > 0) {
+                                districtSelect.append('<option value="">-- Chọn Quận/Huyện --</option>').prop('disabled', false);
+                                $.each(data, function (index, item) {
+                                    districtSelect.append($('<option>', {
+                                        value: item.value,
+                                        text: item.text
+                                    }));
+                                });
+                            } else {
+                                districtSelect.append('<option value="">-- Không có Quận/Huyện --</option>');
+                            }
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            console.error("Lỗi khi tải Quận/Huyện:", textStatus, errorThrown);
+                            districtSelect.empty().append('<option value="">Lỗi tải Quận/Huyện</option>');
+                        });
+                }
+            });
+
+            districtSelect.on('change', function () {
+                var districtId = $(this).val();
+                wardSelect.empty().append('<option value="">-- Đang tải Xã/Phường... --</option>').prop('disabled', true);
+
+                if (districtId) {
+                    var url = wardsUrl + '?districtId=' + districtId;
+                    console.log("Requesting Wards URL:", url);
+
+                    $.getJSON(url)
+                        .done(function (data) {
+                            wardSelect.empty();
+                            if (data && data.length > 0) {
+                                wardSelect.append('<option value="">-- Chọn Xã/Phường --</option>').prop('disabled', false);
+                                $.each(data, function (index, item) {
+                                    wardSelect.append($('<option>', {
+                                        value: item.value,
+                                        text: item.text
+                                    }));
+                                });
+                            } else {
+                                wardSelect.append('<option value="">-- Không có Xã/Phường --</option>');
+                            }
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            console.error("Lỗi khi tải Xã/Phường:", textStatus, errorThrown);
+                            wardSelect.empty().append('<option value="">Lỗi tải Xã/Phường</option>');
+                        });
+                }
+            });
+        });
+    </script>
+
 }

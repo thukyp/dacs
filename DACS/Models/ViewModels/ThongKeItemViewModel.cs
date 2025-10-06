@@ -17,7 +17,7 @@ namespace DACS.Models.ViewModels
         public long TongXuat { get; set; } // Tổng xuất trong kỳ
 
         [Display(Name = "Tồn hiện tại")]
-        public long TonHienTai { get; set; } // Tồn cuối kỳ (lấy từ TonKho)
+        public float TonHienTai { get; set; } // Tồn cuối kỳ (lấy từ TonKho)
 
         [Display(Name = "Chênh lệch")]
         public long ChenhLech => TongNhap - TongXuat; // Chênh lệch Nhập - Xuất trong kỳ

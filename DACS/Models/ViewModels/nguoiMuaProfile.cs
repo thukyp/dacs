@@ -22,15 +22,15 @@ namespace DACS.Models.ViewModels
         public string SDT_NguoiMua { get; set; } // Đổi thành string (không nullable)
 
         // --- Địa chỉ chi tiết (Giả sử Mã là string) ---
-        [Required(ErrorMessage = "Vui lòng chọn Tỉnh/Thành phố.")]
+        
         [Display(Name = "Tỉnh/Thành phố")]
         public string DiaChi_TinhTP { get; set; } // <<< Đổi thành string, thêm Display
 
-        [Required(ErrorMessage = "Vui lòng chọn Quận/Huyện.")]
+        
         [Display(Name = "Quận/Huyện")]
         public string DiaChi_QuanHuyen { get; set; } // <<< Đổi thành string, thêm Display
 
-        [Required(ErrorMessage = "Vui lòng chọn Xã/Phường.")]
+        
         [Display(Name = "Xã/Phường")]
         public string DiaChi_XaPhuong { get; set; } // <<< Đổi thành string, thêm Display
 
