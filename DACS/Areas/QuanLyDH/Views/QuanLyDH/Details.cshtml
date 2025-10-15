@@ -98,20 +98,7 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid d-flex p-0">
-        <div class="sidebar">
-            <h2>OWNER</h2>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="Index" class="nav-link"><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
-                <li class="nav-item"><a asp-area="QuanLyDH" asp-controller="QuanLyDH" asp-action="QuanLyThanhToan" class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh Toán</a></li>
-            </ul>
-        </div>
-
-        <div class="main-content-area">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="page-header">@ViewData["Title"]</div>
-                <a asp-action="Index" asp-controller="QuanLyDH" asp-area="QuanLyDH" class="btn btn-outline-secondary mb-3"><i class="fas fa-arrow-left me-2"></i> Quay Lại Danh Sách</a>
-            </div>
+    
 
             @if (TempData["SuccessMessage"] != null)
             {
@@ -179,6 +166,10 @@
                     </form>
                 }
                 <a asp-action="UpdatePaymentStatus" asp-controller="QuanLyDH" asp-area="QuanLyDH" asp-route-id="@Model.M_DonHang" class="btn btn-info"><i class="far fa-credit-card me-1"></i> Cập nhật TT Thanh Toán</a>
+        <a asp-controller="QuanLyDH" asp-action="index">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại
+        </a>
+
             </div>
 
 
@@ -280,7 +271,7 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">Sản Phẩm</th>
-                                        <th scope="col" class="text-center">SL</th>
+                                        <th scope="col" class="text-center">KL</th>
                                         <th scope="col" class="text-end">Đơn Giá</th>
                                         <th scope="col" class="text-end">Thành Tiền</th>
                                     </tr>
@@ -296,20 +287,20 @@
                                                     <img src="~/@item.SanPham.AnhSanPham" alt="@item.SanPham.TenSanPham" style="width: 30px; height: 30px; object-fit: cover; margin-left: 5px;" />
                                                 }
                                             </td>
-                                            <td class="text-center">@item.Quantity</td>
+                                            <td class="text-center">@item.Khoiluong</td>
                                             <td class="text-end">@item.GiaDatHang.ToString("N0") đ</td>
-                                            <td class="text-end">@((item.Quantity * item.GiaDatHang).ToString("N0")) đ</td>
+                                            <td class="text-end">@((item.Khoiluong * item.GiaDatHang).ToString("N0")) đ</td>
                                         </tr>
                                     }
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="3" class="text-end fw-bold">Tổng cộng sản phẩm:</td>
-                                        <td class="text-end fw-bold">@Model.ChiTietDatHangs.Sum(c => c.Quantity  * c.GiaDatHang).ToString("N0") đ</td>
+                                        <td class="text-end fw-bold">@Model.ChiTietDatHangs.Sum(c => c.Khoiluong  * c.GiaDatHang).ToString("N0") đ</td>
                                     </tr>
                                     <tr>
                                         <td colspan="3" class="text-end fw-bold">Phí vận chuyển:</td>
-                                        <td class="text-end fw-bold">@((Model.TotalPrice - Model.ChiTietDatHangs.Sum(c => c.Quantity * c.GiaDatHang)).ToString("N0")) đ</td>
+                                        <td class="text-end fw-bold">0 đ</td>
                                     </tr>
                                     <tr>
                                         <td colspan="3" class="text-end fw-bold h5">Tổng Thanh Toán:</td>

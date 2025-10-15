@@ -45,5 +45,6 @@ namespace DACS.Models
         public string TrangThaiDonHang { get; set; }
         public string ProductId { get; set; }
         public int Quantity { get; set; }
+        
     }
 }

@@ -22,29 +22,22 @@ namespace DACS.Models
         public string? Email_KhachHang { get; set; } // <<< Cho phép null
 
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
-        [StringLength(20)]
+        [StringLength(10)]
         [Phone]
         public string SDT_KhachHang { get; set; }
 
-        // --- XÓA CÁC TRƯỜNG TÊN ĐỊA CHỈ CŨ ---
-        // public string? DiaChi_TinhTP { get; set; }
-        // public string? DiaChi_QuanHuyen { get; set; }
-        // public string? DiaChi_XaPhuong { get; set; }
-        // -----------------------------------
-
         // --- THÊM CÁC TRƯỜNG KHÓA NGOẠI MÃ ĐỊA CHỈ ---
         // Kiểu dữ liệu (string/int) và độ dài phải khớp với Khóa chính của bảng ĐVHC
-        [Required(ErrorMessage = "Vui lòng chọn Tỉnh/Thành phố.")]
+        
         [StringLength(10)] // Hoặc int
         [Display(Name = "Tỉnh/Thành phố")]
         public string MaTinh { get; set; } // <<< Khóa ngoại đến TinhThanhPho
 
-        [Required(ErrorMessage = "Vui lòng chọn Quận/Huyện.")]
+        
         [StringLength(10)] // Hoặc int
         [Display(Name = "Quận/Huyện")]
         public string MaQuan { get; set; } // <<< Khóa ngoại đến QuanHuyen
 
-        [Required(ErrorMessage = "Vui lòng chọn Xã/Phường.")]
         [StringLength(10)] // Hoặc int
         [Display(Name = "Xã/Phường")]
         public string MaXa { get; set; } // <<< Khóa ngoại đến XaPhuong
@@ -80,11 +73,14 @@ namespace DACS.Models
 
         [ForeignKey("MaXa")] // Đảm bảo ForeignKey trỏ đúng vào thuộc tính MaXa ở trên
         public virtual XaPhuong? XaPhuong { get; set; } // Cho phép null nếu DB cho phép
-        // --- Kết thúc Navigation địa chỉ ---
-
+                                                        // --- Kết thúc Navigation địa chỉ ---
+        [ForeignKey("Id")] // Đảm bảo ForeignKey trỏ đúng vào thuộc tính MaXa ở trên
+        public virtual ChiTietLienHe? ChiTietLienHe { get; set; }
         public virtual ICollection<ChiTietDatHang> ChiTietDatHangs { get; set; } = new List<ChiTietDatHang>();
         public virtual ICollection<ChiTietDanhGia> ChiTietDanhGias { get; set; } = new List<ChiTietDanhGia>();
         public virtual ICollection<YeuCauThuGom> YeuCauThuGoms { get; set; } = new List<YeuCauThuGom>();
+        public virtual ICollection<ChatHistory> ChatHistories { get; set; } = new List<ChatHistory>();
+
         // -----------------------------
     }
 }

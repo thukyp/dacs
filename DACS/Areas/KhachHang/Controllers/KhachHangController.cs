@@ -206,7 +206,6 @@ namespace DACS.Areas.KhachHang.Controllers
                     Ten_KhachHang = user.FullName ?? user.UserName ?? "Chưa đặt tên",
                     Email_KhachHang = user.Email ?? "Chưa có email",
                     SDT_KhachHang = user.PhoneNumber ?? "Chưa có SĐT",
-                    // Để null nếu DB cho phép và người dùng sẽ cập nhật sau
                     MaTinh = "T00",
                     MaQuan = "Q0100",
                     MaXa = "X010100",
@@ -283,7 +282,6 @@ namespace DACS.Areas.KhachHang.Controllers
                 Ten_NguoiMua = nguoiMuaProfile.Ten_KhachHang,
                 Email_NguoiMua = nguoiMuaProfile.Email_KhachHang,
                 SDT_NguoiMua = nguoiMuaProfile.SDT_KhachHang,
-                // Vẫn có thể gán các trường Edit_... nếu ViewModel này dùng chung cho cả View Edit
                 Edit_DiaChi_TinhTP = nguoiMuaProfile.MaTinh,
                 Edit_DiaChi_QuanHuyen = nguoiMuaProfile.MaQuan,
                 Edit_DiaChi_XaPhuong = nguoiMuaProfile.MaXa,
@@ -345,7 +343,6 @@ namespace DACS.Areas.KhachHang.Controllers
                 ViewBag.DistrictOptions = new SelectList(Enumerable.Empty<SelectListItem>(), "MaQuan", "TenQuan");
             }
 
-            // 3. Tải Xã/Phường DỰA VÀO Quận/Huyện hiện tại (nếu có)
             if (!string.IsNullOrEmpty(viewModel.Edit_DiaChi_QuanHuyen))
             {
                 var wards = await _context.XaPhuongs
@@ -365,9 +362,39 @@ namespace DACS.Areas.KhachHang.Controllers
 
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetDistricts(string provinceId) // Tên tham số "provinceId" phải khớp với data gửi từ AJAX
+        {
+            if (string.IsNullOrEmpty(provinceId))
+            {
+                return Json(new List<object>()); // Trả về danh sách rỗng nếu không có provinceId
+            }
 
+            var districts = await _context.QuanHuyens // Giả sử _context là ApplicationDbContext của bạn
+                                          .Where(q => q.MaTinh == provinceId)
+                                          .OrderBy(q => q.TenQuan)
+                                          .Select(q => new { value = q.MaQuan, text = q.TenQuan }) // Quan trọng: trả về value và text
+                                          .ToListAsync();
+            return Json(districts);
+        }
 
-        [HttpPost]
+        [HttpGet]
+        public async Task<IActionResult> GetWards(string districtId) // Tên tham số "districtId" phải khớp
+        {
+            if (string.IsNullOrEmpty(districtId))
+            {
+                return Json(new List<object>()); // Trả về danh sách rỗng
+            }
+
+            var wards = await _context.XaPhuongs // Giả sử _context là ApplicationDbContext của bạn
+                                      .Where(w => w.MaQuan == districtId)
+                                      .OrderBy(w => w.TenXa)
+                                      .Select(w => new { value = w.MaXa, text = w.TenXa }) // Quan trọng: trả về value và text
+                                      .ToListAsync();
+            return Json(wards);
+        }
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditNguoiMuaProfile model) // Giả sử ViewModel tên là EditNguoiMuaProfile
         {
@@ -1075,29 +1102,11 @@ namespace DACS.Areas.KhachHang.Controllers
             }
 
         }
-
-
-
-
-
-        // ========== PHẦN THÊM MỚI CHO TẠO/SỬA ==========
-
-
-
-        // --- Action Tạo Yêu Cầu - GET (Di chuyển từ HomeController) ---
-
         [HttpGet]
-
         public async Task<IActionResult> Create() // Đổi tên từ ThuGom thành Create
 
         {
-
-            // Load dữ liệu cho dropdowns (Đã sửa để lấy đúng SanPhams/LoaiSanPhams theo lựa chọn cuối)
-
             await LoadDropdownDataAsync(); // Gọi hàm helper load dropdown
-
-
-
             return View("Create", new ThuGomViewModel()); // Trả về View Create.cshtml
 
         }
@@ -1531,24 +1540,7 @@ namespace DACS.Areas.KhachHang.Controllers
 
                 yeuCauGoc.GhiChu = model.SupplierNotes;
 
-                // Cập nhật địa chỉ nếu cho phép sửa ở đây? Thường nên sửa ở profile KhachHang
-
-                // yeuCauGoc.KhachHang.DiaChi_... = model.Supplier...; // KHÔNG NÊN LÀM THẾ NÀY TRỰC TIẾP
-
-
-
-                // Xử lý ảnh (phức tạp hơn: xóa ảnh cũ nếu có ảnh mới, lưu ảnh mới)
-
-                // Tạm thời bỏ qua xử lý ảnh trong Edit để đơn giản
-
-                // Nếu cần, tham khảo logic upload/delete trong Action Edit Profile
-
-
-
-                // Cập nhật ChiTietThuGom
-
                 chiTietGoc.M_LoaiSP = model.ByproductType; // Cập nhật loại SP
-
                 chiTietGoc.M_DonViTinh = model.ByproductUnit;
 
                 chiTietGoc.SoLuong = (int)model.ByproductQuantity.Value;
@@ -1711,11 +1703,8 @@ namespace DACS.Areas.KhachHang.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
         public IActionResult Error()
-
         {
-
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-
         }
 
 
@@ -1723,7 +1712,6 @@ namespace DACS.Areas.KhachHang.Controllers
         private async Task LoadDropdownDataAsync(ThuGomViewModel? model = null)
 
         {
-
             var sanPhamList = await _context.LoaiSanPhams.OrderBy(sp => sp.TenLoai).ToListAsync(); // Dùng LoaiSanPham theo yêu cầu cuối
 
             ViewData["LoaiSanPhamOptions"] = new SelectList(sanPhamList, "M_LoaiSP", "TenLoai", model?.ByproductType); // Giữ giá trị chọn nếu có
@@ -1736,7 +1724,70 @@ namespace DACS.Areas.KhachHang.Controllers
 
         }
 
+        [HttpGet] // Action này chỉ đáp ứng yêu cầu GET
+        public async Task<JsonResult> GetDistrictsForHome(string provinceId) // Nhận MaTinh từ AJAX
+        {
+            // Kiểm tra xem provinceId có được gửi lên không
+            if (string.IsNullOrEmpty(provinceId))
+            {
+                // Trả về một danh sách rỗng nếu không có provinceId
+                return Json(new List<object>());
+            }
 
+            try
+            {
+                // Truy vấn database để lấy các Quận/Huyện thuộc Tỉnh/TP đã chọn
+                var districts = await _context.QuanHuyens // Sử dụng DbContext của bạn
+                                        .Where(q => q.MaTinh == provinceId) // Lọc theo MaTinh
+                                        .OrderBy(q => q.TenQuan) // Sắp xếp theo tên
+                                                                 // Chọn chỉ Mã và Tên để gửi về trình duyệt (nhẹ hơn)
+                                                                 // Đặt tên thuộc tính là 'id' và 'name' để JavaScript dễ dùng
+                                        .Select(q => new { id = q.MaQuan, name = q.TenQuan })
+                                        .ToListAsync();
+
+                // Trả về danh sách dưới dạng JSON
+                return Json(districts);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Lỗi khi lấy Quận/Huyện cho Tỉnh ID: {provinceId}");
+                // Cân nhắc trả về một đối tượng lỗi để JS biết và xử lý
+                // return Json(new { error = "Lỗi tải dữ liệu Quận/Huyện." });
+                return Json(new List<object>()); // Hoặc trả về rỗng khi lỗi
+            }
+        }
+
+        [HttpGet] // Action này chỉ đáp ứng yêu cầu GET
+        public async Task<JsonResult> GetWardsForHome(string districtId) // Nhận MaQuan từ AJAX
+        {
+            // Kiểm tra xem districtId có được gửi lên không
+            if (string.IsNullOrEmpty(districtId))
+            {
+                // Trả về một danh sách rỗng nếu không có districtId
+                return Json(new List<object>());
+            }
+
+            try
+            {
+                // Truy vấn database để lấy các Xã/Phường thuộc Quận/Huyện đã chọn
+                var wards = await _context.XaPhuongs // Sử dụng DbContext của bạn
+                                       .Where(w => w.MaQuan == districtId) // Lọc theo MaQuan
+                                       .OrderBy(w => w.TenXa) // Sắp xếp theo tên
+                                                              // Chọn chỉ Mã và Tên
+                                                              // Đặt tên thuộc tính là 'id' và 'name'
+                                       .Select(w => new { id = w.MaXa, name = w.TenXa })
+                                       .ToListAsync();
+
+                // Trả về danh sách dưới dạng JSON
+                return Json(wards);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Lỗi khi lấy Xã/Phường cho Quận ID: {districtId}");
+                // return Json(new { error = "Lỗi tải dữ liệu Xã/Phường." });
+                return Json(new List<object>()); // Trả về rỗng khi lỗi
+            }
+        }
 
     }
 

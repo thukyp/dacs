@@ -597,9 +597,9 @@ namespace DACS.Areas.QuanLyXNK.Controllers
 
                         if (existingTonKho != null)
                         {
-                            existingTonKho.SoLuong += soLuongCollected;
+                            existingTonKho.KhoiLuong += soLuongCollected;
                             _context.Update(existingTonKho); // Đánh dấu TonKho để được cập nhật
-                            _logger.LogInformation("Chuẩn bị cập nhật TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng +{SoLuong}. Tổng mới: {TongSoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected, existingTonKho.SoLuong);
+                            _logger.LogInformation("Chuẩn bị cập nhật TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng +{SoLuong}. Tổng mới: {TongSoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected, existingTonKho.KhoiLuong);
                         }
                         else
                         {
@@ -607,12 +607,9 @@ namespace DACS.Areas.QuanLyXNK.Controllers
                             {
                                 MaKho = targetMaKho,
                                 M_LoaiSP = maSanPham,
-                                SoLuong = soLuongCollected,
+                                KhoiLuong = soLuongCollected,
                                 M_DonViTinh = maDonViTinh, 
-                                NgayNhapKho = DateTime.UtcNow.Date,
-                                HanSuDung = null, // Cần xác định logic cho HanSuDung và SoLo từ ChiTietThuGom nếu có
-                                SoLo = null     // Hoặc một giá trị mặc định/logic khác
-                            };
+                                 };
                             _context.Add(newTonKho); // Đánh dấu TonKho mới để được thêm
                             _logger.LogInformation("Chuẩn bị thêm mới TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng: {SoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected);
                         }

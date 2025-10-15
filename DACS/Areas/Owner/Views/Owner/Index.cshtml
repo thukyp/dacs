@@ -1,12 +1,6 @@
 ﻿@model DACS.Models.ViewModels.OwnerDashboardViewModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-	// Layout được đặt là null vì file này tự quản lý toàn bộ cấu trúc HTML.
-	// Nếu bạn có một _Layout.cshtml riêng cho Area Owner và muốn dùng nó,
-	// thì file này chỉ nên chứa phần nội dung <div class="main-content-area">...</div>
-	// và bỏ đi các phần <html>, <head>, <style>, sidebar, và các script tags ở cuối.
-	// Tuy nhiên, theo yêu cầu "Ko dc doi thiet ke cua toi" và bạn cung cấp full HTML,
-	// tôi sẽ giữ nguyên cấu trúc này thành một trang hoàn chỉnh.
 	Layout = null;
 }
 <!DOCTYPE html>
@@ -18,13 +12,13 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 	<link rel="stylesheet" href="~/css/AdminLayout.css" />
-	<style>
-		/* CSS cơ bản từ file của bạn. Các style này nên được ưu tiên đặt trong AdminLayout.css */
+    <style>
+        /* Basic CSS - move to external files if possible */
 		body, html {
 			height: 100%;
+			font-size: 16px; /* hoặc 1rem */
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 		}
-		/* .container class này có vẻ không được sử dụng cho layout chính,
-						   vì layout chính dùng d-flex. Nếu không dùng, có thể bỏ đi. */
 
 		.container {
 			display: grid;
@@ -42,23 +36,54 @@
 			width: 250px;
 			flex-shrink: 0;
 			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
 		}
 
 			.sidebar h2 {
 				border-bottom: 1px solid #495057;
 				padding-bottom: 10px;
-				font-size: 1.5rem;
+				font-size: 2.6rem;
+				margin-bottom: 1rem;
+				font-weight: 600;
+			}
+
+			.sidebar .nav {
+				flex-grow: 1;
 			}
 
 			.sidebar .nav-link {
 				color: #adb5bd;
 				padding: 8px 15px;
+				border-radius: 0.25rem;
+				margin-bottom: 5px;
+				font-size: 1.2rem;
 			}
 
 				.sidebar .nav-link.active, .sidebar .nav-link:hover {
 					color: #fff;
 					background-color: #495057;
-					border-radius: 0.25rem;
+				}
+
+			.sidebar .nav-item.mt-auto {
+				margin-top: auto;
+				border-top: 1px solid #495057;
+				padding-top: 15px;
+			}
+
+			.sidebar .logout-form button {
+				padding: 8px 15px;
+				color: #dc3545;
+				background: none;
+				border: none;
+				width: 100%;
+				text-align: left;
+				font-size: 0.9rem;
+			}
+
+				.sidebar .logout-form button:hover {
+					background-color: rgba(220, 53, 69, 0.1);
+					color: #bd2130;
 				}
 
 		.main-content-area {
@@ -68,77 +93,101 @@
 			overflow-y: auto;
 		}
 
-		.page-header {
+		.header {
 			font-size: 1.75rem;
 			font-weight: 500;
-			margin-bottom: 1.5rem;
+			margin-bottom: 1rem;
 			color: #343a40;
 		}
 
 		.stat-card {
 			background-color: #fff;
 			border-radius: 0.375rem;
-			padding: 1rem;
-			margin-bottom: 1.5rem;
-			box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+			padding: 15px;
+			margin-bottom: 1rem;
+			box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 			text-align: center;
 		}
 
 			.stat-card .value {
-				font-size: 1.75rem;
+				font-size: 1.5rem;
 				font-weight: 600;
 			}
 
 			.stat-card .label {
 				font-size: 0.9rem;
 				color: #6c757d;
-				margin-top: 0.25rem;
 			}
 
-		.quick-link-card .card-body {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
+		.filter-section {
+			background-color: #fff;
+			padding: 15px;
+			border-radius: 0.375rem;
+			margin-bottom: 1.5rem;
+			box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 		}
 
-		.quick-link-card i {
-			font-size: 2rem; /* Hoặc dùng class fa-2x của FontAwesome */
-			margin-bottom: 0.5rem; /* Hoặc dùng class mb-2 của Bootstrap */
+		.table th {
+			font-weight: 600;
+			font-size: 0.85rem;
 		}
 
-		.quick-link-card a {
-			text-decoration: none;
-			color: inherit;
+		.table td {
+			font-size: 0.85rem;
+			vertical-align: middle;
 		}
 
-		.quick-link-card:hover {
-			background-color: #e9ecef;
+		.table .actions form, .table .actions a, .table .actions button {
+			margin-right: 3px;
+			display: inline-block;
 		}
-	</style>
-</head>
+		/* Adjust spacing */
+		.table .actions .btn-sm {
+			padding: 0.2rem 0.4rem;
+			font-size: 0.75rem;
+		}
+		/* Smaller buttons */
+		.table .badge {
+			font-size: 0.75rem;
+			padding: 0.3em 0.5em;
+		}
+
+		.user-display span {
+			display: block;
+		}
+
+		.user-display small {
+			color: #6c757d;
+			font-size: 0.9em;
+		}
+    </style>
+    </head>
 <body>
-	<div class="d-flex">
-		<div class="sidebar">
-			<h2>OWNER</h2>
-			<ul class="nav flex-column">
-				@* Điều chỉnh các asp-controller và asp-action cho phù hợp với cấu trúc của bạn *@
-				<li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="Index" class="nav-link"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
-				<li class="nav-item"><a asp-area="Owner" asp-controller="DoanhThu" asp-action="Index" class="nav-link"><i class="fas fa-chart-line me-2"></i> Doanh thu</a></li>
-				<li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyND" asp-action="Index" class="nav-link"><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
-				<li class="nav-item"><a asp-area="Owner" asp-controller="QuanLySP" asp-action="Index" class="nav-link"><i class="fas fa-box-open me-2"></i> Quản lý Sản phẩm</a></li>
-				<li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
-				<li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyDonHang" asp-action="Index" class="nav-link active"><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
-				<li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog me-2"></i> Cài đặt</a></li>
-				<form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm_sidebar_index" class="mt-3">
-					@* Moved mt-3 to form *@
-					<button type="submit" class="list-group-item list-group-item-action text-danger border-0 bg-transparent p-0 w-100 text-start">
-						@* Adjusted button style to better match list items *@
-						<span class="list-group-item list-group-item-action border-0 text-danger"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Đăng xuất</span>
-					</button>
-				</form>
-			</ul>
-		</div>
+
+    @* --- Main Layout Container --- *@
+    <div class="d-flex">
+        @* --- Sidebar --- *@
+        <div class="sidebar">
+            <h2>OWNER</h2>
+            <ul class="nav flex-column">
+                @* Điều chỉnh các asp-controller và asp-action cho phù hợp với cấu trúc của bạn *@
+                <li class="nav-item"><a asp-area="Owner" asp-controller="Owner" asp-action="Index" class="nav-link active"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="DoanhThu" asp-action="Index" class="nav-link"><i class="fas fa-chart-line me-2"></i> Doanh thu</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyND" asp-action="Index" class="nav-link"><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLySP" asp-action="Index" class="nav-link"><i class="fas fa-box-open me-2"></i> Quản lý Sản phẩm</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyDonHang" asp-action="Index" class="nav-link"><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
+                <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyThanhToan" asp-action="Index" class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh toán</a></li>
+                
+               
+            </ul>
+			<div class="nav-item mt-auto ">
+				<button type="submit" class="text-danger border-0 bg-transparent p-0 w-100 text-start mt-1">
+					@* Adjusted button style to better match list items *@
+					<a href="/home/index" class="border-0 text-danger" style="text-decoration: none;"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Về trang chủ</a>
+				</button>
+			</div>
+        </div>
 
 		<div class="main-content-area">
 			<div class="page-header">Dashboard Tổng Quan - Chào @Model.OwnerName!</div>
@@ -204,10 +253,13 @@
 					<div class="card shadow-sm">
 						<div class="card-body">
 							<h5 class="card-title">Biểu đồ Doanh thu (7 ngày gần nhất - Triệu VND)</h5>
-							<canvas id="dashboardRevenueChart" height="100"></canvas>
+							@* Thêm một div bao bọc canvas để kiểm soát kích thước tốt hơn *@
+							<div class="chart-wrapper" style="position: relative; height: 300px; width: 100%;">
+								<canvas id="dashboardRevenueChart"></canvas> @* Bỏ height="100" *@
+							</div>
 							@if (Model.RevenueChartData == null || !Model.RevenueChartData.Any() || Model.RevenueChartLabels == null || !Model.RevenueChartLabels.Any())
 							{
-								<p class="text-center text-muted mt-2"><small>(Không có dữ liệu doanh thu để hiển thị biểu đồ)</small></p>
+								<p class="text-center text-muted mt-2 no-chart-data-message"><small>(Không có dữ liệu doanh thu để hiển thị biểu đồ)</small></p>
 							}
 						</div>
 					</div>
@@ -220,14 +272,30 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			const ctx = document.getElementById('dashboardRevenueChart');
+			document.addEventListener('DOMContentLoaded', function () {
+			const canvasElement = document.getElementById('dashboardRevenueChart');
+			// Dùng querySelector để lấy thẻ p thông báo (nếu bạn muốn ẩn/hiện nó bằng JS)
+			const noDataMessageElement = document.querySelector('.no-chart-data-message');
+
 			// Đảm bảo Model và các thuộc tính của nó không null trước khi serialize
 			const revenueLabels = @Html.Raw(Model?.RevenueChartLabels != null ? Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueChartLabels) : "[]");
 			const revenueData = @Html.Raw(Model?.RevenueChartData != null ? Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueChartData) : "[]");
 
-			if (ctx && revenueLabels.length > 0 && revenueData.length > 0) {
-				new Chart(ctx, {
+			// --- Bước Debug Quan Trọng ---
+			console.log('Revenue Labels (dữ liệu thô từ Model):', @Html.Raw(Model?.RevenueChartLabels != null ? "'" + Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueChartLabels) + "'" : "'[]'"));
+			console.log('Revenue Data (dữ liệu thô từ Model):', @Html.Raw(Model?.RevenueChartData != null ? "'" + Newtonsoft.Json.JsonConvert.SerializeObject(Model.RevenueChartData) + "'" : "'[]'"));
+			console.log('Parsed Revenue Labels (sau khi gán vào biến JS):', revenueLabels);
+			console.log('Parsed Revenue Data (sau khi gán vào biến JS):', revenueData);
+			// --- Kết thúc Bước Debug ---
+
+			if (canvasElement && revenueLabels && revenueLabels.length > 0 && revenueData && revenueData.length > 0) {
+
+				// Nếu có dữ liệu và biểu đồ sẽ được vẽ, ẩn thông báo "Không có dữ liệu" từ Razor (nếu nó đang hiển thị)
+				if (noDataMessageElement) {
+					noDataMessageElement.style.display = 'none';
+				}
+
+				new Chart(canvasElement, { // Sử dụng canvasElement thay vì ctx (ctx là context 2d, Chart.js cần element)
 					type: 'line',
 					data: {
 						labels: revenueLabels,
@@ -242,7 +310,8 @@
 					},
 					options: {
 						responsive: true,
-						maintainAspectRatio: true,
+						maintainAspectRatio: false, // *** THAY ĐỔI QUAN TRỌNG ***
+													// false: cho phép biểu đồ co giãn tự do theo kích thước của div cha (chart-wrapper)
 						scales: {
 							y: {
 								beginAtZero: true,
@@ -252,15 +321,20 @@
 									}
 								}
 							}
+							// Bạn có thể thêm cấu hình cho trục x nếu cần
+							// x: { ... }
 						}
+						// Bạn có thể thêm các plugins khác nếu cần, ví dụ:
+						// plugins: {
+						// legend: { display: true },
+						// tooltip: { enabled: true }
+						// }
 					}
 				});
-			} else if (ctx && !(revenueLabels.length > 0 && revenueData.length > 0)) {
-				 // Nếu canvas tồn tại nhưng không có dữ liệu, bạn có thể vẽ thông báo trực tiếp lên canvas
-				const context = ctx.getContext('2d');
-				context.textAlign = 'center';
-				context.font = '16px Arial';
-				context.fillText('Không có dữ liệu biểu đồ.', ctx.width / 2, ctx.height / 2);
+			} else {
+				console.warn('Biểu đồ không được khởi tạo: Canvas không tìm thấy hoặc không có đủ dữ liệu.');
+				// Thông báo <p> từ Razor sẽ hiển thị nếu dữ liệu trống.
+				// Không cần vẽ thêm lên canvas ở đây trừ khi bạn muốn một fallback phức tạp hơn.
 			}
 		});
 	</script>
