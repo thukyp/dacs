@@ -7,6 +7,135 @@
 
 @* Bạn có thể copy phần CSS và Sidebar từ các view khác nếu muốn giao diện đồng nhất *@
 <style>
+    <style >
+    body, html {
+        height: 100%;
+    }
+
+    .container {
+        display: grid;
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        flex-direction: row;
+    }
+
+    .main-container {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+    /* main-container thay cho .container của bạn */
+    .sidebar {
+        background-color: #212529;
+        color: #fff;
+        padding: 15px;
+        width: 250px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .sidebar h2 {
+            border-bottom: 1px solid #495057;
+            padding-bottom: 10px;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar .nav {
+            flex-grow: 1;
+        }
+
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 8px 15px;
+            border-radius: 0.25rem;
+            margin-bottom: 5px;
+        }
+
+            .sidebar .nav-link.active, .sidebar .nav-link:hover {
+                color: #fff;
+                background-color: #495057;
+            }
+
+        .sidebar .nav-item.mt-auto {
+            margin-top: auto;
+        }
+
+        .sidebar .logout-form button {
+            padding: 8px 15px;
+            color: #dc3545;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+            .sidebar .logout-form button:hover {
+                background-color: rgba(220, 53, 69, 0.1);
+                color: #bd2130;
+            }
+
+    .main-content-area {
+        padding: 25px;
+        background-color: #f8f9fa;
+        flex-grow: 1;
+        overflow-y: auto;
+        height: 100vh;
+    }
+
+    .page-header {
+        font-size: 1.75rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        color: #343a40;
+    }
+
+    .stat-card {
+        background-color: #fff;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+        text-align: center;
+    }
+
+        .stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+    .filter-card {
+        background-color: #fff;
+        padding: 1rem 1.5rem;
+        border-radius: 0.375rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+    }
+
+    .table-container .card-header {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table-container .card-footer {
+        border-top: 1px solid #dee2e6;
+    }
+
+    .badge {
+        font-size: 0.8em;
+        padding: 0.4em 0.6em;
+    }
+
     .item-row {
         margin-bottom: 15px;
         padding-bottom: 15px;
@@ -18,9 +147,31 @@
         }
 </style>
 
-<div class="container mt-4">
-    <h2>@ViewData["Title"]</h2>
+<div class="d-flex main-container">
+    
     <hr />
+    
+
+    <div class="sidebar">
+        <h2>Quản Lý XNK</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyDSPX" asp-action="Index" class="nav-link "><i class="fas fa-dolly-flatbed me-2"></i> DS Phiếu Xuất</a></li> @* Link mới *@
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="QuanLyDSPX" asp-action="Create" class="nav-link active"><i class="fas fa-plus-circle me-2"></i> Tạo Phiếu Xuất</a></li> @* Link mới *@
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="KhoHang" asp-action="Index" class="nav-link"><i class="fas fa-warehouse me-2"></i> DS Kho hàng</a></li>
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="TonKho" asp-action="Index" class="nav-link"><i class="fas fa-boxes-stacked me-2"></i> Tồn kho SP</a></li>
+            <li class="nav-item"><a asp-area="QuanLyXNK" asp-controller="ThongKe" asp-action="Index" class="nav-link"><i class="fas fa-chart-bar me-2"></i> Thống kê NX</a></li>
+        </ul>
+        <div class="nav-item mt-auto ">
+            <button type="submit" class="text-danger border-0 bg-transparent p-0 w-100 text-start mt-1">
+                    @* Adjusted button style to better match list items *@
+                <a href="/home/index" class="border-0 text-danger" style="text-decoration: none;"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Về trang chủ</a>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content-area">
+        <div class="page-header">@ViewData["Title"]</div>
 
     <form asp-action="Create" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -94,7 +245,7 @@
         </div>
     </form>
 </div>
-
+</div>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

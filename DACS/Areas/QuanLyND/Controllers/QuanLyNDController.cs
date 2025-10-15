@@ -336,7 +336,6 @@ namespace DACS.Areas.QuanlyND.Controllers // Đảm bảo đúng namespace và A
         [HttpGet]
         public async Task<IActionResult> Edit(string userId)
         {
-            // TODO: Implement Get Edit View logic
             TempData["InfoMessage"] = "Chức năng Sửa đang được phát triển.";
             return RedirectToAction(nameof(Index), new { area = "QuanlyND" });
         }
@@ -345,7 +344,6 @@ namespace DACS.Areas.QuanlyND.Controllers // Đảm bảo đúng namespace và A
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditUserViewModel model)
         {
-            // TODO: Implement Post Edit logic
             TempData["InfoMessage"] = "Chức năng Sửa đang được phát triển.";
             return RedirectToAction(nameof(Index), new { area = "QuanlyND" });
         }

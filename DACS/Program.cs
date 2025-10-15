@@ -1,14 +1,22 @@
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using DACS.Controllers;
 using DACS.Models;
 using DACS.Repositories;
 using DACS.Repository;
+using DACS.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-
+    
 var builder = WebApplication.CreateBuilder(args);
+//builder.WebHost.UseUrls("http://10.69.172.216:5000");//chạy ebsite
 
-// Add services to the container.
+builder.Services.AddScoped<HomeController>();//kết nối chat
+builder.Services.AddSingleton<SocketServer>();//kết nối chat
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDistributedMemoryCache();
@@ -45,6 +53,8 @@ builder.Services.AddScoped<IPhieuXuatRepository, PhieuXuatRepository>();
 
 
 var app = builder.Build();
+var socketServer = app.Services.GetRequiredService<SocketServer>();
+_ = Task.Run(() => socketServer.StartAsync()); //kết nối chat
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

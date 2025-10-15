@@ -96,6 +96,60 @@ namespace DACS.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("DACS.Models.CauHoiThuongGap", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CauHoi")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("CauTraLoi")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CauHoiThuongGap");
+                });
+
+            modelBuilder.Entity("DACS.Models.ChatHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CauHoi")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("CauTraLoi")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("M_KhachHang")
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("NgayChat")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("M_KhachHang");
+
+                    b.ToTable("ChatHistory");
+                });
+
             modelBuilder.Entity("DACS.Models.ChiTietDanhGia", b =>
                 {
                     b.Property<string>("M_KhachHang")
@@ -197,6 +251,41 @@ namespace DACS.Migrations
                     b.HasIndex("M_DonHang");
 
                     b.ToTable("ChiTietHoanTras");
+                });
+
+            modelBuilder.Entity("DACS.Models.ChiTietLienHe", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HoTen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("M_KhachHang")
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("NgayGui")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoiDung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TrangThai")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("M_KhachHang");
+
+                    b.ToTable("ChiTietLienHe");
                 });
 
             modelBuilder.Entity("DACS.Models.ChiTietPhieuXuat", b =>
@@ -347,6 +436,9 @@ namespace DACS.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<bool>("DaTruTonKho")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LyDoHoanTra")
                         .HasColumnType("nvarchar(max)");
 
@@ -380,6 +472,16 @@ namespace DACS.Migrations
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SoDienThoaidathang")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Tendathang")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<float>("TotalPrice")
                         .HasColumnType("real");
@@ -513,6 +615,9 @@ namespace DACS.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("MaQuan")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -530,8 +635,8 @@ namespace DACS.Migrations
 
                     b.Property<string>("SDT_KhachHang")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Ten_KhachHang")
                         .IsRequired()
@@ -543,6 +648,8 @@ namespace DACS.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("M_KhachHang");
+
+                    b.HasIndex("Id");
 
                     b.HasIndex("MaQuan");
 
@@ -572,6 +679,11 @@ namespace DACS.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("TenKho")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TenLoaiKho")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -840,14 +952,19 @@ namespace DACS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("HanSuDung")
-                        .HasColumnType("datetime2");
+                    b.Property<float>("KhoiLuong")
+                        .HasColumnType("real");
 
                     b.Property<string>("M_DonViTinh")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("M_LoaiSP")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("M_SanPham")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -860,19 +977,11 @@ namespace DACS.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<DateTime>("NgayNhapKho")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SoLo")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long>("SoLuong")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("M_LoaiSP");
+
+                    b.HasIndex("M_SanPham");
 
                     b.HasIndex("MaDonViTinh");
 
@@ -1099,6 +1208,15 @@ namespace DACS.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DACS.Models.ChatHistory", b =>
+                {
+                    b.HasOne("DACS.Models.KhachHang", "KhachHang")
+                        .WithMany("ChatHistories")
+                        .HasForeignKey("M_KhachHang");
+
+                    b.Navigation("KhachHang");
+                });
+
             modelBuilder.Entity("DACS.Models.ChiTietDanhGia", b =>
                 {
                     b.HasOne("DACS.Models.KhachHang", "KhachHang")
@@ -1160,6 +1278,15 @@ namespace DACS.Migrations
                     b.Navigation("DonHang");
 
                     b.Navigation("HoanTra");
+                });
+
+            modelBuilder.Entity("DACS.Models.ChiTietLienHe", b =>
+                {
+                    b.HasOne("DACS.Models.KhachHang", "KhachHang")
+                        .WithMany()
+                        .HasForeignKey("M_KhachHang");
+
+                    b.Navigation("KhachHang");
                 });
 
             modelBuilder.Entity("DACS.Models.ChiTietPhieuXuat", b =>
@@ -1288,6 +1415,10 @@ namespace DACS.Migrations
 
             modelBuilder.Entity("DACS.Models.KhachHang", b =>
                 {
+                    b.HasOne("DACS.Models.ChiTietLienHe", "ChiTietLienHe")
+                        .WithMany()
+                        .HasForeignKey("Id");
+
                     b.HasOne("DACS.Models.QuanHuyen", "QuanHuyen")
                         .WithMany()
                         .HasForeignKey("MaQuan")
@@ -1311,6 +1442,8 @@ namespace DACS.Migrations
                         .HasForeignKey("DACS.Models.KhachHang", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ChiTietLienHe");
 
                     b.Navigation("QuanHuyen");
 
@@ -1443,6 +1576,12 @@ namespace DACS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DACS.Models.SanPham", "SanPham")
+                        .WithMany()
+                        .HasForeignKey("M_SanPham")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DACS.Models.DonViTinh", "DonViTinh")
                         .WithMany()
                         .HasForeignKey("MaDonViTinh");
@@ -1458,6 +1597,8 @@ namespace DACS.Migrations
                     b.Navigation("KhoHang");
 
                     b.Navigation("LoaiSanPham");
+
+                    b.Navigation("SanPham");
                 });
 
             modelBuilder.Entity("DACS.Models.XaPhuong", b =>
@@ -1580,6 +1721,8 @@ namespace DACS.Migrations
 
             modelBuilder.Entity("DACS.Models.KhachHang", b =>
                 {
+                    b.Navigation("ChatHistories");
+
                     b.Navigation("ChiTietDanhGias");
 
                     b.Navigation("ChiTietDatHangs");

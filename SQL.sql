@@ -368,3 +368,4 @@ INSERT INTO DonViTinhs (M_DonViTinh, TenLoaiTinh) VALUES
 
 
 
+delete from LoaiSanPhams

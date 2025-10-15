@@ -15,8 +15,8 @@ namespace DACS.Models.ViewModels
         [Display(Name = "Đơn vị")]
         public string TenDonViTinh { get; set; } = "N/A";
 
-        [Display(Name = "Số lượng còn")]
-        public long SoLuong { get; set; }
+        [Display(Name = "Khối lượng còn")]
+        public float KhoiLuong { get; set; }
 
         // Quan trọng: Trường này KHÔNG có trong Model TonKho bạn cung cấp.
         // Cần thêm trường này vào Model TonKho và cập nhật DB thì logic trạng thái mới chính xác.

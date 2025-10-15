@@ -49,7 +49,7 @@
     @* nhấn vào search hiện lên khung chat và đề xuất *@
     
     <header id="header" class="site-header">
-        <div class="nav-top navbar-expand-sm navbar-light bg-light">
+        <div class="nav-top navbar-expand-sm navbar-light bg-agriculture-green">
             <div class="container-fluid">
                 <div class="row g-0">
                     <div class="col-lg-5">
@@ -66,7 +66,7 @@
 
 
                                 <a href="https://www.youtube.com/watch?v=i6wU_CQUbIA">
-                                    <i class="fa-brands fa-zalo"><img src="~/images/Zalo.png" width="25" height="25" /> Zalo</i>
+                                    <i class="fa-brands fa-zalo"><img src="~/images/icons8-zalo-50.png" width="25" height="25" /> Zalo</i>
 
                                 </a>
 
@@ -92,7 +92,7 @@
             </a>
         </div>
 
-        <nav id="header-nav" class="navbar-mid navbar-expand-sm navbar-light bg-light">
+        <nav id="header-nav" class="navbar-mid navbar-expand-sm navbar-light bg-agriculture-earth">
             <div class="container">
 
 
@@ -115,17 +115,20 @@
                             <div class="search-popup" id="searchPopup">
                                 <div class="search-popup-container">
                                     <button class="close-btn" id="closeSearch">&times;</button>
-                                    <form action="/tim-kiem" method="get">
-                                        <input type="search" name="s" placeholder="Tìm sản phẩm bạn cần..." autofocus />
+                                    <form action="/DS_SP/TimKiem" method="get">
+                                        <input type="text" id="searchBox" class="form-control" style="width:400px; border-radius:1.5rem;" name="keyword" placeholder="Tìm sản phẩm bạn cần..." autocomplete="off" />
+                                        
+                                        
+                                        <div id="suggestions" class="list-group w-100" style="z-index:1000;"></div>
                                     </form>
 
                                     <ul class="cat-list">
-                                        <li><a href="#">Điện thoại</a></li>
-                                        <li><a href="#">Đồng hồ</a></li>
-                                        <li><a href="#">Tai nghe</a></li>
-                                        <li><a href="#">Phụ kiện</a></li>
-                                        <li><a href="#">Màn hình</a></li>
-                                        <li><a href="#">Loa</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=b%C3%A3+m%C3%ADa">Bã mía</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Trấu+nghiền">Trấu nghiền</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Rơm+mì">Rơm mì</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Xơ+dừa">Xơ dừa</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Viên+nén+trấu">Viên nén trấu</a></li>
+                                        <li><a href="/DS_SP/TimKiem?keyword=Phân+compost">Phân compost</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -191,8 +194,8 @@
                                 <ul class="list-group mb-3" id="cart-items">
                                     @if (cart?.Items != null && cart.Items.Any() && User.IsInRole("KhachHang") || User.IsInRole("Owner") || User.IsInRole("QuanLyXNK") || User.IsInRole("QuanLyND") || User.IsInRole("QuanLySP") || User.IsInRole("QuanLyDH"))
 									{
-                                        decimal total = 0;
-                                        int itemCount = 0;
+                                        float total = 0;
+                                        float itemCount = 0;
 
                                         @foreach (var item in cart.Items)
                                         {
@@ -247,8 +250,12 @@
             </div>
 
         </nav>
+      
 
-        <nav class="navbar-bot navbar-expand-sm navbar-light bg-light">
+
+        
+
+        <nav class="navbar-bot navbar-expand-sm navbar-light bg-agriculture-green">
             <div class="row">
                 <div class="col-lg-1 col-3 col-xs-3 ">
                 </div>
@@ -340,87 +347,114 @@
         </nav>
 
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="end-footer">
+    <footer class="end-footer ">
         <div class="container">
-            <div class="row">
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul>
-                        <li>
-                            <a href="#">about us</a>
-                        </li>
-                        <li>
-                            <a href="#">our service</a>
-                        </li>
-                        <li>
-                            <a href="#">privacy policy</a>
-                        </li>
-                        <li>
-                            <a href="#">affiliate program</a>
-                        </li>
+            <div class="row ">
+                <!-- Giới thiệu công ty -->
+                <div class="footer-col mt-2">
+                    <h4>Về chúng tôi</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-light">Giới thiệu nền tảng</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Sứ mệnh & Tầm nhìn</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Chính sách bảo mật</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Hợp tác cùng chúng tôi</a></li>
                     </ul>
                 </div>
-                <div class="footer-col">
-                    <h4>Get help</h4>
-                    <ul>
-                        <li>
-                            <a href="#">FAQ</a>
-                        </li>
-                        <li>
-                            <a href="#">shipping</a>
-                        </li>
-                        <li>
-                            <a href="#">return</a>
-                        </li>
-                        <li>
-                            <a href="#">order status</a>
-                        </li>
-                        <li>
-                            <a href="#">payment opinions</a>
-                        </li>
+
+                <!-- Hỗ trợ khách hàng -->
+                <div class="footer-col mt-2">
+                    <h4>Hỗ trợ</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-light">Câu hỏi thường gặp</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Chính sách vận chuyển</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Chính sách đổi trả</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Tra cứu đơn hàng</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Phương thức thanh toán</a></li>
                     </ul>
                 </div>
-                <div class="footer-col">
-                    <h4>Service</h4>
-                    <ul>
-                        <li>
-                            <a href="#">dfdfsdsv</a>
-                        </li>
-                        <li>
-                            <a href="#">dvsdsvdsv</a>
-                        </li>
-                        <li>
-                            <a href="#">dsvdvsdvs</a>
-                        </li>
-                        <li>
-                            <a href="#">dsvdvsvds</a>
-                        </li>
-                        <li>
-                            <a href="#">vdsdsvdvs</a>
-                        </li>
-                        <li>
-                            <a href="#">dvsdvs</a>
-                        </li>
+
+                <!-- Dịch vụ chính -->
+                <div class="footer-col mt-2">
+                    <h4>Dịch vụ</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-light">Đăng bán phụ phẩm</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Thu mua tận nơi</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Kết nối doanh nghiệp</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Giao nhận & vận chuyển</a></li>
+                        <li><a href="#" class="text-decoration-none text-light">Tư vấn tái chế</a></li>
                     </ul>
                 </div>
-                <div class="footer-col">
-                    <h4>Follow us</h4>
+
+                <!-- Mạng xã hội -->
+                <div class="footer-col mt-2">
+                    <h4>Kết nối với chúng tôi</h4>
                     <div class="social-link">
-                        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                        <a href="#"><i class="fa-brands fa-zalo"><img src="~/Img/icons8-zalo-50.png" width="25" height="25" /></i></a>
-                        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="text-light "><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="text-light "><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="text-light "><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" class="text-light ">
+                            <i class="fa-brands fa-zalo">
+                            <img src="~/images/icons8-zalo-50.png" width="25" height="25" alt="Zalo" style="vertical-align: middle;" /></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#searchBox').on('input', function () {
+                const keyword = $(this).val();
+                if (keyword.length === 0) {
+                    $('#suggestions').empty();
+                    return;
+                }
+
+                $.ajax({
+                    url: '/DS_SP/Suggest',
+                    type: 'GET',
+                    data: { keyword: keyword },
+                    success: function (data) {
+                        $('#suggestions').empty();
+                        if (data.length > 0) {
+                            data.forEach(function (item) {
+                                $('#suggestions').append(`
+                                    <a href="#" class="list-group-item list-group-item-action suggestion-item"
+                                       data-name="${item.tenSanPham}" data-id="${item.m_SanPham}">
+                                        ${item.tenSanPham}
+                                    </a>
+                                `);
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Khi người dùng nhấn vào gợi ý
+            $(document).on('click', '.suggestion-item', function (e) {
+                e.preventDefault();
+                const name = $(this).data('name');
+                const id = $(this).data('id');
+
+                $('#searchBox').val(name); // Ghi vào ô input
+
+                
+            });
+
+            
+        });
+    </script>
+
+
     
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -451,7 +485,7 @@
             updateCartStats();
             document.querySelectorAll(".soLuongInput").forEach(input => {
                 input.addEventListener("input", updateCartStats);
-            });
+            });0
         });
     </script>
 
@@ -516,29 +550,227 @@
         });
     </script>
     <script>
+            // === POPUP TÌM KIẾM ===
         const openBtn = document.querySelector('.search-button');
-        const popup = document.getElementById('searchPopup');
-        const closeBtn = document.getElementById('closeSearch');
+        const searchPopup = document.getElementById('searchPopup');
+        const closeSearchBtn = document.getElementById('closeSearch');
 
+        // Mở popup tìm kiếm
         openBtn.addEventListener('click', () => {
-          popup.classList.add('active');
+            searchPopup.classList.add('active');
         });
 
-        closeBtn.addEventListener('click', () => {
-          popup.classList.remove('active');
+        // Đóng popup tìm kiếm
+        closeSearchBtn.addEventListener('click', () => {
+            searchPopup.classList.remove('active');
         });
 
-        // Bấm ra ngoài là đóng
-        popup.addEventListener('click', (e) => {
-          if (e.target === popup) popup.classList.remove('active');
+        // Bấm ra ngoài đóng popup tìm kiếm
+        document.addEventListener('click', (e) => {
+            if (
+                searchPopup.classList.contains('active') &&
+                !searchPopup.contains(e.target) &&
+                !e.target.closest('.search-button')
+            ) {
+                searchPopup.classList.remove('active');
+            }
         });
 
-        // Bấm ESC để đóng
+        // ESC để đóng popup tìm kiếm
         document.addEventListener('keyup', (e) => {
-          if (e.key === 'Escape') popup.classList.remove('active');
+            if (e.key === 'Escape' && searchPopup.classList.contains('active')) {
+                searchPopup.classList.remove('active');
+            }
         });
     </script>
 
+    @{
+        ViewBag.Title = "Chatbot hỗ trợ khách hàng";
+    }
+    <div class="chat-bubble" id="chatToggle" aria-label="Open chat" title="Chat với hỗ trợ">
+        <svg class="chat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="blue" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </div>
+    <aside class="chat-window" id="chatWindow" aria-hidden="true">
+        <header class="chat-header">
+            <div class="avatar">AI</div>
+            <div class="header-title">
+                <h4 style="color:ghostwhite">Hỗ trợ trực tuyến</h4>
+                <p style="color:ghostwhite">Thường trả lời trong vài giây</p>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn"style="color:white" id="minimizeBtn" title="Thu nhỏ">—</button>
+                <button class="icon-btn" style="color:white" id="closeBtn" title="Đóng">✕</button>
+            </div>
+        </header>
+
+
+        <div class="chat-body" id="chatbox" role="log" aria-live="polite">
+            <!-- demo messages -->
+            <div class="msg bot">Xin chào! Mình có thể giúp gì cho bạn hôm nay?</div>
+        </div>
+
+
+        <div class="chat-input">
+            <input id="userInput" style="width=30px;" type="text" placeholder="Gõ tin nhắn..." aria-label="Gõ tin nhắn" />
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+            <button onclick="document.getElementById('fileInput').click()" class="send-btn">📎</button>
+            <button onclick="sendMessage()" class="send-btn" id="sendBtn">Gửi</button>
+        </div>
+    </aside>
+
+
+
+
+    <script>
+            const toggle = document.getElementById('chatToggle');
+        const chatWin = document.getElementById('chatWindow');
+        const closeBtn = document.getElementById('closeBtn');
+        const minBtn = document.getElementById('minimizeBtn');
+        const body = document.getElementById('chatbox');
+        const input = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        let open = false;
+        let minimized = false;
+
+        // Mở chat
+        toggle.addEventListener('click', () => {
+            open = true;
+            minimized = false;
+            chatWin.style.display = 'flex';
+            chatWin.classList.add('open');
+            chatWin.classList.remove('minimized');
+            chatWin.style.opacity = '1';
+            chatWin.style.transform = 'scale(1)';
+            chatWin.setAttribute('aria-hidden', 'false');
+            setTimeout(() => input.focus(), 180);
+        });
+
+        // Đóng chat
+        closeBtn.addEventListener('click', () => {
+            open = false;
+            minimized = false;
+            chatWin.classList.remove('open', 'minimized');
+            chatWin.style.opacity = '0';
+            chatWin.style.transform = 'scale(0.8)';
+            setTimeout(() => { chatWin.style.display = 'none'; }, 200);
+        });
+
+        // Thu nhỏ chat
+        minBtn.addEventListener('click', () => {
+            if (!open) return;
+            minimized = !minimized;
+            chatWin.classList.toggle('minimized', minimized);
+            if (!minimized) setTimeout(() => input.focus(), 120);
+        });
+
+        // Click ra ngoài chỉ đóng chat nếu không click vào khung chat hoặc icon chat
+        document.addEventListener('click', (e) => {
+            if (
+                chatWin.classList.contains('open') &&
+                !chatWin.contains(e.target) &&
+                !e.target.closest('#chatToggle')
+            ) {
+                chatWin.classList.remove('open');
+                chatWin.style.opacity = '0';
+                chatWin.style.transform = 'scale(0.8)';
+                setTimeout(() => { chatWin.style.display = 'none'; open = false; }, 200);
+            }
+        });
+
+        // ESC để đóng chat
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape' && chatWin.classList.contains('open')) {
+                chatWin.classList.remove('open');
+                chatWin.style.display = 'none';
+                open = false;
+            }
+        });
+         function showThinking() {
+            const botTyping = document.createElement("div");
+            botTyping.className = "msg bot typing";
+            botTyping.innerHTML = `<i>Đang suy nghĩ<span class="dots">...</span></i>`;
+            body.appendChild(botTyping);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function hideThinking() {
+            const typingMsg = document.querySelector(".msg.bot.typing");
+            if (typingMsg) typingMsg.remove();
+        }
+        // input file
+                document.getElementById("fileInput").addEventListener("change", async function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Thêm phần hiển thị trước khi gửi
+            const chatbox = document.getElementById("chatbox");
+            const msgDiv = document.createElement("div");
+            msgDiv.className = "msg user";
+            msgDiv.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Ảnh tải lên" style="max-width:150px; border-radius:8px;">`;
+            chatbox.appendChild(msgDiv);
+
+            // Gửi ảnh lên server
+            try {
+                const response = await fetch("/api/chat/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error("Upload thất bại");
+
+                const result = await response.json();
+                showThinking();
+                // Hiển thị phản hồi từ chatbot
+                const botDiv = document.createElement("div");
+                botDiv.className = "msg bot";
+                botDiv.innerText = result.reply || "Ảnh đã được xử lý!";
+                chatbox.appendChild(botDiv);
+                chatbox.scrollTop = chatbox.scrollHeight;
+            } catch (err) {
+                alert("❌ Lỗi khi tải ảnh: " + err.message);
+            }
+        });
+               
+
+        // === GỬI TIN NHẮN ĐẾN SERVER ===
+        async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            body.innerHTML += `<div class="msg user"><b>Bạn:</b> ${msg}</div>`;
+            showThinking();
+            try {
+                const res = await fetch('/Home/Ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `message=${encodeURIComponent(msg)}`
+                });
+
+                if (!res.ok) throw new Error("Lỗi khi gửi yêu cầu đến server.");
+                const data = await res.json();
+                hideThinking();
+                body.innerHTML += `<div class="msg bot"><b>Bot:</b> ${data.response}</div>`;
+            } catch (err) { 
+                hideThinking();
+                body.innerHTML += `<div class="msg bot" style="color:#f87171"><b>Lỗi:</b> ${err.message}</div>`;
+            }
+
+            input.value = "";
+            body.scrollTop = body.scrollHeight;
+        }
+
+        // Gửi khi nhấn Enter
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

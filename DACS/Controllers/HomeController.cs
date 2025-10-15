@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 
 using System.Security.Claims;
@@ -5,15 +7,16 @@ using DACS.Areas.KhachHang.Controllers;
 using DACS.Models;
 
 using DACS.Models.ViewModels;
-
+using DACS.Services;
+using FuzzySharp;
 using Microsoft.AspNetCore.Identity;
 
 using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Configuration;
 
 
 namespace DACS.Controllers
@@ -32,10 +35,9 @@ namespace DACS.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager; // Sử dụng ApplicationUser hoặc lớp User Identity của bạn
 
-
-
-        public HomeController(
-
+        private readonly IConfiguration _configuration;
+        public HomeController(
+            IConfiguration configuration,
       ILogger<HomeController> logger,
 
       ApplicationDbContext dbContext,
@@ -45,6 +47,7 @@ namespace DACS.Controllers
       UserManager<ApplicationUser> userManager)
 
         {
+            _configuration = configuration;
 
             _logger = logger;
 
@@ -72,6 +75,39 @@ namespace DACS.Controllers
 
             return View();
 
+        }
+
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
+        // Xử lý form liên hệ (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Contact(ChiTietLienHe model)
+        {
+            // Kiểm tra nếu người dùng chưa đăng nhập
+           
+
+
+            try
+            {
+                model.Id = Guid.NewGuid().ToString("N").Substring(0, 10);
+                model.NgayGui = DateTime.UtcNow;
+                model.TrangThai = "chưa xử lý";
+                _context.ChiTietLienHe.Add(model);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Thông tin liên hệ của bạn đã được gửi thành công.";
+                return RedirectToAction("Contact");
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu cần
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại sau.";
+                return View(model);
+            }
         }
 
         // GET: /Home/ThuGom
@@ -275,17 +311,27 @@ namespace DACS.Controllers
 
         {
 
-            string prefix = "YC";
+            string prefix = "YC" + DateTime.Now.ToString("yyMMdd");
+            var todayCodes = _context.YeuCauThuGoms
+                .Where(y => y.M_YeuCau.StartsWith(prefix))
+                .OrderByDescending(y => y.M_YeuCau)
+                .Select(y => y.M_YeuCau)
+                .FirstOrDefault();
 
-            string timestamp = DateTime.UtcNow.ToString("yyMMddHHmm"); // Dùng UTC
+            int nextNumber = 1;
 
-            string randomPart = new Random().Next(1000, 9999).ToString();
+            if (!string.IsNullOrEmpty(todayCodes))
+            {
+                // Lấy phần số sau prefix
+                string numberPart = todayCodes.Substring(prefix.Length);
+                if (int.TryParse(numberPart, out int parsed))
+                {
+                    nextNumber = parsed + 1;
+                }
+            }
 
-            // Cần kiểm tra tính duy nhất trong DB trước khi trả về mã này trong môi trường thực tế
-
-            return $"{prefix}{timestamp}{randomPart}".Substring(0, 10); // Giới hạn 10 ký tự nếu cần
-
-        }
+            return prefix + nextNumber.ToString("D2");
+        }
 
 
 
@@ -299,13 +345,7 @@ namespace DACS.Controllers
 
         }
 
-        public IActionResult Contact()
-
-        {
-
-            return View();
-
-        }
+        
 
         public IActionResult News()
 
@@ -543,6 +583,103 @@ namespace DACS.Controllers
                 // return Json(new { error = "Lỗi tải dữ liệu Xã/Phường." });
                 return Json(new List<object>()); // Trả về rỗng khi lỗi
             }
+        }
+        [HttpPost]
+        public async Task<JsonResult> Ask([FromForm] string message)
+        {
+            string traLoi = "Xin lỗi, tôi chưa hiểu câu hỏi này.";
+
+            var allQuestions = _context.CauHoiThuongGap.ToList();
+            if (allQuestions.Any())
+            {
+                var bestMatch = allQuestions
+                    .Select(q => new
+                    {
+                        CauHoi = q.CauHoi,
+                        CauTraLoi = q.CauTraLoi,
+                        Score = Fuzz.Ratio(message.ToLower(), q.CauHoi.ToLower())
+                    })
+                    .OrderByDescending(x => x.Score)
+                    .FirstOrDefault();
+
+                if (bestMatch != null && bestMatch.Score > 70)
+                {
+                    traLoi = bestMatch.CauTraLoi;
+                }
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.UserId == userId);
+            
+                var chat = new ChatHistory
+                {
+
+                    CauHoi = message,
+                    CauTraLoi = traLoi,
+                    NgayChat = DateTime.Now,
+                    M_KhachHang = khachHang.M_KhachHang,
+                };
+            
+            try
+            {
+                _context.ChatHistory.Add(chat);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi khi lưu lịch sử: " + ex.Message);
+            
+}
+            return Json(new { response = traLoi });
+        }
+
+        [HttpPost("api/chat/upload")]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { reply = "Không có ảnh nào được gửi lên." });
+
+            var uploadPath = Path.Combine("wwwroot/images/Uploads", file.FileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(uploadPath));
+
+            using (var stream = new FileStream(uploadPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            string pythonExe = @"C:\Users\hoa23\AppData\Local\Programs\Python\Python312\python.exe"; // đường dẫn Python
+            string scriptPath = @"D:\Doancs(important)\2025-05-24\dacs\DACS\Services\compare_images.py"; // script so sánh
+            string datasetFolder = @"D:\Doancs(important)\2025-05-24\dacs\DACS\wwwroot\images\Products";
+
+            // Gọi Python để so sánh ảnh
+            var process = new System.Diagnostics.Process();
+            process.StartInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = pythonExe,
+                Arguments = $"\"{scriptPath}\" \"{uploadPath}\" \"{datasetFolder}\"",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            process.Start();
+            string stdout = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+
+            string firstLine = stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim();
+            string bestMatch = firstLine ?? "None";
+            if (bestMatch == "None" || string.IsNullOrEmpty(bestMatch))
+                return Ok(new { reply = "Không tìm thấy phụ phẩm phù hợp." });
+
+            // Tìm mô tả phụ phẩm trong CSDL
+            var matchedProduct = await _context.SanPhams
+                .FirstOrDefaultAsync(p => p.AnhSanPham.Contains(bestMatch));
+
+            string reply = matchedProduct != null
+                ? $"Ảnh của bạn giống với phụ phẩm: {matchedProduct.TenSanPham}. Mô tả: {matchedProduct.MoTa}"
+                : $"Ảnh của bạn giống với: {bestMatch} (chưa có mô tả trong CSDL).";
+
+            return Ok(new { reply });
         }
 
     }

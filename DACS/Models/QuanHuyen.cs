@@ -11,7 +11,7 @@ namespace DACS.Models // <-- Kiểm tra lại namespace
         [Display(Name = "Mã Quận/Huyện")]
         public string MaQuan { get; set; }
 
-        [Required(ErrorMessage = "Vui lòng nhập Tên Quận/Huyện.")]
+       
         [StringLength(100)]
         [Display(Name = "Tên Quận/Huyện")]
         public string TenQuan { get; set; }
@@ -21,7 +21,7 @@ namespace DACS.Models // <-- Kiểm tra lại namespace
         // public string? LoaiHinh { get; set; }
 
         // --- Khóa ngoại đến TinhThanhPho ---
-        [Required(ErrorMessage = "Vui lòng chọn Tỉnh/Thành phố.")]
+       
         [StringLength(10)] // Phải khớp kiểu và độ dài với TinhThanhPho.MaTinh
         [Display(Name = "Tỉnh/Thành phố")]
         public string MaTinh { get; set; } // Foreign Key property

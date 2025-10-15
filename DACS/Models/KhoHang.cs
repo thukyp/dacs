@@ -29,7 +29,9 @@ namespace DACS.Models // Hoặc namespace phù hợp
         [StringLength(50)]
         [Display(Name = "Trạng thái")]
         public string TrangThai { get; set; } // Nên dùng các giá trị từ KhoHangTrangThai
-
+        [Required]
+        [StringLength(100)]
+        public string TenLoaiKho { get; set; }
         // --- Thêm các thuộc tính hoặc quan hệ khác nếu cần ---
         // Ví dụ: Liên kết đến các bản ghi tồn kho trong kho này
         // public virtual ICollection<TonKho> TonKhos { get; set; } = new List<TonKho>();

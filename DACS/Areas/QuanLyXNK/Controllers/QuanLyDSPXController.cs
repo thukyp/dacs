@@ -181,13 +181,13 @@ namespace DACS.Areas.QuanLyXNK.Controllers
                             tk.M_LoaiSP == ctItemVM.M_LoaiSP &&
                             tk.M_DonViTinh == ctItemVM.M_DonViTinh); // Sử dụng MaDonViTinh
 
-                    if (tonKhoHienTai == null || tonKhoHienTai.SoLuong < ctItemVM.SoLuong)
+                    if (tonKhoHienTai == null || tonKhoHienTai.KhoiLuong < ctItemVM.SoLuong)
                     {
                         await transaction.RollbackAsync();
                         string tenSP = _context.LoaiSanPhams.FirstOrDefault(l => l.M_LoaiSP == ctItemVM.M_LoaiSP)?.TenLoai ?? ctItemVM.M_LoaiSP;
                         _logger.LogWarning("Rollback transaction do không đủ tồn kho cho SP {MaSP} ({TenSP}) tại Kho {MaKho}. Tồn: {Ton}, Xuất: {Xuat}",
-                            ctItemVM.M_LoaiSP, tenSP, viewModel.MaKho, tonKhoHienTai?.SoLuong ?? 0, ctItemVM.SoLuong);
-                        ModelState.AddModelError("", $"Không đủ tồn kho cho sản phẩm '{tenSP}'. Tồn hiện tại: {tonKhoHienTai?.SoLuong ?? 0}, Yêu cầu xuất: {ctItemVM.SoLuong}.");
+                            ctItemVM.M_LoaiSP, tenSP, viewModel.MaKho, tonKhoHienTai?.KhoiLuong ?? 0, ctItemVM.SoLuong);
+                        ModelState.AddModelError("", $"Không đủ tồn kho cho sản phẩm '{tenSP}'. Tồn hiện tại: {tonKhoHienTai?.KhoiLuong ?? 0}, Yêu cầu xuất: {ctItemVM.SoLuong}.");
                         await PopulateDropdownsAsync(viewModel);
                         return View(viewModel);
                     }
@@ -225,10 +225,10 @@ namespace DACS.Areas.QuanLyXNK.Controllers
 
                     if (tonKhoItemToUpdate != null) // Điều này luôn đúng do đã kiểm tra ở trên
                     {
-                        tonKhoItemToUpdate.SoLuong -= chiTiet.SoLuong;
+                        tonKhoItemToUpdate.KhoiLuong -= chiTiet.SoLuong;
                         _context.Update(tonKhoItemToUpdate);
                         _logger.LogInformation("Chuẩn bị trừ kho cho SP {MaSP} tại Kho {MaKho}, số lượng trừ: {SoLuongTru}. Tồn mới dự kiến: {TonMoi}",
-                            tonKhoItemToUpdate.M_LoaiSP, tonKhoItemToUpdate.MaKho, chiTiet.SoLuong, tonKhoItemToUpdate.SoLuong);
+                            tonKhoItemToUpdate.M_LoaiSP, tonKhoItemToUpdate.MaKho, chiTiet.SoLuong, tonKhoItemToUpdate.KhoiLuong);
                     }
                 }
                 _context.PhieuXuats.Add(phieuXuat); // Thêm phiếu xuất (và các chi tiết của nó) vào context

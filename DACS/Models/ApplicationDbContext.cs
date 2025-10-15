@@ -71,7 +71,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<ChiTietPhieuXuat> ChiTietPhieuXuats { get; set; }
     public DbSet<PhieuXuat> PhieuXuats { get; set; }
 
-
+    public DbSet<ChiTietLienHe> ChiTietLienHe { get; set; }
+    public DbSet<CauHoiThuongGap> CauHoiThuongGap { get; set; }
+    public DbSet<ChatHistory> ChatHistory { get; set; }
+    
 
 
     protected override void OnModelCreating(ModelBuilder builder)
