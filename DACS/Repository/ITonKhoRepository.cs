@@ -19,7 +19,8 @@ namespace DACS.Repository // Hoặc DACS.Interfaces
 
         // Lấy danh sách Kho hàng cho dropdown filter
         Task<IEnumerable<SelectListItem>> GetKhoHangOptionsAsync();
-
+        Task UpdateTonKhoKhoiLuongAsync(string productId, float newKhoiLuong);
+        Task<TonKho?> GetTonKhoByProductIdAsync(string productId);
         // Có thể thêm các phương thức khác nếu cần (GetById, Add, Update, Delete...)
         // Task<TonKho?> GetByIdAsync(int id, bool trackChanges = false);
         // Task AddAsync(TonKho tonKho);

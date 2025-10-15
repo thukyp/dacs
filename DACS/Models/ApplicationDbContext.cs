@@ -71,6 +71,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<ChiTietPhieuXuat> ChiTietPhieuXuats { get; set; }
     public DbSet<PhieuXuat> PhieuXuats { get; set; }
 
+    public DbSet<ChiTietLienHe> ChiTietLienHe { get; set; }
 
 
 

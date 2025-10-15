@@ -23,24 +23,20 @@ namespace DACS.Models
         public virtual LoaiSanPham LoaiSanPham { get; set; }
 
         [Required]
-        [Display(Name = "Số lượng")]
-        public long SoLuong { get; set; } // Số lượng tồn
+        [Display(Name = "Khối lượng")]
+        public float KhoiLuong { get; set; } // Số lượng tồn
 
-        [DataType(DataType.Date)]
-        [Display(Name = "Ngày nhập")]
-        public DateTime NgayNhapKho { get; set; } = DateTime.UtcNow.Date;
-
-        [DataType(DataType.Date)]
-        [Display(Name = "Hạn sử dụng")]
-        public DateTime? HanSuDung { get; set; }
-
-        [StringLength(50)]
-        [Display(Name = "Số lô")]
-        public string? SoLo { get; set; }
 
         // Có thể thêm Đơn vị tính nếu cần (FK đến DonViTinh)
-        public string M_DonViTinh { get; set; }
-        [ForeignKey("MaDonViTinh")]
+        [Required]
+        [StringLength(10)]
+        public string M_SanPham { get; set; } // PFK
+        public string M_DonViTinh { get; set; } 
+
+        [ForeignKey("MaDonViTinh")] 
         public virtual DonViTinh DonViTinh { get; set; }
+        [ForeignKey("M_SanPham")]
+        public virtual SanPham SanPham { get; set; }
+
     }
 }

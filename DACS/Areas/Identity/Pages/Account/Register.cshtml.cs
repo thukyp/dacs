@@ -188,17 +188,6 @@ namespace DACS.Areas.Identity.Pages.Account
                             await _context.SaveChangesAsync(); // Lưu trực tiếp qua DbContext
                             _logger.LogInformation($"NguoiMua profile created for User ID: {user.Id}");
                         }
-                        //else if (roleToAssign == SD.Role_PhuTa || roleToAssign == SD.Role_BacSi)
-                        //{
-
-                        //    var newNhanVien = new NhanVien
-                        //    {
-                        //        UserId = user.Id
-                        //    };
-                        //    _context.NhanViens.Add(newNhanVien);
-                        //    await _context.SaveChangesAsync(); // Lưu NhanVien
-                        //    _logger.LogInformation($"NhanVien record created for User ID: {user.Id}");
-                        //}
                     }
                     catch (Exception ex)
                     {

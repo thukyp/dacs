@@ -21,7 +21,12 @@ namespace DACS.Models
         [StringLength(50)] // Tăng độ dài trạng thái
         public string TrangThai { get; set; }
 
-        
+        public string TrangThaiThanhToan { get; set; }
+        public string? LyDoHoanTra { get; set; } // Lý do khách hàng hoàn trả
+        public DateTime? NgayHoanTra { get; set; }
+        public string? TrangThaiHoanTra { get; set; }
+
+        public bool DaTruTonKho { get; set; } = false;
         [StringLength(10)]
         public string M_VanDon { get; set; } // FK
 
@@ -51,6 +56,16 @@ namespace DACS.Models
         public float TotalPrice { get; set; }
          // Giữ lại nếu cột DB là NOT NULL, bỏ đi nếu cột DB cho phép NULL
         public string Notes { get; set; } // Thêm thuộc tính Notes khớp với cột DB
+        [Required]
+        [StringLength(100)]
+        public string Tendathang { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
+        [Phone]
+        [StringLength(10)]
+        public string SoDienThoaidathang { get; set; }
+
+       
         // ---> KẾT THÚC THÊM <---
     }
 }

@@ -49,6 +49,18 @@ namespace DACS.Areas.QuanLyXNK.Controllers
                     .ThenInclude(ct => ct.DonViTinh) // Nối đơn vị tính từ chi tiết
                 .AsQueryable(); // Bắt đầu xây dựng query
 
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                string lowerSearchTerm = searchTerm.ToLower().Trim();
+                query = query.Where(yc =>
+                    (yc.M_YeuCau != null && yc.M_YeuCau.ToLower().Contains(lowerSearchTerm)) || // <<< THÊM yc.M_YeuCau != null
+                    (yc.KhachHang != null && yc.KhachHang.Ten_KhachHang != null && yc.KhachHang.Ten_KhachHang.ToLower().Contains(lowerSearchTerm)) ||
+                    (yc.KhachHang != null && yc.KhachHang.SDT_KhachHang != null && yc.KhachHang.SDT_KhachHang.Contains(lowerSearchTerm)) // Đối với SDT, ToLower() có thể không cần thiết nếu nó chỉ chứa số.
+                                                                                                                                         // Tuy nhiên, Contains trên chuỗi thường phân biệt chữ hoa/thường ở phía CSDL trừ khi collation của CSDL là case-insensitive.
+                                                                                                                                         // Để đảm bảo tìm kiếm không phân biệt hoa/thường cho SDT nếu có chữ, bạn có thể thêm .ToLower() cho cả SDT_KhachHang.
+                );
+            }
+
             // --- Áp dụng Bộ lọc ---
             if (!string.IsNullOrEmpty(searchTerm))
             {
@@ -585,26 +597,19 @@ namespace DACS.Areas.QuanLyXNK.Controllers
 
                         if (existingTonKho != null)
                         {
-                            existingTonKho.SoLuong += soLuongCollected;
+                            existingTonKho.KhoiLuong += soLuongCollected;
                             _context.Update(existingTonKho); // Đánh dấu TonKho để được cập nhật
-                            _logger.LogInformation("Chuẩn bị cập nhật TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng +{SoLuong}. Tổng mới: {TongSoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected, existingTonKho.SoLuong);
+                            _logger.LogInformation("Chuẩn bị cập nhật TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng +{SoLuong}. Tổng mới: {TongSoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected, existingTonKho.KhoiLuong);
                         }
                         else
                         {
                             var newTonKho = new TonKho
                             {
                                 MaKho = targetMaKho,
-                                // Fix for the error CS0103: The name 'maLoaiSP' does not exist in the current context
-                                // The variable 'maLoaiSP' was not defined in the context. It should be replaced with the correct variable name 'maSanPham'.
-
-                                // With this corrected line:
                                 M_LoaiSP = maSanPham,
-                                SoLuong = soLuongCollected,
-                                M_DonViTinh = maDonViTinh,
-                                NgayNhapKho = DateTime.UtcNow.Date,
-                                HanSuDung = null,
-                                SoLo = null
-                            };
+                                KhoiLuong = soLuongCollected,
+                                M_DonViTinh = maDonViTinh, 
+                                 };
                             _context.Add(newTonKho); // Đánh dấu TonKho mới để được thêm
                             _logger.LogInformation("Chuẩn bị thêm mới TonKho: Kho={MaKho}, SP={MaSP}, DVT={MaDVT}. Số lượng: {SoLuong}", targetMaKho, maSanPham, maDonViTinh, soLuongCollected);
                         }

@@ -18,16 +18,23 @@
     @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@ @* Bỏ comment nếu bạn có file site.css chung *@
 
     <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #8D6E63;
+            --light-bg: #F9FBE7;
+            --dark-text: #2E2E2E;
+            --card-border: #C8E6C9;
+        }
+      h1{
+            color: var(--primary);
+        }
         body {
-            font-family: 'Outfit', Arial, sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 15px;
-        }
+        
 
         .card-header {
             font-weight: 600;
