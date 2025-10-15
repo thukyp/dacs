@@ -81,13 +81,6 @@ namespace DACS.Controllers
             return View();
         }
 
-        }
-
-        public IActionResult Contact()
-        {
-            return View();
-        }
-
         // Xử lý form liên hệ (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
