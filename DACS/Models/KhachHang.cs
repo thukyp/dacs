@@ -31,16 +31,16 @@ namespace DACS.Models
         
         [StringLength(10)] // Hoặc int
         [Display(Name = "Tỉnh/Thành phố")]
-        public string MaTinh { get; set; } // <<< Khóa ngoại đến TinhThanhPho
+        public string? MaTinh { get; set; } // <<< Khóa ngoại đến TinhThanhPho
 
         
         [StringLength(10)] // Hoặc int
         [Display(Name = "Quận/Huyện")]
-        public string MaQuan { get; set; } // <<< Khóa ngoại đến QuanHuyen
+        public string? MaQuan { get; set; } // <<< Khóa ngoại đến QuanHuyen
 
         [StringLength(10)] // Hoặc int
         [Display(Name = "Xã/Phường")]
-        public string MaXa { get; set; } // <<< Khóa ngoại đến XaPhuong
+        public string? MaXa { get; set; } // <<< Khóa ngoại đến XaPhuong
         // -------------------------------------------
 
         // --- Giữ lại trường địa chỉ chi tiết ---
