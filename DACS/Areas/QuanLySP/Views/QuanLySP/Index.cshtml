@@ -221,26 +221,47 @@
             </div>
 
 
-            <div class="filter-card">
+            <div class="filter-card p-3 bg-light rounded-3 shadow-sm mb-4">
                 <div class="row g-3 align-items-center">
-                    <div class="col-md-5">
-                        <input type="text" id="search-input" class="form-control form-control-sm" placeholder="Tìm tên sản phẩm...">
+                    <!-- Ô tìm kiếm -->
+                    <div class="col-md-4 col-lg-4">
+                        <input type="text" id="search-input" class="form-control" placeholder="🔍 Tìm tên sản phẩm...">
                     </div>
-                    <div class="col-md-3">
-                        <select id="price-filter-select" class="form-select form-select-sm">
+
+                    <!-- Bộ lọc giá -->
+                    <div class="col-md-3 col-lg-3">
+                        <select id="price-filter-select" class="form-select">
                             <option value="" selected>Lọc theo giá</option>
-                            <option value="low-to-high">Thấp đến cao</option>
-                            <option value="high-to-low">Cao đến thấp</option>
+                            <option value="low-to-high">Giá thấp → cao</option>
+                            <option value="high-to-low">Giá cao → thấp</option>
                         </select>
                     </div>
-                   
-                    <div class="col-md-2 text-end">
-                        <a asp-area="QuanLySP" asp-controller="QuanLySP" asp-action="Create" class="btn btn-sm btn-success w-100">
+
+                    <!-- Nút thêm SP -->
+                    <div class="col-md-2 col-lg-2 text-md-end">
+                        <a asp-area="QuanLySP" asp-controller="QuanLySP" asp-action="Create" class="btn btn-success w-100">
                             <i class="fas fa-plus me-1"></i> Thêm SP
                         </a>
                     </div>
+
+                    <!-- Form nhập Excel -->
+                    <div class="col-md-3 col-lg-3">
+                        <form asp-action="ImportExcel" asp-controller="QuanLySP" enctype="multipart/form-data" method="post"
+                              class="d-flex align-items-center gap-2">
+                            <div class="flex-grow-1">
+                                <input type="file" name="excelFile" accept=".xlsx,.xls"
+                                       class="form-control form-control-sm w-100"
+                                       style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm px-3 flex-shrink-0">
+                                <i class="fas fa-file-import me-1"></i> Nhập Excel
+                            </button>
+                        </form>
+                    </div>
+
                 </div>
             </div>
+
 
             <div class="table-container">
                 <div class="table-responsive">
@@ -277,6 +298,7 @@
                                         <a asp-area="QuanLySP" asp-controller="QuanLySP" asp-action="Delete" asp-route-id="@item.M_SanPham" class="btn btn-sm btn-outline-danger" title="Xóa">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
+
                                     </td>
                                 </tr>
                             }

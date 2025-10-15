@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 
 using System.Security.Claims;
@@ -74,6 +73,13 @@ namespace DACS.Controllers
         {
 
             return View();
+
+        }
+
+        public IActionResult Contact()
+        {
+            return View();
+        }
 
         }
 

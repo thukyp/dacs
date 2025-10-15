@@ -43,9 +43,12 @@
         flex-direction: column;
     }
 
-        .sidebar h2 {
+        .sidebar h4 {
             border-bottom: 1px solid #495057;
             padding-bottom: 10px;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
             font-size: 1.98rem;
             margin-bottom: 1rem;
             font-weight: 600;
@@ -176,6 +179,17 @@
             <li class="nav-item"><a asp-area="Owner" asp-controller="DoanhThu" asp-action="Index" class="nav-link"><i class="fas fa-chart-line me-2"></i> Doanh thu</a></li>
             <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyND" asp-action="Index" class="nav-link"><i class="fas fa-users me-2"></i> Quản lý Tài khoản</a></li>
             <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLySP" asp-action="Index" class="nav-link"><i class="fas fa-box-open me-2"></i> Quản lý Sản phẩm</a></li>
+            <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link active"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
+            <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyDonHang" asp-action="Index" class="nav-link "><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
+            <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyGiaoDichThanhToan" asp-action="Index" class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh toán</a></li>
+           
+        </ul>
+        <div class="nav-item mt-auto ">
+            <button type="submit" class="text-danger border-0 bg-transparent p-0 w-100 text-start mt-1">
+                @* Adjusted button style to better match list items *@
+                <a href="/home/index" class="border-0 text-danger" style="text-decoration: none;"><i class="fas fa-sign-out-alt fa-fw me-2"></i> Về trang chủ</a>
+            </button>
+        </div>
             <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyXNK" asp-action="Index" class="nav-link active"><i class="fas fa-truck-loading me-2"></i> Quản lý Thu gom</a></li>
             <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyDonHang" asp-action="Index" class="nav-link "><i class="fas fa-receipt me-2"></i> Quản lý Đơn Hàng</a></li>
             <li class="nav-item"><a asp-area="Owner" asp-controller="QuanLyThanhToan" asp-action="Index" class="nav-link"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh toán</a></li>

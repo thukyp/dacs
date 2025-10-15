@@ -8,6 +8,8 @@ using DACS.Repository;
 using DACS.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
+using OfficeOpenXml;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
     
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +37,7 @@ builder.Services.ConfigureApplicationCookie(options => {
     options.LoginPath = $"/Identity/Account/Login";
     options.LogoutPath = $"/Identity/Account/Logout";
     options.LogoutPath = $"/Identity/Account/AccessDenied";
+
 });
 
 // Add services to the container.
@@ -42,6 +45,7 @@ builder.Services.ConfigureApplicationCookie(options => {
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 builder.Services.AddScoped<INguoiMuaRepository, NguoiMuaRepository>();
 builder.Services.AddScoped<IThuGomRepository, ThuGomRepository>();

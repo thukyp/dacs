@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore; // Vẫn cần cho SelectList
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
 using System;                      // <<< THÊM USING NÀY (cho Guid, Exception)
 using System.IO;                   // <<< THÊM USING NÀY (cho Path, File, FileStream)
 using System.Linq;
@@ -22,6 +23,7 @@ namespace DACS.Areas.QuanLySP.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<QuanLySPController> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment; // <<< THÊM ĐỂ LẤY PATH WWWROOT
+
 
         // Cập nhật Constructor để nhận IWebHostEnvironment
         public QuanLySPController(ISanPhamRepository sanPhamRepo,
@@ -355,6 +357,71 @@ namespace DACS.Areas.QuanLySP.Controllers
             }
             else { TempData["ErrorMessage"] = "Không tìm thấy sản phẩm để xóa."; }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public IActionResult ImportExcel(IFormFile excelFile)
+        {
+            if (excelFile != null && excelFile.Length > 0)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    excelFile.CopyTo(stream);
+                    stream.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                        if (worksheet == null)
+                        {
+                            TempData["ErrorMessage"] = "Không tìm thấy sheet nào trong file Excel.";
+                            return RedirectToAction("Index");
+                        }
+
+                        for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                        {
+                            string tenSP = worksheet.Cells[row, 1].Text;
+                            string giaText = worksheet.Cells[row, 2].Text;
+                            string soLuongText = worksheet.Cells[row, 3].Text;
+
+                            if (string.IsNullOrWhiteSpace(tenSP)) continue;
+
+                            decimal.TryParse(giaText, out decimal gia);
+                            int.TryParse(soLuongText, out int soLuong);
+
+                            var existingProduct = _context.SanPhams.FirstOrDefault(x => x.TenSanPham == tenSP);
+
+                            if (existingProduct != null)
+                            {
+                                existingProduct.SoLuong += soLuong;
+                                existingProduct.Gia = (long)gia;
+                            }
+                            else
+                            {
+                                var newProduct = new SanPham
+                                {
+                                    TenSanPham = tenSP,
+                                    Gia = (long)gia,
+                                    SoLuong = soLuong
+                                };
+                                _context.SanPhams.Add(newProduct);
+                            }
+                        }
+
+                        _context.SaveChanges();
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Nhập Excel thành công!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn tệp Excel hợp lệ.";
+            }
+
+            return RedirectToAction("Index");
         }
 
 
