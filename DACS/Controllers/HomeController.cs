@@ -680,8 +680,6 @@ namespace DACS.Controllers
                 : $"Ảnh của bạn giống với: {bestMatch} (chưa có mô tả trong CSDL).";
 
             return Ok(new { reply });
-        }
-
+       }
     }
-
 }
